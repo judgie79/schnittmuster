@@ -1,5 +1,5 @@
 import { Express } from "express";
-import { environment } from "../config/environment";
+import { environment } from "@config/environment";
 import authRoutes from "./auth.routes";
 import patternsRoutes from "./patterns.routes";
 import tagsRoutes from "./tags.routes";

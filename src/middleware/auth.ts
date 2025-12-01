@@ -1,33 +1,36 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction, RequestHandler } from "express";
 import jwt from "jsonwebtoken";
-import { environment } from "../config/environment";
-import { UnauthorizedError } from "../utils/errors";
-import { IJwtPayload } from "../types";
+import { authConfig } from "@config/auth";
+import { ForbiddenError } from "@shared/errors";
 
-declare global {
-  namespace Express {
-    interface Request {
-      user?: IJwtPayload;
-    }
+export type AuthenticatedUser = {
+  id: string;
+  email: string;
+  provider: string;
+};
+
+export type AuthenticatedRequest = Request & {
+  user?: AuthenticatedUser;
+};
+
+export const authenticate: RequestHandler = (req: Request, _res: Response, next: NextFunction): void => {
+  const request = req as AuthenticatedRequest;
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    next(new ForbiddenError("Authorization header missing"));
+    return;
   }
-}
 
-export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
+  const token = authHeader.replace("Bearer ", "");
   try {
-    const token = req.headers.authorization?.split(" ")[1];
-
-    if (!token) {
-      throw new UnauthorizedError();
-    }
-
-    const decoded = jwt.verify(token, environment.jwt.secret) as IJwtPayload;
-    req.user = decoded;
+    const payload = jwt.verify(token, authConfig.jwt.accessSecret) as jwt.JwtPayload;
+    request.user = {
+      id: String(payload.userId ?? ""),
+      email: String(payload.sub ?? ""),
+      provider: String(payload.provider ?? "local"),
+    };
     next();
-  } catch (error) {
-    if (error instanceof jwt.JsonWebTokenError) {
-      next(new UnauthorizedError("Ungültiger Token"));
-    } else {
-      next(error);
-    }
+  } catch {
+    next(new ForbiddenError("Invalid token"));
   }
 };

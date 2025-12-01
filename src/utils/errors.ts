@@ -1,43 +1,20 @@
-export class AppError extends Error {
-  constructor(
-    public message: string,
-    public statusCode: number = 500,
-    public code: string = "INTERNAL_ERROR"
-  ) {
-    super(message);
-    Object.setPrototypeOf(this, AppError.prototype);
-  }
-}
+import {
+	AppError,
+	ValidationError,
+	NotFoundError,
+	ForbiddenError,
+} from "@shared/errors";
 
-export class ValidationError extends AppError {
-  constructor(message: string, details?: Record<string, any>) {
-    super(message, 400, "VALIDATION_ERROR");
-    this.details = details;
-  }
-
-  details?: Record<string, any>;
-}
-
-export class NotFoundError extends AppError {
-  constructor(resource: string) {
-    super(`${resource} nicht gefunden`, 404, "NOT_FOUND");
-  }
-}
+export { AppError, ValidationError, NotFoundError, ForbiddenError };
 
 export class UnauthorizedError extends AppError {
-  constructor(message: string = "Authentifizierung erforderlich") {
-    super(message, 401, "UNAUTHORIZED");
-  }
-}
-
-export class ForbiddenError extends AppError {
-  constructor(message: string = "Zugriff verweigert") {
-    super(message, 403, "FORBIDDEN");
-  }
+	constructor(message: string = "Authentifizierung erforderlich") {
+		super(message, 401, { code: "UNAUTHORIZED" });
+	}
 }
 
 export class ConflictError extends AppError {
-  constructor(message: string) {
-    super(message, 409, "CONFLICT");
-  }
+	constructor(message: string) {
+		super(message, 409, { code: "CONFLICT" });
+	}
 }

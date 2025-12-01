@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { ValidationError } from "../utils/errors";
+import { ValidationError } from "@shared/errors";
 
 export const validationErrorHandler = (
   err: any,
@@ -11,7 +11,6 @@ export const validationErrorHandler = (
     return res.status(err.statusCode).json({
       success: false,
       message: err.message,
-      code: err.code,
       details: err.details,
     });
   }

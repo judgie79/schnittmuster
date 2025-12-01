@@ -1,50 +1,28 @@
-import { Express, Request, Response, NextFunction } from "express";
-import { AppError } from "../utils/errors";
-import logger from "../utils/logger";
+import { Express, Request, Response, NextFunction, RequestHandler } from "express";
+import { AppError } from "@shared/errors";
+import logger from "@shared/utils/logger";
 
-export function setupErrorHandler(app: Express): void {
-  // 404 Handler
+export const asyncHandler = (fn: RequestHandler) =>
+  (req: Request, res: Response, next: NextFunction) => {
+    Promise.resolve(fn(req, res, next)).catch(next);
+  };
+
+export function registerErrorHandlers(app: Express): void {
   app.use((req: Request, res: Response) => {
-    res.status(404).json({
-      success: false,
-      message: "Route nicht gefunden",
-      code: "NOT_FOUND",
-    });
+    res.status(404).json({ success: false, message: "Route not found" });
   });
 
-  // Error Handler
-  app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-    logger.error(`Error: ${err.message}`, err);
+  app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
+    logger.error("Unhandled error", err as Error);
 
     if (err instanceof AppError) {
       return res.status(err.statusCode).json({
         success: false,
         message: err.message,
-        code: err.code,
-        details: err instanceof AppError && "details" in err ? (err as any).details : undefined,
+        details: err.details,
       });
     }
 
-    // Database errors
-    if (err.code === "23505") {
-      return res.status(409).json({
-        success: false,
-        message: "Eintrag existiert bereits",
-        code: "DUPLICATE_ENTRY",
-      });
-    }
-
-    // Default error
-    res.status(500).json({
-      success: false,
-      message: "Interner Serverfehler",
-      code: "INTERNAL_ERROR",
-    });
+    res.status(500).json({ success: false, message: "Internal server error" });
   });
-}
-
-export function asyncHandler(fn: Function) {
-  return (req: Request, res: Response, next: NextFunction) => {
-    Promise.resolve(fn(req, res, next)).catch(next);
-  };
 }

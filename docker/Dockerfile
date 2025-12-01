@@ -2,20 +2,23 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
+# Install pnpm version compatible with lockfile v6
+RUN npm install -g pnpm@8
 
-# Install dependencies
-RUN npm ci
+# Copy dependency manifests first for better caching
+COPY package.json pnpm-lock.yaml ./
 
-# Copy source
+# Install dependencies using the lockfile
+RUN pnpm install --frozen-lockfile
+
+# Copy the rest of the source code
 COPY . .
 
-# Build TypeScript
-RUN npm run build
+# Build the TypeScript project
+RUN pnpm run build
 
-# Expose port
+# Expose API port
 EXPOSE 5000
 
-# Start server
-CMD ["npm", "start"]
+# Default command
+CMD ["pnpm", "start"]

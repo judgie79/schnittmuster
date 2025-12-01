@@ -14,7 +14,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./src/migrations:/docker-entrypoint-initdb.d:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-schnittmuster_user}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-schnittmuster_user} -d ${DB_NAME:-schnittmuster_db}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -41,13 +41,13 @@ services:
       JWT_EXPIRY: ${JWT_EXPIRY:-24h}
       CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3000}
     ports:
-      - "5000:5000"
+      - "5001:5000"
     volumes:
       - ./src:/app/src
       - ./uploads:/app/uploads
     networks:
       - schnittmuster-network
-    command: npm run dev
+    command: pnpm run dev
 
 volumes:
   postgres_data:

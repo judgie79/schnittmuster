@@ -2,45 +2,108 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-export const environment = {
-  // Server
-  port: parseInt(process.env.PORT || "5000", 10),
-  nodeEnv: process.env.NODE_ENV || "development",
-  apiPrefix: process.env.API_PREFIX || "/api/v1",
+const toNumber = (value: string | undefined, fallback: number): number => {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+};
 
-  // Database
+const toArray = (value: string | undefined, fallback: string[]): string[] => {
+  if (!value) {
+    return fallback;
+  }
+  return value.split(",").map((entry) => entry.trim()).filter(Boolean);
+};
+
+export interface EnvironmentConfig {
+  nodeEnv: string;
+  port: number;
+  apiPrefix: string;
+  database: {
+    host: string;
+    port: number;
+    username: string;
+    password: string;
+    name: string;
+    logging: boolean;
+  };
+  jwt: {
+    accessSecret: string;
+    accessExpiry: string;
+    refreshSecret: string;
+    refreshExpiry: string;
+  };
+  oauth: {
+    provider: string;
+    googleClientId: string;
+    googleClientSecret: string;
+    callbackUrl: string;
+  };
+  storage: {
+    type: "local" | "s3" | "database";
+    uploadDir: string;
+    s3Bucket: string;
+    s3Region: string;
+  };
+  pagination: {
+    defaultPageSize: number;
+    maxPageSize: number;
+  };
+  security: {
+    passwordMinLength: number;
+    rateLimitWindow: number;
+    rateLimitMaxRequests: number;
+  };
+  cors: {
+    origins: string[];
+  };
+  logging: {
+    level: string;
+  };
+}
+
+export const environment: EnvironmentConfig = {
+  nodeEnv: process.env.NODE_ENV || "development",
+  port: toNumber(process.env.PORT, 5000),
+  apiPrefix: process.env.API_PREFIX || "/api/v1",
   database: {
     host: process.env.DB_HOST || "localhost",
-    port: parseInt(process.env.DB_PORT || "5432", 10),
-    user: process.env.DB_USER || "schnittmuster_user",
-    password: process.env.DB_PASSWORD || "password",
-    database: process.env.DB_NAME || "schnittmuster_db",
-    poolMin: parseInt(process.env.DB_POOL_MIN || "2", 10),
-    poolMax: parseInt(process.env.DB_POOL_MAX || "10", 10),
+    port: toNumber(process.env.DB_PORT, 5432),
+    username: process.env.DB_USER || "schnittmuster_user",
+    password: process.env.DB_PASSWORD || "change_in_production",
+    name: process.env.DB_NAME || "schnittmuster_db",
+    logging: (process.env.DB_LOGGING || "false").toLowerCase() === "true",
   },
-
-  // JWT
   jwt: {
-    secret: process.env.JWT_SECRET || "your-secret-key",
-    expiry: process.env.JWT_EXPIRY || "24h",
-    refreshSecret: process.env.JWT_REFRESH_SECRET || "refresh-secret",
+    accessSecret: process.env.JWT_SECRET || "your_jwt_secret_key_change_in_production",
+    accessExpiry: process.env.JWT_EXPIRY || "15m",
+    refreshSecret: process.env.JWT_REFRESH_SECRET || "your_refresh_secret_key",
     refreshExpiry: process.env.JWT_REFRESH_EXPIRY || "7d",
   },
-
-  // File Upload
-  upload: {
-    dir: process.env.UPLOAD_DIR || "./uploads",
-    maxSize: parseInt(process.env.MAX_FILE_SIZE || "52428800", 10), // 50MB default
-    allowedTypes: (process.env.ALLOWED_FILE_TYPES || "pdf,jpg,jpeg,png").split(","),
+  oauth: {
+    provider: process.env.OAUTH_PROVIDER || "google",
+    googleClientId: process.env.GOOGLE_CLIENT_ID || "",
+    googleClientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+    callbackUrl: process.env.OAUTH_CALLBACK_URL || "http://localhost:5000/api/v1/auth/google/callback",
   },
-
-  // CORS
+  storage: {
+    type: (process.env.STORAGE_TYPE as "local" | "s3" | "database") || "local",
+    uploadDir: process.env.UPLOAD_DIR || "./uploads",
+    s3Bucket: process.env.S3_BUCKET || "",
+    s3Region: process.env.S3_REGION || "eu-central-1",
+  },
+  pagination: {
+    defaultPageSize: toNumber(process.env.DEFAULT_PAGE_SIZE, 20),
+    maxPageSize: toNumber(process.env.MAX_PAGE_SIZE, 100),
+  },
+  security: {
+    passwordMinLength: toNumber(process.env.PASSWORD_MIN_LENGTH, 8),
+    rateLimitWindow: toNumber(process.env.RATE_LIMIT_WINDOW, 900000),
+    rateLimitMaxRequests: toNumber(process.env.RATE_LIMIT_MAX_REQUESTS, 100),
+  },
   cors: {
-    origin: (process.env.CORS_ORIGIN || "http://localhost:3000").split(","),
+    origins: toArray(process.env.CORS_ORIGIN, ["http://localhost:3000"]),
   },
-
-  // Logging
-  log: {
+  logging: {
     level: process.env.LOG_LEVEL || "debug",
   },
 };

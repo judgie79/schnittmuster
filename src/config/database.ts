@@ -1,63 +1,30 @@
-import { Pool, PoolClient } from "pg";
+import { Sequelize } from "sequelize";
 import { environment } from "./environment";
-import logger from "../utils/logger";
+import logger from "@shared/utils/logger";
 
-export class Database {
-  private static instance: Database;
-  private pool: Pool;
-
-  private constructor() {
-    this.pool = new Pool({
-      host: environment.database.host,
-      port: environment.database.port,
-      user: environment.database.user,
-      password: environment.database.password,
-      database: environment.database.database,
-      min: environment.database.poolMin,
-      max: environment.database.poolMax,
-      idleTimeoutMillis: 30000,
-      connectionTimeoutMillis: 2000,
-    });
-
-    this.pool.on("error", (err) => {
-      logger.error("Unerwarteter Fehler im Pool:", err);
-    });
+export const sequelize = new Sequelize(
+  environment.database.name,
+  environment.database.username,
+  environment.database.password,
+  {
+    host: environment.database.host,
+    port: environment.database.port,
+    dialect: "postgres",
+    logging: environment.database.logging ? (msg) => logger.debug(msg) : false,
   }
+);
 
-  public static getInstance(): Database {
-    if (!Database.instance) {
-      Database.instance = new Database();
-    }
-    return Database.instance;
-  }
-
-  public async connect(): Promise<void> {
-    try {
-      const client = await this.pool.connect();
-      logger.info("Datenbankverbindung erfolgreich");
-      client.release();
-    } catch (error) {
-      logger.error("Fehler beim Verbinden mit Datenbank:", error);
-      throw error;
-    }
-  }
-
-  public getPool(): Pool {
-    return this.pool;
-  }
-
-  public async query(text: string, values?: any[]): Promise<any> {
-    return this.pool.query(text, values);
-  }
-
-  public async getClient(): Promise<PoolClient> {
-    return this.pool.connect();
-  }
-
-  public async close(): Promise<void> {
-    await this.pool.end();
-    logger.info("Datenbankverbindung geschlossen");
+export async function connectDatabase(): Promise<void> {
+  try {
+    await sequelize.authenticate();
+    logger.info("Sequelize connection established");
+  } catch (error) {
+    logger.error("Unable to connect to database", error);
+    throw error;
   }
 }
 
-export const db = Database.getInstance();
+export async function closeDatabase(): Promise<void> {
+  await sequelize.close();
+  logger.info("Sequelize connection closed");
+}
