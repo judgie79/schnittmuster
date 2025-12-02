@@ -5,6 +5,10 @@ import { Pattern } from "./Pattern";
 import { PatternTag } from "./PatternTag";
 import { PatternNote } from "./PatternNote";
 import { FileStorage } from "./FileStorage";
+import { Role } from "./Role";
+import { UserRole } from "./UserRole";
+import { Resource } from "./Resource";
+import { ResourceAccess } from "./ResourceAccess";
 
 export const models = {
   User,
@@ -14,6 +18,10 @@ export const models = {
   PatternTag,
   PatternNote,
   FileStorage,
+  Role,
+  UserRole,
+  Resource,
+  ResourceAccess,
 };
 
 export function applyAssociations(): void {
@@ -41,6 +49,25 @@ export function applyAssociations(): void {
 
   Pattern.belongsTo(FileStorage, { foreignKey: "fileStorageId", as: "fileStorage" });
   FileStorage.hasOne(Pattern, { foreignKey: "fileStorageId", as: "pattern" });
+
+  User.belongsToMany(Role, { through: UserRole, as: "roles", foreignKey: "userId", otherKey: "roleId" });
+  Role.belongsToMany(User, { through: UserRole, as: "users", foreignKey: "roleId", otherKey: "userId" });
+
+  User.hasMany(Resource, { foreignKey: "ownerId", as: "resources" });
+  Resource.belongsTo(User, { foreignKey: "ownerId", as: "owner" });
+
+  Resource.belongsToMany(User, {
+    through: ResourceAccess,
+    as: "sharedWith",
+    foreignKey: "resourceId",
+    otherKey: "userId",
+  });
+  User.belongsToMany(Resource, {
+    through: ResourceAccess,
+    as: "accessibleResources",
+    foreignKey: "userId",
+    otherKey: "resourceId",
+  });
 }
 
 applyAssociations();

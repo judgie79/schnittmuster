@@ -1,4 +1,5 @@
 import type { ISODateString, UUID } from './types'
+import type { RoleDTO } from './RoleDTO'
 
 export type AuthProvider = 'local' | 'google'
 
@@ -8,6 +9,7 @@ export interface UserDTO {
   email: string
   authProvider: AuthProvider
   photoUrl?: string
+  roles?: RoleDTO[]
   createdAt: ISODateString
   updatedAt: ISODateString
 }

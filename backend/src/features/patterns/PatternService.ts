@@ -1,19 +1,24 @@
 import { PatternRepository } from "@infrastructure/database/repositories/PatternRepository";
 import { PatternMapper } from "@shared/mappers";
 import { PatternCreateDTO, PatternDTO, PatternUpdateDTO, PatternStatus } from "@shared/dtos";
+import { AccessRight } from "schnittmuster-manager-dtos";
 import { PaginatedResult } from "@shared/types";
 import { validatePagination } from "@config/pagination";
-import { ForbiddenError, NotFoundError } from "@shared/errors";
+import { NotFoundError } from "@shared/errors";
 import { StorageFactory } from "@infrastructure/storage/StorageFactory";
 import { IFileStorage } from "@infrastructure/storage/FileStorageService";
 import { Pattern, PatternCreationAttributes } from "@infrastructure/database/models/Pattern";
+import { AccessControlService } from "@features/access-control/AccessControlService";
 
 type UploadedFile = Express.Multer.File;
 
 export class PatternService {
   private readonly storage: IFileStorage;
 
-  constructor(private readonly patternRepository = new PatternRepository()) {
+  constructor(
+    private readonly patternRepository = new PatternRepository(),
+    private readonly accessControlService = new AccessControlService()
+  ) {
     this.storage = StorageFactory.create();
   }
 
@@ -31,7 +36,7 @@ export class PatternService {
     if (!pattern) {
       throw new NotFoundError("Pattern");
     }
-    this.assertOwnership(pattern, userId);
+    await this.assertPatternPermissions(pattern, userId, ["read"]);
     return PatternMapper.toDTOWithRelations(pattern);
   }
 
@@ -54,6 +59,7 @@ export class PatternService {
     }
 
     const pattern = await this.patternRepository.create(data, tagIds);
+    await this.accessControlService.createResource({ id: pattern.id, type: "pattern", ownerId: userId, referenceId: pattern.id });
     return PatternMapper.toDTO(pattern);
   }
 
@@ -67,7 +73,7 @@ export class PatternService {
     if (!pattern) {
       throw new NotFoundError("Pattern");
     }
-    this.assertOwnership(pattern, userId);
+    await this.assertPatternPermissions(pattern, userId, ["write"]);
 
     const { tagIds, status, isFavorite, name, description } = payload;
     const data: Partial<Pattern> = {};
@@ -101,16 +107,21 @@ export class PatternService {
     if (!pattern) {
       throw new NotFoundError("Pattern");
     }
-    this.assertOwnership(pattern, userId);
+    await this.assertPatternPermissions(pattern, userId, ["delete"]);
     if (pattern.fileStorageId) {
       await this.storage.delete(pattern.fileStorageId);
     }
     await this.patternRepository.delete(patternId);
+    await this.accessControlService.deleteResourcesByReference(pattern.id, "pattern");
   }
 
-  private assertOwnership(pattern: Pattern, userId: string): void {
-    if (pattern.userId !== userId) {
-      throw new ForbiddenError("You do not have access to this pattern");
-    }
+  private async assertPatternPermissions(pattern: Pattern, userId: string, rights: AccessRight[]): Promise<void> {
+    const resourceId = await this.resolvePatternResourceId(pattern);
+    await this.accessControlService.assertHasRights(userId, resourceId, rights);
+  }
+
+  private async resolvePatternResourceId(pattern: Pattern): Promise<string> {
+    const resource = await this.accessControlService.ensureResource("pattern", pattern.id, pattern.userId);
+    return resource.id;
   }
 }
