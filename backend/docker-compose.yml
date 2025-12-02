@@ -1,0 +1,57 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: schnittmuster-postgres
+    environment:
+      POSTGRES_USER: ${DB_USER:-schnittmuster_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-change_me_in_production}
+      POSTGRES_DB: ${DB_NAME:-schnittmuster_db}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./src/migrations:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-schnittmuster_user} -d ${DB_NAME:-schnittmuster_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - schnittmuster-network
+
+  backend:
+    build:
+      context: ./
+      dockerfile: docker/Dockerfile
+    container_name: schnittmuster-backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: ${DB_USER:-schnittmuster_user}
+      DB_PASSWORD: ${DB_PASSWORD:-change_me_in_production}
+      DB_NAME: ${DB_NAME:-schnittmuster_db}
+      PORT: 5000
+      JWT_SECRET: ${JWT_SECRET:-your-secret-key}
+      JWT_EXPIRY: ${JWT_EXPIRY:-24h}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:5173,http://localhost:4173}
+    ports:
+      - "5001:5000"
+    volumes:
+      - ./src:/app/src
+      - ./uploads:/app/uploads
+    networks:
+      - schnittmuster-network
+    command: pnpm run dev
+
+volumes:
+  postgres_data:
+
+networks:
+  schnittmuster-network:
+    driver: bridge

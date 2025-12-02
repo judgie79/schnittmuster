@@ -1,0 +1,33 @@
+.nav {
+  position: sticky;
+  bottom: 0;
+  background-color: var(--color-surface);
+  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.08);
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  padding: 4px;
+  gap: 4px;
+}
+
+.button {
+  border: none;
+  background: none;
+  padding: 8px 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: var(--color-muted);
+  border-radius: var(--radius-md);
+  transition: background-color var(--transition-base), color var(--transition-base);
+}
+
+.button span {
+  font-size: 20px;
+}
+
+.active {
+  color: var(--color-primary);
+  background-color: rgba(50, 184, 198, 0.12);
+}

@@ -1,0 +1,22 @@
+import type { ISODateString, UUID } from './types';
+export type AuthProvider = 'local' | 'google';
+export interface UserDTO {
+    id: UUID;
+    username: string;
+    email: string;
+    authProvider: AuthProvider;
+    photoUrl?: string;
+    createdAt: ISODateString;
+    updatedAt: ISODateString;
+}
+export interface UserCreateDTO {
+    username: string;
+    email: string;
+    password: string;
+}
+export interface UserUpdateDTO {
+    username?: string;
+    email?: string;
+    password?: string;
+    photoUrl?: string;
+}

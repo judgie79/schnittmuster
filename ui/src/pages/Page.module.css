@@ -1,0 +1,46 @@
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-2) 0;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.searchLayout {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+}
+
+.filterColumn {
+  flex: 0 0 320px;
+  width: 100%;
+}
+
+.resultsColumn {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.helperText {
+  color: var(--color-muted);
+  font-size: 0.9rem;
+}
+
+@media (max-width: 900px) {
+  .searchLayout {
+    flex-direction: column;
+  }
+
+  .filterColumn {
+    flex: unset;
+  }
+}

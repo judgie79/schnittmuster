@@ -1,0 +1,19 @@
+{
+  "name": "schnittmuster-manager-dtos",
+  "author": "Michael Richter",
+  "license": "MIT",
+  "description": "DTOs für Schnittmuster Manager - Tag-basierte Schnittmuster Verwaltung",
+  "keywords": [],
+  "version": "0.0.1",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": "./dist/index.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "clean": "rm -rf dist"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}

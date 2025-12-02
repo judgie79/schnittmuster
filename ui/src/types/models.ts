@@ -1,0 +1,5 @@
+export type { PatternStatus } from 'shared-dtos'
+export type { TagDTO, TagCategoryDTO } from 'shared-dtos'
+export type { PatternDTO } from 'shared-dtos'
+export type { PaginationInfo } from 'shared-dtos'
+export type { UserDTO } from 'shared-dtos'
