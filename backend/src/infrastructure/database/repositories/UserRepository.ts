@@ -1,14 +1,17 @@
-import { FindOptions, Op } from "sequelize";
+import { FindOptions, Op, Includeable } from "sequelize";
 import { User, UserCreationAttributes } from "@infrastructure/database/models/User";
+import { AdminRole } from "@infrastructure/database/models/AdminRole";
 import { NotFoundError } from "@shared/errors";
+
+const adminInclude: Includeable = { model: AdminRole, as: "adminRoleAssignment" };
 
 export class UserRepository {
   async findById(id: string): Promise<User | null> {
-    return User.findByPk(id);
+    return User.findByPk(id, { include: [adminInclude] });
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    return User.findOne({ where: { email } });
+    return User.findOne({ where: { email }, include: [adminInclude] });
   }
 
   async searchByUsername(query: string): Promise<User[]> {
@@ -21,7 +24,7 @@ export class UserRepository {
       order: [["username", "ASC"]],
     };
 
-    return User.findAll(options);
+    return User.findAll({ ...options, include: [adminInclude] });
   }
 
   async create(data: UserCreationAttributes): Promise<User> {

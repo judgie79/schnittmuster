@@ -2,11 +2,13 @@ import { Request, Response, NextFunction, RequestHandler } from "express";
 import jwt from "jsonwebtoken";
 import { authConfig } from "@config/auth";
 import { ForbiddenError } from "@shared/errors";
+import type { AdminRoleType } from "@shared/dtos";
 
 export type AuthenticatedUser = {
   id: string;
   email: string;
   provider: string;
+  adminRole?: AdminRoleType | null;
 };
 
 export type AuthenticatedRequest = Request & {
@@ -28,6 +30,7 @@ export const authenticate: RequestHandler = (req: Request, _res: Response, next:
       id: String(payload.userId ?? ""),
       email: String(payload.sub ?? ""),
       provider: String(payload.provider ?? "local"),
+      adminRole: (payload.adminRole as AdminRoleType | undefined) ?? undefined,
     };
     next();
   } catch {

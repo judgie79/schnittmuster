@@ -6,3 +6,10 @@ export * from './TagDTO'
 export * from './RoleDTO'
 export * from './ResourceDTO'
 export * from './AuthDTO'
+
+// Admin
+export * from './admin/AdminUserDTO'
+export * from './admin/SystemMetricsDTO'
+export * from './admin/SystemSettingsDTO'
+export * from './admin/AdminAnalyticsDTO'
+export * from './admin/AdminActionDTO'

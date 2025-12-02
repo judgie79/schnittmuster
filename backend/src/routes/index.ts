@@ -3,6 +3,7 @@ import { environment } from "@config/environment";
 import authRoutes from "./auth.routes";
 import patternsRoutes from "./patterns.routes";
 import tagsRoutes from "./tags.routes";
+import adminRoutes from "./admin.routes";
 
 export function setupRoutes(app: Express): void {
   const apiPrefix = environment.apiPrefix;
@@ -10,6 +11,7 @@ export function setupRoutes(app: Express): void {
   app.use(`${apiPrefix}/auth`, authRoutes);
   app.use(`${apiPrefix}/patterns`, patternsRoutes);
   app.use(`${apiPrefix}/tags`, tagsRoutes);
+  app.use(`${apiPrefix}/admin`, adminRoutes);
 
   // Health check
   app.get(`${apiPrefix}/health`, (req, res) => {

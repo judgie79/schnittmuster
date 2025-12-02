@@ -9,6 +9,12 @@ import { Role } from "./Role";
 import { UserRole } from "./UserRole";
 import { Resource } from "./Resource";
 import { ResourceAccess } from "./ResourceAccess";
+import { AdminRole } from "./AdminRole";
+import { SystemMetric } from "./SystemMetric";
+import { SystemSetting } from "./SystemSetting";
+import { AdminActionLog } from "./AdminActionLog";
+import { AdminNotification } from "./AdminNotification";
+import { FlaggedContent } from "./FlaggedContent";
 
 export const models = {
   User,
@@ -22,6 +28,12 @@ export const models = {
   UserRole,
   Resource,
   ResourceAccess,
+  AdminRole,
+  SystemMetric,
+  SystemSetting,
+  AdminActionLog,
+  AdminNotification,
+  FlaggedContent,
 };
 
 export function applyAssociations(): void {
@@ -68,6 +80,14 @@ export function applyAssociations(): void {
     foreignKey: "userId",
     otherKey: "resourceId",
   });
+
+  User.hasOne(AdminRole, { foreignKey: "userId", as: "adminRoleAssignment" });
+  AdminRole.belongsTo(User, { foreignKey: "userId", as: "user" });
+
+  AdminActionLog.belongsTo(User, { foreignKey: "adminId", as: "admin" });
+  AdminNotification.belongsTo(User, { foreignKey: "adminId", as: "admin" });
+  FlaggedContent.belongsTo(User, { foreignKey: "flaggedByUserId", as: "flaggedBy" });
+  FlaggedContent.belongsTo(User, { foreignKey: "reviewedByAdminId", as: "reviewedBy" });
 }
 
 applyAssociations();

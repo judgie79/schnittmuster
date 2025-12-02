@@ -13,7 +13,7 @@ module.exports = {
     "!src/migrations/**",
   ],
   transform: {
-    "^.+\\.ts$": [tsJestTransform, { tsconfig: "tsconfig.json" }],
+    "^.+\\.ts$": [tsJestTransform, { tsconfig: "tsconfig.test.json" }],
   },
   moduleNameMapper: {
     "^@config/(.*)$": "<rootDir>/src/config/$1",
