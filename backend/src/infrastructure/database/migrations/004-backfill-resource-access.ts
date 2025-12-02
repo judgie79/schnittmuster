@@ -2,7 +2,6 @@ import { QueryInterface, QueryTypes } from "sequelize";
 
 const RESOURCE_TABLE = "resources";
 const RESOURCE_ACCESS_TABLE = "resource_access";
-const ACCESS_RIGHT_ENUM = "enum_resource_access_rights";
 
 export async function up(queryInterface: QueryInterface): Promise<void> {
   await queryInterface.sequelize.transaction(async (transaction) => {
@@ -19,7 +18,7 @@ export async function up(queryInterface: QueryInterface): Promise<void> {
 
     await queryInterface.sequelize.query(
       `INSERT INTO ${RESOURCE_ACCESS_TABLE} (user_id, resource_id, rights, granted_by, created_at, updated_at)
-       SELECT p.user_id, p.id, ARRAY['read','write','delete']::${ACCESS_RIGHT_ENUM}[], p.user_id, NOW(), NOW()
+       SELECT p.user_id, p.id, ARRAY['read','write','delete']::text[], p.user_id, NOW(), NOW()
        FROM patterns p
        WHERE NOT EXISTS (
          SELECT 1 FROM ${RESOURCE_ACCESS_TABLE} ra
@@ -61,7 +60,7 @@ export async function up(queryInterface: QueryInterface): Promise<void> {
 
       await queryInterface.sequelize.query(
         `INSERT INTO ${RESOURCE_ACCESS_TABLE} (user_id, resource_id, rights, granted_by, created_at, updated_at)
-         SELECT :ownerId, t.id, ARRAY['read','write','delete']::${ACCESS_RIGHT_ENUM}[], :ownerId, NOW(), NOW()
+         SELECT :ownerId, t.id, ARRAY['read','write','delete']::text[], :ownerId, NOW(), NOW()
          FROM tags t
          WHERE NOT EXISTS (
            SELECT 1 FROM ${RESOURCE_ACCESS_TABLE} ra

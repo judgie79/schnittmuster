@@ -5,14 +5,18 @@ WORKDIR /app
 # Install pnpm version compatible with lockfile v6
 RUN npm install -g pnpm@8
 
-# Copy dependency manifests first for better caching
-COPY package.json pnpm-lock.yaml ./
-
-# Install dependencies using the lockfile
+# --- Shared DTO package ---
+COPY shared-dtos/package.json shared-dtos/pnpm-lock.yaml ./shared-dtos/
+WORKDIR /app/shared-dtos
 RUN pnpm install --frozen-lockfile
+COPY shared-dtos/ ./
+RUN pnpm run build
 
-# Copy the rest of the source code
-COPY . .
+# --- Backend application ---
+WORKDIR /app/backend
+COPY backend/package.json backend/pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
+COPY backend/ ./
 
 # Build the TypeScript project
 RUN pnpm run build

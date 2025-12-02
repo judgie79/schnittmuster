@@ -1,0 +1,11 @@
+.git
+.gitignore
+**/node_modules
+**/dist
+**/.DS_Store
+**/.env
+**/.env.*
+**/coverage
+**/logs
+**/uploads
+**/.pnpm-store

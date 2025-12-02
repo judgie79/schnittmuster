@@ -23,8 +23,8 @@ services:
 
   backend:
     build:
-      context: ./
-      dockerfile: docker/Dockerfile
+      context: ../
+      dockerfile: backend/docker/Dockerfile
     container_name: schnittmuster-backend
     depends_on:
       postgres:

@@ -1,6 +1,6 @@
 import type { FormEvent } from 'react'
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { Button } from '@/components/common/Button'
 import { useAuth } from '@/hooks'
 import styles from './AuthScreen.module.css'
@@ -9,12 +9,22 @@ export const LoginScreen = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
-  const { login, isLoading } = useAuth()
+  const navigate = useNavigate()
+  const { login, isLoading, state } = useAuth()
+
+  useEffect(() => {
+    if (state.isAuthenticated) {
+      const destination = state.user?.adminRole ? '/admin' : '/dashboard'
+      navigate(destination, { replace: true })
+    }
+  }, [state.isAuthenticated, state.user?.adminRole, navigate])
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     try {
-      await login({ email, password })
+      const user = await login({ email, password })
+      const destination = user?.adminRole ? '/admin' : '/dashboard'
+      navigate(destination, { replace: true })
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : 'Login fehlgeschlagen')
     }

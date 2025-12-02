@@ -4,6 +4,10 @@ import { User, UserCreationAttributes } from "@infrastructure/database/models/Us
 export class AuthRepository {
   constructor(private readonly userRepository = new UserRepository()) {}
 
+  findById(id: string): Promise<User | null> {
+    return this.userRepository.findById(id);
+  }
+
   findByEmail(email: string): Promise<User | null> {
     return this.userRepository.findByEmail(email);
   }

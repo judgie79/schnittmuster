@@ -6,10 +6,8 @@ const RESOURCE_TABLE = "resources";
 const RESOURCE_ACCESS_TABLE = "resource_access";
 const ROLE_ENUM = "enum_roles_name";
 const RESOURCE_TYPE_ENUM = "enum_resources_type";
-const ACCESS_RIGHT_ENUM = "enum_resource_access_rights";
 const ROLE_VALUES = ["user", "editor", "admin"] as const;
 const RESOURCE_TYPES = ["pattern", "tag", "file"] as const;
-const ACCESS_RIGHTS = ["read", "write", "delete"] as const;
 
 export async function up(queryInterface: QueryInterface): Promise<void> {
   await queryInterface.createTable(ROLE_TABLE, {
@@ -40,6 +38,11 @@ export async function up(queryInterface: QueryInterface): Promise<void> {
   });
 
   await queryInterface.createTable(USER_ROLE_TABLE, {
+    id: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      primaryKey: true,
+    },
     user_id: {
       type: DataTypes.UUID,
       allowNull: false,
@@ -71,8 +74,8 @@ export async function up(queryInterface: QueryInterface): Promise<void> {
   });
   await queryInterface.addConstraint(USER_ROLE_TABLE, {
     fields: ["user_id", "role_id"],
-    type: "primary key",
-    name: "pk_user_roles",
+    type: "unique",
+    name: "uq_user_roles_user_role",
   });
 
   await queryInterface.createTable(RESOURCE_TABLE, {
@@ -111,6 +114,11 @@ export async function up(queryInterface: QueryInterface): Promise<void> {
   });
 
   await queryInterface.createTable(RESOURCE_ACCESS_TABLE, {
+    id: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      primaryKey: true,
+    },
     user_id: {
       type: DataTypes.UUID,
       allowNull: false,
@@ -130,7 +138,7 @@ export async function up(queryInterface: QueryInterface): Promise<void> {
       onDelete: "CASCADE",
     },
     rights: {
-      type: DataTypes.ARRAY(DataTypes.ENUM(...ACCESS_RIGHTS)),
+      type: DataTypes.ARRAY(DataTypes.STRING),
       allowNull: false,
       defaultValue: ["read"],
     },
@@ -156,8 +164,8 @@ export async function up(queryInterface: QueryInterface): Promise<void> {
   });
   await queryInterface.addConstraint(RESOURCE_ACCESS_TABLE, {
     fields: ["user_id", "resource_id"],
-    type: "primary key",
-    name: "pk_resource_access",
+    type: "unique",
+    name: "uq_resource_access_user_resource",
   });
 }
 
@@ -166,7 +174,6 @@ export async function down(queryInterface: QueryInterface): Promise<void> {
   await queryInterface.dropTable(RESOURCE_TABLE);
   await queryInterface.dropTable(USER_ROLE_TABLE);
   await queryInterface.dropTable(ROLE_TABLE);
-  await queryInterface.sequelize.query(`DROP TYPE IF EXISTS "${ACCESS_RIGHT_ENUM}";`);
   await queryInterface.sequelize.query(`DROP TYPE IF EXISTS "${RESOURCE_TYPE_ENUM}";`);
   await queryInterface.sequelize.query(`DROP TYPE IF EXISTS "${ROLE_ENUM}";`);
 }

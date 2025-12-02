@@ -97,6 +97,14 @@ export class AuthService {
     return { accessToken, refreshToken };
   }
 
+  async getProfile(userId: string): Promise<UserDTO> {
+    const user = await this.authRepository.findById(userId);
+    if (!user) {
+      throw new NotFoundError("User");
+    }
+    return UserMapper.toDTO(user);
+  }
+
   async upsertOAuthUser(profile: { email: string; username: string }): Promise<User> {
     return this.authRepository.upsertOAuthUser(profile);
   }

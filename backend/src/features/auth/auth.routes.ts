@@ -4,6 +4,7 @@ import { body } from "express-validator";
 import { authController } from "./AuthController";
 import { validateRequest } from "@shared/validators/inputValidator";
 import { apiLimiter } from "@middleware/rateLimit";
+import { authenticate } from "@middleware/auth";
 import "./strategies/LocalStrategy";
 import "./strategies/GoogleStrategy";
 
@@ -35,6 +36,8 @@ router.post(
   validateRequest,
   authController.refresh
 );
+
+router.get("/profile", authenticate, authController.profile);
 
 router.get(
   "/google",

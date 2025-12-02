@@ -191,7 +191,7 @@ export class AdminMetricsService {
           attributes: [],
         },
       ],
-      group: ["Pattern.userId"],
+      group: ["Pattern.user_id"],
       raw: true,
     })) as unknown as Array<{ userId: string; patternsCount: string; storageGb: string }>;
 

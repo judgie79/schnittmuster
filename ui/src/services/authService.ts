@@ -34,7 +34,7 @@ export const authService = {
   },
 
   async getProfile(): Promise<UserDTO> {
-    const response = await apiClient.get<ApiResponse<UserDTO>>('/auth/profile')
-    return response.data.data
+    const response = await apiClient.get<ApiResponse<{ user: UserDTO }>>('/auth/profile')
+    return response.data.data.user
   },
 }

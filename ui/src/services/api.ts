@@ -25,15 +25,17 @@ const refreshAccessToken = async (): Promise<string | null> => {
   }
   const response = await axios.post(
     `${API_BASE_URL}/auth/refresh`,
-    { token: refreshToken },
+    { refreshToken },
     { withCredentials: true },
   )
-  const newToken = response.data?.accessToken as string | undefined
-  if (newToken) {
-    localStorage.setItem(STORAGE_KEYS.accessToken, newToken)
-    return newToken
+  const tokens = response.data?.data as { accessToken?: string; refreshToken?: string } | undefined
+  if (tokens?.accessToken) {
+    localStorage.setItem(STORAGE_KEYS.accessToken, tokens.accessToken)
   }
-  return null
+  if (tokens?.refreshToken) {
+    localStorage.setItem(STORAGE_KEYS.refreshToken, tokens.refreshToken)
+  }
+  return tokens?.accessToken ?? null
 }
 
 apiClient.interceptors.response.use(
