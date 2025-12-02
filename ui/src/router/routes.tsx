@@ -11,6 +11,10 @@ import { SettingsScreen } from '@/pages/SettingsScreen'
 import { ProfileScreen } from '@/pages/ProfileScreen'
 import { NotFoundScreen } from '@/pages/NotFoundScreen'
 import { PrivateRoute } from './PrivateRoute'
+import { AdminRoute } from './AdminRoute'
+import { AdminDashboardScreen } from '@/pages/admin/AdminDashboardScreen'
+import { AdminUsersScreen } from '@/pages/admin/AdminUsersScreen'
+import { AdminSettingsScreen } from '@/pages/admin/AdminSettingsScreen'
 
 export const routes: RouteObject[] = [
   {
@@ -29,6 +33,14 @@ export const routes: RouteObject[] = [
           { path: '/patterns/search', element: <SearchScreen /> },
           { path: '/settings', element: <SettingsScreen /> },
           { path: '/profile', element: <ProfileScreen /> },
+          {
+            element: <AdminRoute />,
+            children: [
+              { path: '/admin', element: <AdminDashboardScreen /> },
+              { path: '/admin/users', element: <AdminUsersScreen /> },
+              { path: '/admin/settings', element: <AdminSettingsScreen /> },
+            ],
+          },
         ],
       },
       { path: '*', element: <NotFoundScreen /> },
