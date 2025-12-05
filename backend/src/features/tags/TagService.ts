@@ -51,6 +51,20 @@ export class TagService {
     await this.accessControlService.deleteResourcesByReference(id, "tag");
   }
 
+  async createCategory(payload: { name: string; displayOrder?: number }): Promise<TagCategoryDTO> {
+    const category = await this.tagRepository.createCategory(payload);
+    return TagMapper.toCategoryDTO(category);
+  }
+
+  async updateCategory(id: string, payload: Partial<{ name: string; displayOrder: number }>): Promise<TagCategoryDTO> {
+    const category = await this.tagRepository.updateCategory(id, payload as any);
+    return TagMapper.toCategoryDTO(category);
+  }
+
+  async removeCategory(id: string): Promise<void> {
+    await this.tagRepository.deleteCategory(id);
+  }
+
   private async assertTagPermissions(tagId: string, userId: string, rights: AccessRight[]): Promise<void> {
     const resource = await this.accessControlService.ensureResource("tag", tagId, userId);
     await this.accessControlService.assertHasRights(userId, resource.id, rights);

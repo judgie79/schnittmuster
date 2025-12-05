@@ -8,6 +8,7 @@ export const ROUTE_TITLES: Record<string, string> = {
   '/admin': 'Admin Dashboard',
   '/admin/users': 'Admin Nutzerverwaltung',
   '/admin/settings': 'Systemeinstellungen',
+  '/admin/tags': 'Tags & Kategorien',
 }
 
 export type NavItem = {
@@ -24,4 +25,7 @@ export const BOTTOM_NAV_ITEMS: NavItem[] = [
   { path: '/settings', label: 'Einstellungen', icon: '⚙️' },
   { path: '/profile', label: 'Profil', icon: '👤' },
   { path: '/admin', label: 'Admin', icon: '🛡️', requiresAdmin: true },
+  { path: '/admin/users', label: 'Users', icon: '👤', requiresAdmin: true },
+  { path: '/admin/settings', label: 'Admin Settings', icon: '🛡️', requiresAdmin: true },
+  { path: '/admin/tags', label: 'Tags', icon: '🏷️', requiresAdmin: true },
 ]

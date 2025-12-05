@@ -1,5 +1,6 @@
 import type { ISODateString, UUID } from './types'
 import type { TagDTO } from './TagDTO'
+import type { PatternTagProposalDTO } from './PatternTagProposalDTO'
 
 export type PatternStatus = 'draft' | 'geplant' | 'genaeht' | 'getestet' | 'archiviert'
 
@@ -15,6 +16,7 @@ export interface PatternDTO {
   ownerId: UUID
   createdAt: ISODateString
   updatedAt: ISODateString
+  proposedTags?: PatternTagProposalDTO[]
 }
 
 export interface PatternCreateDTO {

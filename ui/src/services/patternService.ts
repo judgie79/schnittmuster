@@ -1,6 +1,6 @@
 import type { AxiosProgressEvent } from 'axios'
 import { apiClient } from './api'
-import type { ApiResponse, PatternDTO } from 'shared-dtos'
+import type { ApiResponse, PatternDTO, PatternTagProposalDTO } from 'shared-dtos'
 import type { PaginatedResponse } from '@/types'
 
 export interface PatternListParams {
@@ -11,6 +11,12 @@ export interface PatternListParams {
 
 export interface PatternRequestOptions {
   onUploadProgress?: (progress: number) => void
+}
+
+export interface TagProposalPayload {
+  name: string
+  tagCategoryId: string
+  colorHex: string
 }
 
 const handleProgress = (event: AxiosProgressEvent, onUploadProgress?: (progress: number) => void) => {
@@ -35,7 +41,7 @@ export const patternService = {
 
   async create(formData: FormData, options: PatternRequestOptions = {}): Promise<PatternDTO> {
     const response = await apiClient.post<ApiResponse<PatternDTO>>('/patterns', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+      // Let Axios/browsers set the multipart boundary; manual headers discard the file payload.
       onUploadProgress: (event) => handleProgress(event, options.onUploadProgress),
     })
     return response.data.data
@@ -46,9 +52,7 @@ export const patternService = {
     payload: Partial<PatternDTO> | FormData,
     options: PatternRequestOptions = {}
   ): Promise<PatternDTO> {
-    const headers = payload instanceof FormData ? { 'Content-Type': 'multipart/form-data' } : undefined
     const response = await apiClient.put<ApiResponse<PatternDTO>>(`/patterns/${patternId}`, payload, {
-      headers,
       onUploadProgress: (event) => handleProgress(event, options.onUploadProgress),
     })
     return response.data.data
@@ -65,6 +69,16 @@ export const patternService = {
 
   async removeTag(patternId: string, tagId: string): Promise<PatternDTO> {
     const response = await apiClient.delete<ApiResponse<PatternDTO>>(`/patterns/${patternId}/tags/${tagId}`)
+    return response.data.data
+  },
+
+  async listTagProposals(patternId: string): Promise<PatternTagProposalDTO[]> {
+    const response = await apiClient.get<ApiResponse<PatternTagProposalDTO[]>>(`/patterns/${patternId}/tag-proposals`)
+    return response.data.data
+  },
+
+  async createTagProposal(patternId: string, payload: TagProposalPayload): Promise<PatternTagProposalDTO> {
+    const response = await apiClient.post<ApiResponse<PatternTagProposalDTO>>(`/patterns/${patternId}/tag-proposals`, payload)
     return response.data.data
   },
 }

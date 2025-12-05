@@ -1,5 +1,6 @@
+import { Op } from "sequelize";
 import { Tag, TagCreationAttributes } from "@infrastructure/database/models/Tag";
-import { TagCategory } from "@infrastructure/database/models/TagCategory";
+import { TagCategory, TagCategoryCreationAttributes } from "@infrastructure/database/models/TagCategory";
 import { NotFoundError } from "@shared/errors";
 
 export class TagRepository {
@@ -15,6 +16,19 @@ export class TagRepository {
     return Tag.findAll({
       where: { tagCategoryId: categoryId },
       order: [["name", "ASC"]],
+    });
+  }
+
+  findCategoryById(id: string): Promise<TagCategory | null> {
+    return TagCategory.findByPk(id);
+  }
+
+  async findByNameAndCategory(name: string, categoryId: string): Promise<Tag | null> {
+    return Tag.findOne({
+      where: {
+        tagCategoryId: categoryId,
+        name: { [Op.iLike]: name },
+      },
     });
   }
 
@@ -53,5 +67,25 @@ export class TagRepository {
       throw new NotFoundError("Tag");
     }
     await tag.destroy();
+  }
+
+  createCategory(data: TagCategoryCreationAttributes): Promise<TagCategory> {
+    return TagCategory.create(data);
+  }
+
+  async updateCategory(id: string, data: Partial<TagCategory>): Promise<TagCategory> {
+    const category = await this.findCategoryById(id);
+    if (!category) {
+      throw new NotFoundError("Tag category");
+    }
+    return category.update(data);
+  }
+
+  async deleteCategory(id: string): Promise<void> {
+    const category = await this.findCategoryById(id);
+    if (!category) {
+      throw new NotFoundError("Tag category");
+    }
+    await category.destroy();
   }
 }

@@ -15,6 +15,7 @@ import { AdminRoute } from './AdminRoute'
 import { AdminDashboardScreen } from '@/pages/admin/AdminDashboardScreen'
 import { AdminUsersScreen } from '@/pages/admin/AdminUsersScreen'
 import { AdminSettingsScreen } from '@/pages/admin/AdminSettingsScreen'
+import { AdminTagsScreen } from '@/pages/admin/AdminTagsScreen'
 
 export const routes: RouteObject[] = [
   {
@@ -39,6 +40,7 @@ export const routes: RouteObject[] = [
               { path: '/admin', element: <AdminDashboardScreen /> },
               { path: '/admin/users', element: <AdminUsersScreen /> },
               { path: '/admin/settings', element: <AdminSettingsScreen /> },
+              { path: '/admin/tags', element: <AdminTagsScreen /> },
             ],
           },
         ],

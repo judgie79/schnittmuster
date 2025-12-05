@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type FormEvent } from 'react'
+import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { Button } from '@/components/common/Button'
 import { FileUpload } from '@/components/features/FileUpload/FileUpload'
 import { TagSelector } from '@/components/features/TagSelector/TagSelector'
@@ -18,6 +18,7 @@ export interface PatternFormProps {
   initialValues?: Partial<PatternFormValues>
   initialTags?: TagDTO[]
   tagCategories: TagCategoryDTO[]
+  areTagsLoading?: boolean
   onSubmit: (values: PatternFormValues) => void | Promise<void>
   submitLabel?: string
   isSubmitting?: boolean
@@ -42,6 +43,7 @@ export const PatternForm = ({
   initialValues,
   initialTags = [],
   tagCategories,
+  areTagsLoading = false,
   onSubmit,
   submitLabel = 'Speichern',
   isSubmitting = false,
@@ -63,8 +65,26 @@ export const PatternForm = ({
   const [selectedTags, setSelectedTags] = useState<TagDTO[]>(initialTags)
   const [localError, setLocalError] = useState<string | null>(null)
   const [fileSeed, setFileSeed] = useState(0)
+  const resetSnapshotRef = useRef<string | null>(null)
 
   useEffect(() => {
+    const snapshot = JSON.stringify({
+      name: mergedInitial.name,
+      description: mergedInitial.description ?? '',
+      status: mergedInitial.status,
+      isFavorite: mergedInitial.isFavorite,
+      notes: mergedInitial.notes ?? '',
+      tags: initialTags
+        .map((tag) => tag.id)
+        .sort()
+        .join(','),
+    })
+
+    if (resetSnapshotRef.current === snapshot) {
+      return
+    }
+
+    resetSnapshotRef.current = snapshot
     setName(mergedInitial.name)
     setDescription(mergedInitial.description ?? '')
     setStatus(mergedInitial.status)
@@ -162,7 +182,7 @@ export const PatternForm = ({
         />
       </label>
 
-      <TagSelector categories={tagCategories} selected={selectedTags} onToggle={toggleTag} />
+      <TagSelector categories={tagCategories} selected={selectedTags} onToggle={toggleTag} isLoading={areTagsLoading} />
 
       {localError ? <p className={styles.error}>{localError}</p> : null}
       {errorMessage ? <p className={styles.error}>{errorMessage}</p> : null}

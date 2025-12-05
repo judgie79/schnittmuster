@@ -33,6 +33,21 @@ export class TagController {
     await this.tagService.remove(req.params.id, request.user!.id);
     res.status(204).send();
   });
+
+  createCategory = asyncHandler(async (req: Request, res: Response) => {
+    const category = await this.tagService.createCategory(req.body);
+    res.status(201).json({ success: true, data: category });
+  });
+
+  updateCategory = asyncHandler(async (req: Request, res: Response) => {
+    const category = await this.tagService.updateCategory(req.params.id, req.body);
+    res.json({ success: true, data: category });
+  });
+
+  removeCategory = asyncHandler(async (req: Request, res: Response) => {
+    await this.tagService.removeCategory(req.params.id);
+    res.status(204).send();
+  });
 }
 
 export const tagController = new TagController();

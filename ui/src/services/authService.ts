@@ -23,14 +23,20 @@ export const authService = {
   },
 
   async signup(payload: SignupPayload): Promise<UserDTO> {
-    const response = await apiClient.post<ApiResponse<{ user: UserDTO }>>('/auth/register', payload)
+    const response = await apiClient.post<
+      ApiResponse<{ user: UserDTO; accessToken?: string; refreshToken?: string }>
+    >('/auth/register', payload)
+    persistTokens(response.data.data.accessToken, response.data.data.refreshToken)
     return response.data.data.user
   },
 
   async logout(): Promise<void> {
-    await apiClient.post('/auth/logout')
-    localStorage.removeItem(STORAGE_KEYS.accessToken)
-    localStorage.removeItem(STORAGE_KEYS.refreshToken)
+    try {
+      await apiClient.post('/auth/logout')
+    } finally {
+      localStorage.removeItem(STORAGE_KEYS.accessToken)
+      localStorage.removeItem(STORAGE_KEYS.refreshToken)
+    }
   },
 
   async getProfile(): Promise<UserDTO> {

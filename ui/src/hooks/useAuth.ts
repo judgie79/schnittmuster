@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { authService } from '@/services'
 import { useGlobalContext } from '@/context'
 import type { AuthCredentials, SignupPayload } from '@/types'
@@ -10,13 +10,14 @@ const PROFILE_QUERY_KEY = ['profile']
 export const useAuth = () => {
   const { state, dispatch } = useGlobalContext()
   const queryClient = useQueryClient()
+  const [hasCheckedSession, setHasCheckedSession] = useState(false)
 
   const profileQuery = useQuery<UserDTO, Error>({
     queryKey: PROFILE_QUERY_KEY,
     queryFn: () => authService.getProfile(),
-    enabled: state.auth.isAuthenticated,
+    enabled: state.auth.isAuthenticated || !hasCheckedSession,
     staleTime: 5 * 60 * 1000,
-    retry: 1,
+    retry: false,
   })
 
   useEffect(() => {
@@ -24,6 +25,12 @@ export const useAuth = () => {
       dispatch({ type: 'LOGIN_SUCCESS', payload: profileQuery.data })
     }
   }, [dispatch, profileQuery.data])
+
+  useEffect(() => {
+    if (!hasCheckedSession && (profileQuery.isFetched || profileQuery.isError)) {
+      setHasCheckedSession(true)
+    }
+  }, [hasCheckedSession, profileQuery.isError, profileQuery.isFetched])
 
   const loginMutation = useMutation({
     mutationFn: (credentials: AuthCredentials) => authService.login(credentials),

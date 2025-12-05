@@ -1,10 +1,14 @@
-import { FindOptions } from "sequelize";
+import { FindOptions, IncludeOptions, Op, WhereOptions } from "sequelize";
 import { Pattern, PatternCreationAttributes } from "@infrastructure/database/models/Pattern";
 import { Tag } from "@infrastructure/database/models/Tag";
 import { PatternNote } from "@infrastructure/database/models/PatternNote";
 import { NotFoundError } from "@shared/errors";
 import { buildPaginationMeta } from "@shared/utils/helpers";
 import { PaginatedResult } from "@shared/types";
+import { PatternTagProposal } from "@infrastructure/database/models/PatternTagProposal";
+import { TagCategory } from "@infrastructure/database/models/TagCategory";
+import { User } from "@infrastructure/database/models/User";
+import type { PatternListFilters } from "@features/patterns/types";
 
 export class PatternRepository {
   async findById(id: string, options?: FindOptions<Pattern>): Promise<Pattern | null> {
@@ -18,13 +22,48 @@ export class PatternRepository {
     });
   }
 
-  async findAllPaginated(userId: string, page: number, pageSize: number): Promise<PaginatedResult<Pattern>> {
+  async findAllPaginated(
+    userId: string,
+    page: number,
+    pageSize: number,
+    filters: PatternListFilters = {}
+  ): Promise<PaginatedResult<Pattern>> {
     const offset = (page - 1) * pageSize;
+    const where: WhereOptions = { userId };
+
+    if (filters.query) {
+      const like = `%${filters.query}%`;
+      Object.assign(where, {
+        [Op.or]: [{ name: { [Op.iLike]: like } }, { description: { [Op.iLike]: like } }],
+      });
+    }
+
+    if (filters.statuses?.length) {
+      Object.assign(where, { status: { [Op.in]: filters.statuses } });
+    }
+
+    if (filters.favoriteOnly) {
+      Object.assign(where, { isFavorite: true });
+    }
+
+    const tagFilterEnabled = Boolean(filters.tagIds?.length);
+    const include: IncludeOptions[] = [
+      {
+        model: Tag,
+        as: "tags",
+        through: { attributes: [] },
+        required: tagFilterEnabled,
+        where: tagFilterEnabled ? { id: { [Op.in]: filters.tagIds } } : undefined,
+      },
+    ];
+
     const { count, rows } = await Pattern.findAndCountAll({
-      where: { userId },
+      where,
       limit: pageSize,
       offset,
       order: [["createdAt", "DESC"]],
+      distinct: true,
+      include,
     });
 
     return {
@@ -82,7 +121,18 @@ export class PatternRepository {
 
   async getWithTags(id: string): Promise<Pattern | null> {
     return this.findById(id, {
-      include: [{ model: Tag, as: "tags" }],
+      include: [
+        { model: Tag, as: "tags" },
+        {
+          model: PatternTagProposal,
+          as: "tagProposals",
+          include: [
+            { model: TagCategory, as: "category" },
+            { model: Tag, as: "tag" },
+            { model: User, as: "proposedBy" },
+          ],
+        },
+      ],
     });
   }
 

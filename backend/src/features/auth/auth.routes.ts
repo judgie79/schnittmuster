@@ -32,12 +32,14 @@ router.post(
 
 router.post(
   "/refresh",
-  [body("refreshToken").notEmpty()],
+  [body("refreshToken").optional().isString()],
   validateRequest,
   authController.refresh
 );
 
 router.get("/profile", authenticate, authController.profile);
+
+router.post("/logout", authController.logout);
 
 router.get(
   "/google",

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { PatternForm } from '@/components/features/PatternForm/PatternForm'
+import { Loader } from '@/components/common/Loader'
 import { useGlobalContext } from '@/context'
 import { usePatterns, useTags } from '@/hooks'
 import type { PatternFormValues } from '@/types'
@@ -8,7 +9,7 @@ import { buildPatternFormData, createToast } from '@/utils'
 import styles from './Page.module.css'
 
 export const AddPatternScreen = () => {
-  const { categories } = useTags()
+  const { categories, isLoading: areTagsLoading } = useTags()
   const { mutate, mutations } = usePatterns()
   const navigate = useNavigate()
   const { dispatch } = useGlobalContext()
@@ -45,16 +46,21 @@ export const AddPatternScreen = () => {
 
   return (
     <section className={styles.section}>
-      <PatternForm
-        key={formKey}
-        tagCategories={categories}
-        onSubmit={handleSubmit}
-        isSubmitting={isSubmitting}
-        errorMessage={submitError}
-        submitLabel="Schnittmuster speichern"
-        requireFile
-        uploadProgress={uploadProgress}
-      />
+      {areTagsLoading && categories.length === 0 ? (
+        <Loader />
+      ) : (
+        <PatternForm
+          key={formKey}
+          tagCategories={categories}
+          areTagsLoading={areTagsLoading}
+          onSubmit={handleSubmit}
+          isSubmitting={isSubmitting}
+          errorMessage={submitError}
+          submitLabel="Schnittmuster speichern"
+          requireFile
+          uploadProgress={uploadProgress}
+        />
+      )}
     </section>
   )
 }

@@ -1,41 +1,19 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useSearch, useTags } from '@/hooks'
 import { PatternGrid } from '@/components/features/PatternGrid/PatternGrid'
 import { SearchBar } from '@/components/features/SearchBar/SearchBar'
 import { FilterPanel } from '@/components/features/FilterPanel/FilterPanel'
 import type { FilterState } from '@/context/types'
 import type { PatternStatus } from 'shared-dtos'
+import { STATUS_LABELS, TAG_SECTION_CONFIG, type TagFilterKey } from '@/constants/tagFilters'
 import styles from './Page.module.css'
 
-type SectionKey = Extract<keyof FilterState, 'zielgruppe' | 'kleidungsart' | 'hersteller' | 'lizenz' | 'groesse' | 'status'>
-
 interface ComputedSection {
-  id: SectionKey
+  id: TagFilterKey
   title: string
   description?: string
   options: { label: string; value: string }[]
   selectedValues: string[]
-}
-
-const TAG_SECTION_CONFIG: Array<{ id: SectionKey; title: string; categoryName: string; description?: string }> = [
-  {
-    id: 'zielgruppe',
-    title: 'Zielgruppe',
-    categoryName: 'Zielgruppe',
-    description: 'Für wen ist das Schnittmuster gedacht?'
-  },
-  { id: 'kleidungsart', title: 'Kleidungsart', categoryName: 'Kleidungsart' },
-  { id: 'hersteller', title: 'Designer:innen', categoryName: 'Hersteller' },
-  { id: 'lizenz', title: 'Lizenz', categoryName: 'Lizenz' },
-  { id: 'groesse', title: 'Größe', categoryName: 'Größe', description: 'Verfügbare Größenbereiche' },
-]
-
-const STATUS_LABELS: Record<PatternStatus, string> = {
-  draft: 'Entwurf',
-  geplant: 'Geplant',
-  genaeht: 'Genäht',
-  getestet: 'Getestet',
-  archiviert: 'Archiviert',
 }
 
 export const SearchScreen = () => {
@@ -52,6 +30,11 @@ export const SearchScreen = () => {
     isLoading,
   } = useSearch()
   const { categories, isLoading: isLoadingTags } = useTags()
+  const [queryValue, setQueryValue] = useState(filters.query)
+
+  useEffect(() => {
+    setQueryValue(filters.query)
+  }, [filters.query])
 
   const statusSection = useMemo<ComputedSection>(
     () => ({
@@ -86,12 +69,9 @@ export const SearchScreen = () => {
     }, [])
   }, [categories, filters])
 
-  const filterSections = useMemo<ComputedSection[]>(() => {
-    const sections = [...tagSections, statusSection]
-    return sections
-  }, [statusSection, tagSections])
+  const filterSections = useMemo<ComputedSection[]>(() => [...tagSections, statusSection], [statusSection, tagSections])
 
-  const handleClearSection = (sectionId: SectionKey) => {
+  const handleClearSection = (sectionId: TagFilterKey) => {
     setFilters({ [sectionId]: [] } as Partial<FilterState>)
   }
 
@@ -101,13 +81,20 @@ export const SearchScreen = () => {
 
   return (
     <section className={styles.section}>
-      <SearchBar placeholder="Nach Namen suchen" onChange={setQuery} />
+      <SearchBar
+        placeholder="Nach Namen suchen"
+        value={queryValue}
+        onChange={(value) => {
+          setQueryValue(value)
+          setQuery(value)
+        }}
+      />
       <div className={styles.searchLayout}>
         <div className={styles.filterColumn}>
           <FilterPanel
             sections={filterSections}
-            onToggle={(sectionId, value) => toggleFilter(sectionId as SectionKey, value)}
-            onClearSection={(sectionId) => handleClearSection(sectionId as SectionKey)}
+            onToggle={(sectionId, value) => toggleFilter(sectionId as TagFilterKey, value)}
+            onClearSection={(sectionId) => handleClearSection(sectionId as TagFilterKey)}
             onClearAll={clearFilters}
             favoriteOnly={filters.favoriteOnly}
             onFavoriteToggle={toggleFavoriteOnly}

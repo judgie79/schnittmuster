@@ -143,3 +143,73 @@
   gap: var(--space-1);
   align-items: center;
 }
+
+.managementGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: var(--space-2);
+}
+
+.inlineForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.inlineFormRow {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.inlineFormRow:last-child {
+  border-bottom: none;
+}
+
+.inlineForm input,
+.inlineForm select,
+.inlineFormRow input,
+.inlineFormRow select {
+  flex: 1;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-2);
+  background: var(--color-surface);
+}
+
+.inlineFormActions {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.tagRows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: var(--space-1);
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.tagRow {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.tagRowInputs {
+  flex: 1;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.tagRowInputs input[type='text'] {
+  flex: 1;
+}
+
+.tagRowActions {
+  display: flex;
+  gap: 0.4rem;
+}

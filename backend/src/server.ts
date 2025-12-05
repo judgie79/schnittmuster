@@ -1,6 +1,7 @@
 import express, { Express } from "express";
 import cors, { CorsOptions } from "cors";
 import helmet from "helmet";
+import cookieParser from "cookie-parser";
 import { environment } from "@config/environment";
 import { connectDatabase, closeDatabase } from "@config/database";
 import logger from "@shared/utils/logger";
@@ -38,6 +39,7 @@ const corsOptions: CorsOptions = {
 // Security middleware
 app.use(helmet());
 app.use(cors(corsOptions));
+app.use(cookieParser());
 app.use(requestLogger);
 app.use(apiLimiter);
 

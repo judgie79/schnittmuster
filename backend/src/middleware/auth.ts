@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import { authConfig } from "@config/auth";
 import { ForbiddenError } from "@shared/errors";
 import type { AdminRoleType } from "@shared/dtos";
+import { AUTH_COOKIE_NAME } from "@features/auth/constants";
 
 export type AuthenticatedUser = {
   id: string;
@@ -18,12 +19,20 @@ export type AuthenticatedRequest = Request & {
 export const authenticate: RequestHandler = (req: Request, _res: Response, next: NextFunction): void => {
   const request = req as AuthenticatedRequest;
   const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+  const cookieToken = (req as Request & { cookies?: Record<string, string> }).cookies?.[AUTH_COOKIE_NAME];
+
+  let token: string | undefined;
+  if (authHeader?.startsWith("Bearer ")) {
+    token = authHeader.replace("Bearer ", "");
+  }
+  if (!token && cookieToken) {
+    token = cookieToken;
+  }
+  if (!token) {
     next(new ForbiddenError("Authorization header missing"));
     return;
   }
 
-  const token = authHeader.replace("Bearer ", "");
   try {
     const payload = jwt.verify(token, authConfig.jwt.accessSecret) as jwt.JwtPayload;
     request.user = {

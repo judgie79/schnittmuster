@@ -3,4 +3,6 @@ export type {
   PatternCreateDTO,
   PatternUpdateDTO,
   PatternStatus,
+  PatternTagProposalDTO,
+  TagProposalStatus,
 } from "schnittmuster-manager-dtos";

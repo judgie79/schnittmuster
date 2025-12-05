@@ -9,22 +9,31 @@ import { StorageFactory } from "@infrastructure/storage/StorageFactory";
 import { IFileStorage } from "@infrastructure/storage/FileStorageService";
 import { Pattern, PatternCreationAttributes } from "@infrastructure/database/models/Pattern";
 import { AccessControlService } from "@features/access-control/AccessControlService";
+import { PatternListFilters } from "./types";
+import { environment } from "@config/environment";
 
 type UploadedFile = Express.Multer.File;
 
 export class PatternService {
   private readonly storage: IFileStorage;
+  private readonly persistFileReference: boolean;
 
   constructor(
     private readonly patternRepository = new PatternRepository(),
     private readonly accessControlService = new AccessControlService()
   ) {
     this.storage = StorageFactory.create();
+    this.persistFileReference = environment.storage.type === "database";
   }
 
-  async list(userId: string, page?: number, pageSize?: number): Promise<PaginatedResult<PatternDTO>> {
+  async list(
+    userId: string,
+    page?: number,
+    pageSize?: number,
+    filters?: PatternListFilters
+  ): Promise<PaginatedResult<PatternDTO>> {
     const { page: safePage, pageSize: safeSize } = validatePagination(page, pageSize);
-    const result = await this.patternRepository.findAllPaginated(userId, safePage, safeSize);
+    const result = await this.patternRepository.findAllPaginated(userId, safePage, safeSize, filters);
     return {
       data: PatternMapper.toDTOList(result.data),
       pagination: result.pagination,
@@ -37,7 +46,13 @@ export class PatternService {
       throw new NotFoundError("Pattern");
     }
     await this.assertPatternPermissions(pattern, userId, ["read"]);
-    return PatternMapper.toDTOWithRelations(pattern);
+    const dto = PatternMapper.toDTOWithRelations(pattern);
+    if (dto.proposedTags) {
+      dto.proposedTags = dto.proposedTags.filter(
+        (proposal) => proposal.status === "approved" || proposal.proposedByUserId === userId
+      );
+    }
+    return dto;
   }
 
   async create(userId: string, payload: PatternCreateDTO, file?: UploadedFile): Promise<PatternDTO> {
@@ -53,7 +68,7 @@ export class PatternService {
     if (file) {
       const metadata = await this.storage.upload(file.buffer, file.originalname, file.mimetype);
       Object.assign(data, {
-        fileStorageId: metadata.id,
+        fileStorageId: this.persistFileReference ? metadata.id : null,
         filePath: metadata.url,
       });
     }
@@ -90,11 +105,12 @@ export class PatternService {
       data.isFavorite = isFavorite;
     }
     if (file) {
-      if (pattern.fileStorageId) {
-        await this.storage.delete(pattern.fileStorageId);
+      const existingFileId = this.getStoredFileIdentifier(pattern);
+      if (existingFileId) {
+        await this.storage.delete(existingFileId);
       }
       const metadata = await this.storage.upload(file.buffer, file.originalname, file.mimetype);
-      data.fileStorageId = metadata.id;
+      data.fileStorageId = this.persistFileReference ? metadata.id : null;
       data.filePath = metadata.url;
     }
 
@@ -108,8 +124,9 @@ export class PatternService {
       throw new NotFoundError("Pattern");
     }
     await this.assertPatternPermissions(pattern, userId, ["delete"]);
-    if (pattern.fileStorageId) {
-      await this.storage.delete(pattern.fileStorageId);
+    const storedFileId = this.getStoredFileIdentifier(pattern);
+    if (storedFileId) {
+      await this.storage.delete(storedFileId);
     }
     await this.patternRepository.delete(patternId);
     await this.accessControlService.deleteResourcesByReference(pattern.id, "pattern");
@@ -123,5 +140,16 @@ export class PatternService {
   private async resolvePatternResourceId(pattern: Pattern): Promise<string> {
     const resource = await this.accessControlService.ensureResource("pattern", pattern.id, pattern.userId);
     return resource.id;
+  }
+
+  private getStoredFileIdentifier(pattern: Pattern): string | undefined {
+    if (pattern.fileStorageId) {
+      return pattern.fileStorageId;
+    }
+    if (!pattern.filePath) {
+      return undefined;
+    }
+    const segments = pattern.filePath.split("/").filter(Boolean);
+    return segments.length ? segments[segments.length - 1] : undefined;
   }
 }

@@ -35,6 +35,152 @@
   font-size: 0.9rem;
 }
 
+.quickFilters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: var(--space-1);
+}
+
+.detailImage {
+  width: 100%;
+  border-radius: var(--radius-3);
+  object-fit: cover;
+}
+
+.tagSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.tagList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tagChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-2);
+  background: var(--color-muted-bg);
+  font-size: 0.9rem;
+}
+
+.colorDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+  display: inline-flex;
+}
+
+.actionGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-1);
+}
+
+.proposalForm {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-3);
+  padding: var(--space-2);
+  background: var(--color-surface);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.formGrid {
+  display: grid;
+  gap: var(--space-1);
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.formGrid label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.9rem;
+}
+
+.formGrid input,
+.formGrid select,
+.proposalForm textarea {
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-2);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.errorMessage {
+  color: var(--color-danger, #b32222);
+  font-size: 0.9rem;
+}
+
+.proposalSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.proposalList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.proposalCard {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-3);
+  padding: var(--space-1);
+  background: var(--color-surface);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.proposalHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-1);
+  align-items: center;
+}
+
+.proposalTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.proposalActions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.proposalStatus {
+  font-size: 0.8rem;
+}
+
+.proposalStatusApproved {
+  background: rgba(52, 168, 83, 0.15);
+  color: #257942;
+}
+
+.proposalStatusRejected {
+  background: rgba(244, 67, 54, 0.15);
+  color: #b12a1c;
+}
+
+.proposalStatusPending {
+  background: rgba(255, 193, 7, 0.2);
+  color: #8a6100;
+}
+
 @media (max-width: 900px) {
   .searchLayout {
     flex-direction: column;
