@@ -17,6 +17,10 @@ export type AuthenticatedRequest = Request & {
 };
 
 export const authenticate: RequestHandler = (req: Request, _res: Response, next: NextFunction): void => {
+  if (req.method === "OPTIONS") {
+    next();
+    return;
+  }
   const request = req as AuthenticatedRequest;
   const authHeader = req.headers.authorization;
   const cookieToken = (req as Request & { cookies?: Record<string, string> }).cookies?.[AUTH_COOKIE_NAME];

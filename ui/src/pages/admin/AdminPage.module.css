@@ -207,6 +207,13 @@
 
 .tagRowInputs input[type='text'] {
   flex: 1;
+  min-width: 100px;
+}
+.tagRowInputs input[type='color'] {
+  max-width: 200px;
+}
+.inlineFormRow button {
+  max-width: 200px;
 }
 
 .tagRowActions {

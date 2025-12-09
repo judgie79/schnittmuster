@@ -2,6 +2,7 @@ import { promises as fs } from "fs";
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
 import { FileMetadata, IFileStorage } from "../FileStorageService";
+import { buildFileDownloadUrl } from "@shared/utils/files";
 
 export class LocalStorage implements IFileStorage {
   constructor(private readonly uploadDir: string = "./uploads") {}
@@ -27,7 +28,7 @@ export class LocalStorage implements IFileStorage {
       originalName: fileName,
       mimeType,
       size: file.length,
-      url: `/uploads/${storedName}`,
+      url: buildFileDownloadUrl(fileId),
     };
   }
 
@@ -49,6 +50,6 @@ export class LocalStorage implements IFileStorage {
 
   getUrl(fileId: string): string {
     // Consumers should rely on metadata.url returned from upload; fallback uses base path
-    return `/uploads/${fileId}`;
+    return buildFileDownloadUrl(fileId);
   }
 }

@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 import { FileStorage } from "@infrastructure/database/models/FileStorage";
 import { FileMetadata, IFileStorage } from "../FileStorageService";
+import { buildFileDownloadUrl } from "@shared/utils/files";
 
 export class DatabaseStorage implements IFileStorage {
   async upload(file: Buffer, fileName: string, mimeType: string): Promise<FileMetadata> {
@@ -17,7 +18,7 @@ export class DatabaseStorage implements IFileStorage {
       originalName: fileName,
       mimeType,
       size: file.length,
-      url: `/api/v1/files/${record.id}`,
+      url: buildFileDownloadUrl(record.id),
     };
   }
 
@@ -34,6 +35,6 @@ export class DatabaseStorage implements IFileStorage {
   }
 
   getUrl(fileId: string): string {
-    return `/api/v1/files/${fileId}`;
+    return buildFileDownloadUrl(fileId);
   }
 }

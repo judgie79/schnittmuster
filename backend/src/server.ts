@@ -21,6 +21,7 @@ logger.info(`CORS allowed origins: ${allowedOrigins.length ? allowedOrigins.join
 const corsOptions: CorsOptions = {
   credentials: true,
   origin: (origin, callback) => {
+    
     if (!origin) {
       logger.debug("CORS check skipped because request has no origin header");
       return callback(null, true);
@@ -37,8 +38,13 @@ const corsOptions: CorsOptions = {
 };
 
 // Security middleware
-app.use(helmet());
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+  })
+);
 app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 app.use(cookieParser());
 app.use(requestLogger);
 app.use(apiLimiter);

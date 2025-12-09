@@ -9,6 +9,10 @@ import { PatternRepository } from "@infrastructure/database/repositories/Pattern
 import { tagProposalController } from "@features/tags/TagProposalController";
 
 const upload = multer({ storage: multer.memoryStorage() });
+const uploadFields = upload.fields([
+  { name: "file", maxCount: 1 },
+  { name: "thumbnail", maxCount: 1 },
+]);
 const router: Router = Router();
 const patternRepository = new PatternRepository();
 
@@ -32,7 +36,7 @@ router.get(
 
 router.post(
   "/",
-  upload.single("file"),
+  uploadFields,
   [body("name").isLength({ min: 3 }), body("description").optional().isString()],
   validateRequest,
   patternController.create
@@ -59,7 +63,7 @@ router.put(
     resourceType: "pattern",
     resourceOwnerResolver: resolvePatternOwner,
   }),
-  upload.single("file"),
+  uploadFields,
   [body("name").optional().isLength({ min: 3 })],
   validateRequest,
   patternController.update

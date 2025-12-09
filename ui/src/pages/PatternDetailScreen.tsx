@@ -1,28 +1,20 @@
 import clsx from 'clsx'
 import { useEffect, useMemo, useState } from 'react'
-import type { FormEvent } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Button } from '@/components/common/Button'
 import { Loader } from '@/components/common/Loader'
-import { Badge } from '@/components/common/Badge'
 import { usePattern, useTags } from '@/hooks'
 import { useGlobalContext } from '@/context'
 import { patternService, tagService } from '@/services'
-import { createToast } from '@/utils'
-import type { PatternTagProposalDTO, TagProposalStatus } from 'shared-dtos'
-import styles from './Page.module.css'
-
-const PROPOSAL_STATUS_LABELS: Record<TagProposalStatus, string> = {
-  pending: 'Ausstehend',
-  approved: 'Freigegeben',
-  rejected: 'Abgelehnt',
-}
+import { createToast, printAssetFromUrl, resolveAssetUrl } from '@/utils'
+import type { TagProposalStatus } from 'shared-dtos'
+import { FaEdit, FaPrint, FaTag, FaCheck, FaTimes } from 'react-icons/fa'
 
 const DEFAULT_PROPOSAL_COLOR = '#2F6FED'
 
 export const PatternDetailScreen = () => {
   const { patternId } = useParams()
+  const navigate = useNavigate()
   const queryClient = useQueryClient()
   const { state, dispatch } = useGlobalContext()
   const { categories } = useTags()
@@ -35,6 +27,7 @@ export const PatternDetailScreen = () => {
   const userId = state.auth.user?.id
   const isAdmin = Boolean(state.auth.user?.adminRole)
   const isOwner = data?.ownerId === userId
+  const canEditPattern = Boolean(patternId) && (isOwner || isAdmin)
 
   useEffect(() => {
     if (!proposalCategoryId && categories.length) {
@@ -96,172 +89,147 @@ export const PatternDetailScreen = () => {
     },
   })
 
-  const handleProposalSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    if (!proposalName.trim() || !proposalCategoryId || proposalMutation.isPending) {
-      return
-    }
-    proposalMutation.mutate()
-  }
+  if (isLoading) return <div className="flex justify-center py-12"><Loader /></div>
+  if (error || !data) return <div className="p-4 text-center text-error">Fehler beim Laden des Schnittmusters</div>
 
-  const handleApprove = (proposalId: string) => {
-    approveMutation.mutate(proposalId)
-  }
-
-  const handleReject = (proposalId: string) => {
-    rejectMutation.mutate(proposalId)
-  }
-
-  const getStatusClass = (status: TagProposalStatus) => {
-    switch (status) {
-      case 'approved':
-        return styles.proposalStatusApproved
-      case 'rejected':
-        return styles.proposalStatusRejected
-      default:
-        return styles.proposalStatusPending
-    }
-  }
-
-  const sortedProposals = useMemo<PatternTagProposalDTO[]>(() => {
-    return [...proposals].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-  }, [proposals])
-
-  if (isLoading) {
-    return <Loader />
-  }
-
-  if (error || !data) {
-    return <p>Pattern konnte nicht geladen werden.</p>
-  }
+  const thumbnailSrc = resolveAssetUrl(data.thumbnailUrl) ?? 'https://placehold.co/800x600?text=Schnittmuster'
 
   return (
-    <section className={styles.section}>
-      <img
-        src={data.thumbnailUrl ?? 'https://placehold.co/1200x800?text=Schnittmuster'}
-        alt={data.name}
-        className={styles.detailImage}
-      />
-      <header className={styles.sectionHeader}>
-        <div>
-          <h2>{data.name}</h2>
-          <p className={styles.helperText}>{data.description ?? 'Keine Beschreibung hinterlegt.'}</p>
-        </div>
-        <Badge>{data.status.toUpperCase()}</Badge>
-      </header>
+    <div className="space-y-6 pb-20">
+      {/* Hero Image */}
+      <div className="aspect-video w-full overflow-hidden rounded-xl shadow-sm bg-background -mt-4 mx-auto max-w-2xl">
+        <img
+          src={thumbnailSrc}
+          alt={data.name}
+          className="h-full w-full object-cover"
+        />
+      </div>
 
-      <div className={styles.tagSection}>
-        <h3>Tags</h3>
-        <div className={styles.tagList}>
-          {data.tags.length ? (
-            data.tags.map((tag) => (
-              <span key={tag.id} className={styles.tagChip}>
-                <span className={styles.colorDot} style={{ backgroundColor: tag.colorHex ?? '#555' }} aria-hidden />
-                {tag.name}
-              </span>
-            ))
-          ) : (
-            <p className={styles.helperText}>Noch keine Tags zugewiesen.</p>
+      {/* Header Info */}
+      <div className="space-y-4">
+        <div className="flex justify-between items-start">
+          <h1 className="text-2xl font-bold text-text">{data.name}</h1>
+          {canEditPattern && (
+            <button
+              onClick={() => navigate(`/patterns/${patternId}/edit`)}
+              className="p-2 text-primary hover:bg-background rounded-full transition-colors"
+              aria-label="Bearbeiten"
+            >
+              <FaEdit size={20} />
+            </button>
           )}
         </div>
-      </div>
 
-      <div className={styles.actionGrid}>
-        <Button>📥 Datei öffnen</Button>
-        <Button variant="secondary">✓ Als genäht markieren</Button>
-        <Button variant="ghost">★ Favorisieren</Button>
-      </div>
-
-      {canProposeTag ? (
-        <div className={styles.proposalForm}>
-          <h3>Neuen Tag vorschlagen</h3>
-          <form className={styles.formGrid} onSubmit={handleProposalSubmit}>
-            <label>
-              <span>Bezeichnung</span>
-              <input
-                type="text"
-                value={proposalName}
-                onChange={(event) => setProposalName(event.target.value)}
-                placeholder="z. B. Oversized"
-                required
-              />
-            </label>
-            <label>
-              <span>Kategorie</span>
-              <select value={proposalCategoryId} onChange={(event) => setProposalCategoryId(event.target.value)} required>
-                {categories.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label>
-              <span>Farbe</span>
-              <input type="color" value={proposalColor} onChange={(event) => setProposalColor(event.target.value)} />
-            </label>
-            <Button
-              type="submit"
-              disabled={!proposalName.trim() || !proposalCategoryId || proposalMutation.isPending}
+        <div className="flex flex-wrap gap-2">
+          {data.tags.map((tag) => (
+            <span
+              key={tag.id}
+              className="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-primary/10 text-primary"
             >
-              {proposalMutation.isPending ? 'Sende Vorschlag ...' : 'Tag vorschlagen'}
-            </Button>
-          </form>
-          {proposalError ? <p className={styles.errorMessage}>{proposalError}</p> : null}
-        </div>
-      ) : null}
-
-      {sortedProposals.length > 0 && (
-        <section className={styles.proposalSection}>
-          <header className={styles.sectionHeader}>
-            <h3>Vorgeschlagene Tags</h3>
-            <span className={styles.helperText}>
-              {pendingProposals.length ? `${pendingProposals.length} offen` : 'Nichts offen'}
+              {tag.name}
             </span>
-          </header>
-          <div className={styles.proposalList}>
-            {sortedProposals.map((proposal) => (
-              <article key={proposal.id} className={styles.proposalCard}>
-                <div className={styles.proposalHeader}>
-                  <div className={styles.proposalTitle}>
-                    <span className={styles.colorDot} style={{ backgroundColor: proposal.colorHex }} aria-hidden />
-                    <div>
-                      <strong>{proposal.name}</strong>
-                      <p className={styles.helperText}>{proposal.category?.name ?? 'Kategorie unbekannt'}</p>
-                    </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Actions */}
+      <div className="grid grid-cols-2 gap-4">
+        <button
+          onClick={() => data.fileUrl && printAssetFromUrl(data.fileUrl)}
+          disabled={!data.fileUrl}
+          className="flex items-center justify-center gap-2 p-4 rounded-xl bg-surface border border-border shadow-sm hover:bg-background transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <FaPrint className="text-primary" size={24} />
+          <span className="font-medium">Drucken</span>
+        </button>
+        {/* Add more actions here if needed */}
+      </div>
+
+      {/* Tag Proposals Section */}
+      {(canProposeTag || (isAdmin && pendingProposals.length > 0)) && (
+        <div className="bg-surface rounded-xl p-4 shadow-sm border border-border space-y-4">
+          <h3 className="text-lg font-semibold flex items-center gap-2">
+            <FaTag className="text-primary" />
+            Tags verwalten
+          </h3>
+
+          {canProposeTag && (
+            <form
+              onSubmit={(e) => {
+                e.preventDefault()
+                proposalMutation.mutate()
+              }}
+              className="space-y-3"
+            >
+              <div>
+                <label className="block text-sm font-medium text-text-muted mb-1">Neuer Tag</label>
+                <input
+                  type="text"
+                  value={proposalName}
+                  onChange={(e) => setProposalName(e.target.value)}
+                  className="w-full p-2 rounded-lg border border-border bg-background"
+                  placeholder="z.B. Sommerkleid"
+                />
+              </div>
+              
+              <div className="flex gap-2">
+                <select
+                  value={proposalCategoryId}
+                  onChange={(e) => setProposalCategoryId(e.target.value)}
+                  className="flex-1 p-2 rounded-lg border border-border bg-background"
+                >
+                  {categories.map((cat) => (
+                    <option key={cat.id} value={cat.id}>{cat.name}</option>
+                  ))}
+                </select>
+                <input
+                  type="color"
+                  value={proposalColor}
+                  onChange={(e) => setProposalColor(e.target.value)}
+                  className="h-10 w-10 rounded-lg border border-border p-1 bg-background cursor-pointer"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={!proposalName || proposalMutation.isPending}
+                className="w-full py-2 bg-primary text-primary-foreground rounded-lg font-medium disabled:opacity-50"
+              >
+                Vorschlagen
+              </button>
+            </form>
+          )}
+
+          {isAdmin && pendingProposals.length > 0 && (
+            <div className="space-y-2 mt-4 pt-4 border-t border-border">
+              <h4 className="text-sm font-medium text-text-muted">Ausstehende Vorschläge</h4>
+              {pendingProposals.map((proposal) => (
+                <div key={proposal.id} className="flex items-center justify-between bg-background p-2 rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <span className="w-3 h-3 rounded-full" style={{ backgroundColor: proposal.colorHex }} />
+                    <span>{proposal.name}</span>
                   </div>
-                  <Badge className={clsx(styles.proposalStatus, getStatusClass(proposal.status))}>
-                    {PROPOSAL_STATUS_LABELS[proposal.status]}
-                  </Badge>
+                  <div className="flex gap-1">
+                    <button
+                      onClick={() => approveMutation.mutate(proposal.id)}
+                      className="p-1.5 text-green-600 hover:bg-green-50 rounded"
+                    >
+                      <FaCheck />
+                    </button>
+                    <button
+                      onClick={() => rejectMutation.mutate(proposal.id)}
+                      className="p-1.5 text-red-600 hover:bg-red-50 rounded"
+                    >
+                      <FaTimes />
+                    </button>
+                  </div>
                 </div>
-                <p className={styles.helperText}>
-                  Vorgeschlagen von {proposal.proposedBy?.username ?? 'Unbekannt'} ·{' '}
-                  {new Date(proposal.createdAt).toLocaleDateString('de-DE')}
-                </p>
-                {isAdmin && proposal.status === 'pending' ? (
-                  <div className={styles.proposalActions}>
-                    <Button
-                      type="button"
-                      onClick={() => handleApprove(proposal.id)}
-                      disabled={approveMutation.isPending || rejectMutation.isPending}
-                    >
-                      Freigeben
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      onClick={() => handleReject(proposal.id)}
-                      disabled={approveMutation.isPending || rejectMutation.isPending}
-                    >
-                      Ablehnen
-                    </Button>
-                  </div>
-                ) : null}
-              </article>
-            ))}
-          </div>
-        </section>
+              ))}
+            </div>
+          )}
+        </div>
       )}
-    </section>
+    </div>
   )
 }
+

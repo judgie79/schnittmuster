@@ -6,7 +6,6 @@ import { useGlobalContext } from '@/context'
 import { usePatterns, useTags } from '@/hooks'
 import type { PatternFormValues } from '@/types'
 import { buildPatternFormData, createToast } from '@/utils'
-import styles from './Page.module.css'
 
 export const AddPatternScreen = () => {
   const { categories, isLoading: areTagsLoading } = useTags()
@@ -45,9 +44,11 @@ export const AddPatternScreen = () => {
   }
 
   return (
-    <section className={styles.section}>
+    <div className="pb-20">
       {areTagsLoading && categories.length === 0 ? (
-        <Loader />
+        <div className="flex justify-center py-12">
+          <Loader />
+        </div>
       ) : (
         <PatternForm
           key={formKey}
@@ -61,6 +62,7 @@ export const AddPatternScreen = () => {
           uploadProgress={uploadProgress}
         />
       )}
-    </section>
+    </div>
   )
 }
+

@@ -4,6 +4,7 @@ import { PatternTagProposal } from "@infrastructure/database/models/PatternTagPr
 import { PatternDTO } from "@shared/dtos";
 import { TagMapper } from "./TagMapper";
 import { PatternTagProposalMapper } from "./PatternTagProposalMapper";
+import { normalizeFilePathToDownloadUrl } from "@shared/utils/files";
 
 const toIsoString = (value?: Date): string => (value ? value.toISOString() : new Date().toISOString());
 
@@ -27,8 +28,8 @@ export class PatternMapper {
       id: pattern.id,
       name: pattern.name,
       description: pattern.description ?? undefined,
-      thumbnailUrl: pattern.thumbnailPath ?? undefined,
-      fileUrl: pattern.filePath ?? undefined,
+      thumbnailUrl: normalizeFilePathToDownloadUrl(pattern.thumbnailPath),
+      fileUrl: normalizeFilePathToDownloadUrl(pattern.filePath),
       status: pattern.status,
       isFavorite: pattern.isFavorite,
       tags: tags ? TagMapper.toDTOList(tags) : [],

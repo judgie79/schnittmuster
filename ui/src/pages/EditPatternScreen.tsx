@@ -7,8 +7,7 @@ import { useGlobalContext } from '@/context'
 import { usePattern, useTags } from '@/hooks'
 import { patternService } from '@/services'
 import type { PatternFormValues } from '@/types'
-import { buildPatternFormData, createToast } from '@/utils'
-import styles from './Page.module.css'
+import { buildPatternFormData, createToast, resolveAssetUrl } from '@/utils'
 
 export const EditPatternScreen = () => {
   const { patternId } = useParams()
@@ -52,15 +51,22 @@ export const EditPatternScreen = () => {
 
   if (patternQuery.isLoading || isLoadingTags) {
     return (
-      <section className={styles.section}>
+      <div className="flex justify-center items-center min-h-[50vh]">
         <Loader />
-      </section>
+      </div>
     )
   }
 
   if (!patternQuery.data) {
-    return <p>Pattern nicht gefunden.</p>
+    return (
+      <div className="p-4 text-center text-text-muted">
+        Pattern nicht gefunden.
+      </div>
+    )
   }
+
+  const currentFileUrl = resolveAssetUrl(patternQuery.data.fileUrl)
+  const currentThumbnailUrl = resolveAssetUrl(patternQuery.data.thumbnailUrl)
 
   const initialValues: PatternFormValues = {
     name: patternQuery.data.name,
@@ -83,7 +89,8 @@ export const EditPatternScreen = () => {
   }
 
   return (
-    <section className={styles.section}>
+    <div className="p-4 pb-24 max-w-2xl mx-auto">
+      <h1 className="text-2xl font-bold text-text mb-6">Schnittmuster bearbeiten</h1>
       <PatternForm
         key={patternQuery.data.id}
         initialValues={initialValues}
@@ -94,7 +101,9 @@ export const EditPatternScreen = () => {
         errorMessage={submitError}
         submitLabel="Änderungen speichern"
         uploadProgress={uploadProgress}
+        existingFileUrl={currentFileUrl}
+        existingThumbnailUrl={currentThumbnailUrl}
       />
-    </section>
+    </div>
   )
 }

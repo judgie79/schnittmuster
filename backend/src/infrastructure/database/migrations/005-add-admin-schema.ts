@@ -1,5 +1,6 @@
 import { DataTypes, QueryInterface } from "sequelize";
 import bcrypt from "bcryptjs";
+import { v4 as uuid } from "uuid";
 
 const ADMIN_ROLES_TABLE = "admin_roles";
 const SYSTEM_METRICS_TABLE = "system_metrics";
@@ -20,8 +21,8 @@ const FLAG_STATUS_VALUES = ["pending", "reviewed", "approved", "rejected"] as co
 const DEFAULT_ADMIN_EMAIL = "admin@schnittmuster.local";
 const DEFAULT_ADMIN_USERNAME = "system-admin";
 const DEFAULT_ADMIN_PASSWORD = "AdminChangeMe123!";
-const DEFAULT_ADMIN_USER_ID = "11111111-1111-1111-1111-111111111111";
-const DEFAULT_ADMIN_ROLE_ID = "22222222-2222-2222-2222-222222222222";
+const DEFAULT_ADMIN_USER_ID = uuid();
+const DEFAULT_ADMIN_ROLE_ID = uuid();
 
 export async function up(queryInterface: QueryInterface): Promise<void> {
   await queryInterface.createTable(ADMIN_ROLES_TABLE, {

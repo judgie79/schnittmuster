@@ -11,6 +11,7 @@ import { Pattern, PatternCreationAttributes } from "@infrastructure/database/mod
 import { AccessControlService } from "@features/access-control/AccessControlService";
 import { PatternListFilters } from "./types";
 import { environment } from "@config/environment";
+import { extractFileIdentifierFromPath } from "@shared/utils/files";
 
 type UploadedFile = Express.Multer.File;
 
@@ -55,7 +56,12 @@ export class PatternService {
     return dto;
   }
 
-  async create(userId: string, payload: PatternCreateDTO, file?: UploadedFile): Promise<PatternDTO> {
+  async create(
+    userId: string,
+    payload: PatternCreateDTO,
+    file?: UploadedFile,
+    thumbnail?: UploadedFile
+  ): Promise<PatternDTO> {
     const { tagIds, status, isFavorite, name, description } = payload as PatternCreateDTO & { isFavorite?: boolean };
     const data: PatternCreationAttributes = {
       userId,
@@ -73,6 +79,11 @@ export class PatternService {
       });
     }
 
+    if (thumbnail) {
+      const metadata = await this.storage.upload(thumbnail.buffer, thumbnail.originalname, thumbnail.mimetype);
+      data.thumbnailPath = metadata.url;
+    }
+
     const pattern = await this.patternRepository.create(data, tagIds);
     await this.accessControlService.createResource({ id: pattern.id, type: "pattern", ownerId: userId, referenceId: pattern.id });
     return PatternMapper.toDTO(pattern);
@@ -82,7 +93,8 @@ export class PatternService {
     patternId: string,
     userId: string,
     payload: PatternUpdateDTO,
-    file?: UploadedFile
+    file?: UploadedFile,
+    thumbnail?: UploadedFile
   ): Promise<PatternDTO> {
     const pattern = await this.patternRepository.findById(patternId);
     if (!pattern) {
@@ -112,6 +124,15 @@ export class PatternService {
       const metadata = await this.storage.upload(file.buffer, file.originalname, file.mimetype);
       data.fileStorageId = this.persistFileReference ? metadata.id : null;
       data.filePath = metadata.url;
+    }
+
+    if (thumbnail) {
+      const existingThumbnailId = extractFileIdentifierFromPath(pattern.thumbnailPath);
+      if (existingThumbnailId) {
+        await this.storage.delete(existingThumbnailId);
+      }
+      const metadata = await this.storage.upload(thumbnail.buffer, thumbnail.originalname, thumbnail.mimetype);
+      data.thumbnailPath = metadata.url;
     }
 
     const updated = await this.patternRepository.update(patternId, data, tagIds);
@@ -146,10 +167,6 @@ export class PatternService {
     if (pattern.fileStorageId) {
       return pattern.fileStorageId;
     }
-    if (!pattern.filePath) {
-      return undefined;
-    }
-    const segments = pattern.filePath.split("/").filter(Boolean);
-    return segments.length ? segments[segments.length - 1] : undefined;
+    return extractFileIdentifierFromPath(pattern.filePath);
   }
 }

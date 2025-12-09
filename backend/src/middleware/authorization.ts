@@ -4,6 +4,7 @@ import { ForbiddenError, NotFoundError } from "@shared/errors";
 import { RoleService } from "@features/access-control/RoleService";
 import { AccessControlService } from "@features/access-control/AccessControlService";
 import { AuthenticatedRequest } from "./auth";
+import { AdminUserRepository } from "@infrastructure/database/repositories/AdminUserRepository";
 
 const roleService = new RoleService();
 const accessControlService = new AccessControlService();
@@ -28,6 +29,7 @@ const resolveResourceId = (req: AuthenticatedRequest, options: AuthorizeOptions)
   return undefined;
 };
 
+
 export const authorize = (options: AuthorizeOptions = {}): RequestHandler => {
   const { roles = [], rights = [], allowOwner = true } = options;
   return async (req: Request, _res: Response, next: NextFunction): Promise<void> => {
@@ -42,7 +44,13 @@ export const authorize = (options: AuthorizeOptions = {}): RequestHandler => {
       if (roles.length) {
         const hasRole = await roleService.userHasRole(userId, roles);
         if (!hasRole) {
-          throw new ForbiddenError("Insufficient role permissions");
+          const adminUserRepository = new AdminUserRepository();
+          const role = await adminUserRepository.getAdminRole(userId);
+          if (!role) { 
+            throw new ForbiddenError("Insufficient role permissions");
+          }
+          next();
+          return;
         }
       }
 

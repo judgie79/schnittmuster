@@ -20,8 +20,10 @@
     "date-fns": "^3.6.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-icons": "^5.5.0",
     "react-router-dom": "^7.0.2",
     "shared-dtos": "file:../shared-dtos",
+    "tailwind-merge": "^3.4.0",
     "zustand": "^4.5.5"
   },
   "devDependencies": {

@@ -75,7 +75,7 @@ export class PatternRepository {
   async create(data: PatternCreationAttributes, tagIds?: string[]): Promise<Pattern> {
     const pattern = await Pattern.create(data);
     if (tagIds?.length) {
-      await (pattern as any).$set("tags", tagIds);
+      await this.setTagsAssociation(pattern, tagIds);
     }
     return pattern;
   }
@@ -87,7 +87,7 @@ export class PatternRepository {
     }
     await pattern.update(data);
     if (tagIds) {
-      await (pattern as any).$set("tags", tagIds);
+      await this.setTagsAssociation(pattern, tagIds);
     }
     return pattern;
   }
@@ -116,7 +116,39 @@ export class PatternRepository {
     if (!pattern) {
       throw new NotFoundError("Pattern");
     }
-    await (pattern as any).$set("tags", tagIds);
+    await this.setTagsAssociation(pattern, tagIds);
+  }
+
+  async findByFileIdentifier(identifier: string): Promise<Pattern | null> {
+    const likePattern = `%${identifier}`;
+    return Pattern.findOne({
+      where: {
+        [Op.or]: [
+          { fileStorageId: identifier },
+          { filePath: { [Op.iLike]: likePattern } },
+          { thumbnailPath: { [Op.iLike]: likePattern } },
+        ],
+      },
+    });
+  }
+
+  private async setTagsAssociation(pattern: Pattern, tagIds: string[]): Promise<void> {
+    const instance = pattern as unknown as Record<string, unknown> & {
+      setTags?: (ids: string[]) => Promise<void>;
+      $set?: (association: string, ids: string[]) => Promise<void>;
+    };
+
+    if (typeof instance.setTags === "function") {
+      await instance.setTags(tagIds);
+      return;
+    }
+
+    if (typeof instance.$set === "function") {
+      await instance.$set("tags", tagIds);
+      return;
+    }
+
+    throw new Error("Pattern tags association is not configured correctly");
   }
 
   async getWithTags(id: string): Promise<Pattern | null> {

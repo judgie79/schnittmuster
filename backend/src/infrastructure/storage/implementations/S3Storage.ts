@@ -1,6 +1,7 @@
 import AWS from "aws-sdk";
 import { v4 as uuidv4 } from "uuid";
 import { FileMetadata, IFileStorage } from "../FileStorageService";
+import { buildFileDownloadUrl } from "@shared/utils/files";
 
 export class S3Storage implements IFileStorage {
   private readonly s3: AWS.S3;
@@ -27,7 +28,7 @@ export class S3Storage implements IFileStorage {
       originalName: fileName,
       mimeType,
       size: file.length,
-      url: `https://${this.bucket}.s3.amazonaws.com/${key}`,
+      url: buildFileDownloadUrl(fileId),
     };
   }
 
@@ -56,6 +57,6 @@ export class S3Storage implements IFileStorage {
   }
 
   getUrl(fileId: string): string {
-    return `https://${this.bucket}.s3.amazonaws.com/patterns/${fileId}`;
+    return buildFileDownloadUrl(fileId);
   }
 }

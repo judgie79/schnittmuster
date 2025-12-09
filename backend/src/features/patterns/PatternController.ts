@@ -6,6 +6,7 @@ import type { PatternStatus } from "@shared/dtos";
 import { PATTERN_STATUS_VALUES, TAG_FILTER_PARAM_KEYS, type PatternListFilters } from "./types";
 
 type UploadedFile = Express.Multer.File;
+type UploadedFileMap = Record<string, UploadedFile[]>;
 
 export class PatternController {
   constructor(private readonly patternService = new PatternService()) {}
@@ -75,6 +76,18 @@ export class PatternController {
     return statuses.length ? statuses : undefined;
   }
 
+  private extractUploadedFiles(req: Request): { file?: UploadedFile; thumbnail?: UploadedFile } {
+    const files = (req as Request & { files?: UploadedFileMap }).files;
+    if (!files) {
+      return {};
+    }
+    const getFirst = (key: string) => (files[key] && files[key][0]) || undefined;
+    return {
+      file: getFirst("file"),
+      thumbnail: getFirst("thumbnail"),
+    };
+  }
+
   private buildListFilters(query: Request["query"]): PatternListFilters {
     const params = query as Record<string, unknown>;
     const tagIds = TAG_FILTER_PARAM_KEYS.flatMap((key) => this.parseStringArray(params[key]));
@@ -112,6 +125,7 @@ export class PatternController {
     const request = req as AuthenticatedRequest;
     const tagIds = this.parseTagIds(request.body.tagIds);
     const isFavorite = this.parseBoolean(request.body.isFavorite);
+    const { file, thumbnail } = this.extractUploadedFiles(request);
     const payload = {
       ...request.body,
       tagIds,
@@ -120,7 +134,8 @@ export class PatternController {
     const pattern = await this.patternService.create(
       request.user!.id,
       payload,
-      request.file as UploadedFile | undefined
+      file,
+      thumbnail
     );
     res.status(201).json({ success: true, data: pattern });
   });
@@ -129,6 +144,7 @@ export class PatternController {
     const request = req as AuthenticatedRequest;
     const tagIds = this.parseTagIds(request.body.tagIds);
     const isFavorite = this.parseBoolean(request.body.isFavorite);
+    const { file, thumbnail } = this.extractUploadedFiles(request);
     const payload = {
       ...request.body,
       tagIds,
@@ -138,7 +154,8 @@ export class PatternController {
       request.params.id,
       request.user!.id,
       payload,
-      request.file as UploadedFile | undefined
+      file,
+      thumbnail
     );
     res.json({ success: true, data: pattern });
   });

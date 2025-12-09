@@ -3,7 +3,6 @@ import { ROUTE_TITLES } from '@/utils/navigation'
 import { Container } from './Container'
 import { Header } from './Header'
 import { BottomNav } from './BottomNav'
-import styles from './Layout.module.css'
 
 export const Layout = () => {
   const { pathname } = useLocation()
@@ -11,9 +10,9 @@ export const Layout = () => {
   const isAuthRoute = pathname === '/' || pathname.startsWith('/login') || pathname.startsWith('/signup')
 
   return (
-    <div className={styles.appShell}>
+    <div className="flex flex-col min-h-screen bg-background text-text transition-colors duration-300">
       {!isAuthRoute && <Header title={title} />}
-      <main className={styles.main}>
+      <main className="flex-1 pb-20">
         <Container>
           <Outlet />
         </Container>
@@ -22,3 +21,4 @@ export const Layout = () => {
     </div>
   )
 }
+
