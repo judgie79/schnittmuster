@@ -1,0 +1,68 @@
+import { AxiosProgressEvent } from 'axios';
+import { apiClient } from './api';
+import { ApiResponse, PatternDTO, PatternTagProposalDTO } from 'schnittmuster-manager-dtos';
+import { PaginatedResponse, PatternListParams, PatternRequestOptions, TagProposalPayload } from '../types/patterns';
+
+const handleProgress = (event: AxiosProgressEvent, onUploadProgress?: (progress: number) => void) => {
+  if (!onUploadProgress || !event.total) return;
+  const percent = Math.round((event.loaded / event.total) * 100);
+  onUploadProgress(percent);
+};
+
+export const patternService = {
+  async list(params: PatternListParams = {}): Promise<PaginatedResponse<PatternDTO[]>> {
+    const { page = 1, pageSize = 20, filters = {} } = params;
+    const response = await apiClient.get<PaginatedResponse<PatternDTO[]>>('/patterns', {
+      params: { page, pageSize, ...filters },
+    });
+    return response.data;
+  },
+
+  async get(patternId: string): Promise<PatternDTO> {
+    const response = await apiClient.get<ApiResponse<PatternDTO>>(`/patterns/${patternId}`);
+    return response.data.data;
+  },
+
+  async create(formData: FormData, options: PatternRequestOptions = {}): Promise<PatternDTO> {
+    const response = await apiClient.post<ApiResponse<PatternDTO>>('/patterns', formData, {
+      // Let Axios/browsers set the multipart boundary; manual headers discard the file payload.
+      onUploadProgress: (event) => handleProgress(event, options.onUploadProgress),
+    });
+    return response.data.data;
+  },
+
+  async update(
+    patternId: string,
+    payload: Partial<PatternDTO> | FormData,
+    options: PatternRequestOptions = {}
+  ): Promise<PatternDTO> {
+    const response = await apiClient.put<ApiResponse<PatternDTO>>(`/patterns/${patternId}`, payload, {
+      onUploadProgress: (event) => handleProgress(event, options.onUploadProgress),
+    });
+    return response.data.data;
+  },
+
+  async remove(patternId: string): Promise<void> {
+    await apiClient.delete(`/patterns/${patternId}`);
+  },
+
+  async assignTags(patternId: string, tagIds: string[]): Promise<PatternDTO> {
+    const response = await apiClient.post<ApiResponse<PatternDTO>>(`/patterns/${patternId}/tags`, { tagIds });
+    return response.data.data;
+  },
+
+  async removeTag(patternId: string, tagId: string): Promise<PatternDTO> {
+    const response = await apiClient.delete<ApiResponse<PatternDTO>>(`/patterns/${patternId}/tags/${tagId}`);
+    return response.data.data;
+  },
+
+  async listTagProposals(patternId: string): Promise<PatternTagProposalDTO[]> {
+    const response = await apiClient.get<ApiResponse<PatternTagProposalDTO[]>>(`/patterns/${patternId}/tag-proposals`);
+    return response.data.data;
+  },
+
+  async createTagProposal(patternId: string, payload: TagProposalPayload): Promise<PatternTagProposalDTO> {
+    const response = await apiClient.post<ApiResponse<PatternTagProposalDTO>>(`/patterns/${patternId}/tag-proposals`, payload);
+    return response.data.data;
+  },
+};
