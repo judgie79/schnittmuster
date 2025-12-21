@@ -1,17 +1,29 @@
 import clsx from 'clsx'
-import { useEffect, useMemo, useState } from 'react'
-import type { FormEvent } from 'react'
-import { useParams } from 'react-router-dom'
+import { useEffect, useMemo, useState, useId } from 'react'
+import type { ChangeEvent, FormEvent } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/common/Button'
 import { Loader } from '@/components/common/Loader'
 import { Badge } from '@/components/common/Badge'
 import { usePattern, useTags, useProtectedFile } from '@/hooks'
 import { useGlobalContext } from '@/context'
-import { patternService, tagService, fileService } from '@/services'
+import { patternService, tagService, patternPrinter } from '@/services'
 import { createToast } from '@/utils'
 import type { PatternTagProposalDTO, TagProposalStatus } from 'shared-dtos'
 import styles from './Page.module.css'
+
+const getContrastColor = (hexColor?: string) => {
+  if (!hexColor) {
+    return '#0f172a'
+  }
+  const hex = hexColor.replace('#', '')
+  const r = parseInt(hex.substring(0, 2), 16)
+  const g = parseInt(hex.substring(2, 4), 16)
+  const b = parseInt(hex.substring(4, 6), 16)
+  const yiq = (r * 299 + g * 587 + b * 114) / 1000
+  return yiq >= 128 ? '#0f172a' : '#f8fafc'
+}
 
 const PROPOSAL_STATUS_LABELS: Record<TagProposalStatus, string> = {
   pending: 'Ausstehend',
@@ -20,9 +32,12 @@ const PROPOSAL_STATUS_LABELS: Record<TagProposalStatus, string> = {
 }
 
 const DEFAULT_PROPOSAL_COLOR = '#2F6FED'
+const PRINT_SCALE_STORAGE_KEY = 'pattern-print-scale'
+const clampScaleValue = (value: number) => Math.min(150, Math.max(50, Math.round(value)))
 
 export const PatternDetailScreen = () => {
   const { patternId } = useParams()
+  const navigate = useNavigate()
   const queryClient = useQueryClient()
   const { state, dispatch } = useGlobalContext()
   const { categories } = useTags()
@@ -32,17 +47,42 @@ export const PatternDetailScreen = () => {
   const [proposalCategoryId, setProposalCategoryId] = useState('')
   const [proposalColor, setProposalColor] = useState(DEFAULT_PROPOSAL_COLOR)
   const [proposalError, setProposalError] = useState<string | null>(null)
-  const [isDownloadingFile, setIsDownloadingFile] = useState(false)
+  const [printScale, setPrintScale] = useState(100)
+  const [isPrinting, setIsPrinting] = useState(false)
+  const [printError, setPrintError] = useState<string | null>(null)
+  const scaleInputId = useId()
 
   const userId = state.auth.user?.id
   const isAdmin = Boolean(state.auth.user?.adminRole)
   const isOwner = data?.ownerId === userId
+  const canEdit = Boolean(patternId && (isOwner || isAdmin))
 
   useEffect(() => {
     if (!proposalCategoryId && categories.length) {
       setProposalCategoryId(categories[0].id)
     }
   }, [categories, proposalCategoryId])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return
+    }
+    const storedRaw = window.localStorage.getItem(PRINT_SCALE_STORAGE_KEY)
+    if (storedRaw === null) {
+      return
+    }
+    const storedValue = Number(storedRaw)
+    if (Number.isFinite(storedValue)) {
+      setPrintScale(clampScaleValue(storedValue))
+    }
+  }, [])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return
+    }
+    window.localStorage.setItem(PRINT_SCALE_STORAGE_KEY, String(printScale))
+  }, [printScale])
 
   const proposals = data?.proposedTags ?? []
   const pendingProposals = proposals.filter((proposal) => proposal.status === 'pending')
@@ -114,24 +154,42 @@ export const PatternDetailScreen = () => {
     rejectMutation.mutate(proposalId)
   }
 
-  const handleFileOpen = async () => {
-    if (!data?.fileUrl || isDownloadingFile) {
+  const handleEditNavigate = () => {
+    if (!patternId) {
       return
     }
-    setIsDownloadingFile(true)
+    navigate(`/patterns/${patternId}/edit`)
+  }
+
+  const handleScaleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const nextValue = Number(event.target.value)
+    if (Number.isNaN(nextValue)) {
+      return
+    }
+    setPrintScale(clampScaleValue(nextValue))
+    setPrintError(null)
+  }
+
+  const handlePrint = async () => {
+    if (!data?.fileUrl) {
+      setPrintError('Keine druckbare Datei gefunden.')
+      return
+    }
+    setIsPrinting(true)
+    setPrintError(null)
     try {
-      const blob = await fileService.get(data.fileUrl)
-      const objectUrl = URL.createObjectURL(blob)
-      const newWindow = window.open(objectUrl, '_blank', 'noopener')
-      if (newWindow) {
-        newWindow.focus()
-      }
-      setTimeout(() => URL.revokeObjectURL(objectUrl), 60_000)
-    } catch (fetchError) {
-      const message = fetchError instanceof Error ? fetchError.message : 'Datei konnte nicht geladen werden.'
+      await patternPrinter.print({
+        fileUrl: data.fileUrl,
+        fileName: data.name,
+        scale: printScale / 100,
+      })
+      dispatch({ type: 'ADD_TOAST', payload: createToast('Druck vorbereitet – prüfe den Dialog.', 'success') })
+    } catch (printIssue) {
+      const message = printIssue instanceof Error ? printIssue.message : 'Druck fehlgeschlagen.'
+      setPrintError(message)
       dispatch({ type: 'ADD_TOAST', payload: createToast(message, 'error') })
     } finally {
-      setIsDownloadingFile(false)
+      setIsPrinting(false)
     }
   }
 
@@ -170,38 +228,68 @@ export const PatternDetailScreen = () => {
           <h2>{data.name}</h2>
           <p className={styles.helperText}>{data.description ?? 'Keine Beschreibung hinterlegt.'}</p>
         </div>
-        <Badge>{data.status.toUpperCase()}</Badge>
+        <div className={styles.headerActions}>
+          <Badge>{data.status.toUpperCase()}</Badge>
+          {canEdit ? (
+            <Button type="button" variant="secondary" onClick={handleEditNavigate}>
+              Bearbeiten
+            </Button>
+          ) : null}
+        </div>
       </header>
 
       <div className={styles.tagSection}>
         <h3>Tags</h3>
         <div className={styles.tagList}>
           {data.tags.length ? (
-            data.tags.map((tag) => (
-              <span key={tag.id} className={styles.tagChip}>
-                <span className={styles.colorDot} style={{ backgroundColor: tag.colorHex ?? '#555' }} aria-hidden />
-                {tag.name}
-              </span>
-            ))
+            data.tags.map((tag) => {
+              const backgroundColor = tag.colorHex ?? '#e2e8f0'
+              const textColor = getContrastColor(backgroundColor)
+              return (
+                <span
+                  key={tag.id}
+                  className={styles.tagChip}
+                  style={{ backgroundColor, color: textColor }}
+                >
+                  {tag.name}
+                </span>
+              )
+            })
           ) : (
             <p className={styles.helperText}>Noch keine Tags zugewiesen.</p>
           )}
         </div>
       </div>
 
+      <div className={styles.printControls}>
+        <label htmlFor={scaleInputId}>
+          <span>Druck-Skalierung (%)</span>
+          <input
+            id={scaleInputId}
+            type="number"
+            min={50}
+            max={150}
+            step={1}
+            value={printScale}
+            onChange={handleScaleChange}
+            className={styles.printInput}
+          />
+        </label>
+        <p className={styles.helperText}>
+          100% = Originalgröße. Passe die Skalierung an, falls dein Testquadrat zu groß oder klein ist.
+        </p>
+        {printError ? <p className={styles.printError}>{printError}</p> : null}
+      </div>
+
       <div className={styles.actionGrid}>
-        <Button
-          type="button"
-          onClick={handleFileOpen}
-          disabled={!data.fileUrl || isDownloadingFile}
-        >
-          {isDownloadingFile ? 'Datei öffnen …' : '📥 Datei öffnen'}
+        <Button type="button" onClick={handlePrint} disabled={!data.fileUrl || isPrinting}>
+          {isPrinting ? 'Druck wird vorbereitet ...' : '🖨️ Drucken'}
         </Button>
         <Button variant="secondary">✓ Als genäht markieren</Button>
         <Button variant="ghost">★ Favorisieren</Button>
       </div>
 
-      {canProposeTag ? (
+      {/* {canProposeTag ? (
         <div className={styles.proposalForm}>
           <h3>Neuen Tag vorschlagen</h3>
           <form className={styles.formGrid} onSubmit={handleProposalSubmit}>
@@ -290,7 +378,7 @@ export const PatternDetailScreen = () => {
             ))}
           </div>
         </section>
-      )}
+      )} */}
     </section>
   )
 }

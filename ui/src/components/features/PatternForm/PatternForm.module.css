@@ -10,6 +10,50 @@
   gap: var(--space-4);
 }
 
+.previewCard {
+  margin-top: 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-2);
+  padding: 0.75rem;
+  background-color: var(--color-muted-bg);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.previewLabel {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-muted-strong, #334155);
+}
+
+.previewImage {
+  width: 100%;
+  border-radius: var(--radius-2);
+  max-height: 220px;
+  object-fit: cover;
+}
+
+.previewFileRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.previewFileName {
+  font-weight: 600;
+  color: var(--color-foreground, #0f172a);
+  word-break: break-word;
+  flex: 1 1 auto;
+}
+
+.previewError {
+  color: var(--color-danger);
+  font-size: 0.85rem;
+}
+
 .sectionTitle {
   font-size: 1rem;
   font-weight: 600;

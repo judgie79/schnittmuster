@@ -89,6 +89,9 @@ export const EditPatternScreen = () => {
         initialValues={initialValues}
         initialTags={patternQuery.data.tags}
         tagCategories={categories}
+        areTagsLoading={isLoadingTags}
+        existingThumbnailUrl={patternQuery.data.thumbnailUrl}
+        existingFileUrl={patternQuery.data.fileUrl}
         onSubmit={handleSubmit}
         isSubmitting={updateMutation.isPending}
         errorMessage={submitError}

@@ -2,6 +2,9 @@ import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { Button } from '@/components/common/Button'
 import { FileUpload } from '@/components/features/FileUpload/FileUpload'
 import { TagSelector } from '@/components/features/TagSelector/TagSelector'
+import { useProtectedFile } from '@/hooks'
+import { fileService } from '@/services'
+import { resolveAssetUrl } from '@/utils/url'
 import type { PatternFormValues } from '@/types'
 import type { PatternStatus, TagCategoryDTO, TagDTO } from 'shared-dtos'
 import styles from './PatternForm.module.css'
@@ -19,6 +22,8 @@ export interface PatternFormProps {
   initialTags?: TagDTO[]
   tagCategories: TagCategoryDTO[]
   areTagsLoading?: boolean
+  existingThumbnailUrl?: string
+  existingFileUrl?: string
   onSubmit: (values: PatternFormValues) => void | Promise<void>
   submitLabel?: string
   isSubmitting?: boolean
@@ -39,11 +44,22 @@ const DEFAULT_VALUES: PatternFormValues = {
   notes: '',
 }
 
+const getFileNameFromPath = (path?: string): string | null => {
+  if (!path) {
+    return null
+  }
+  const sanitized = path.split(/[?#]/)[0]
+  const segments = sanitized.split('/').filter(Boolean)
+  return segments.length ? segments[segments.length - 1] : null
+}
+
 export const PatternForm = ({
   initialValues,
   initialTags = [],
   tagCategories,
   areTagsLoading = false,
+  existingThumbnailUrl,
+  existingFileUrl,
   onSubmit,
   submitLabel = 'Speichern',
   isSubmitting = false,
@@ -65,7 +81,11 @@ export const PatternForm = ({
   const [selectedTags, setSelectedTags] = useState<TagDTO[]>(initialTags)
   const [localError, setLocalError] = useState<string | null>(null)
   const [fileSeed, setFileSeed] = useState(0)
+  const [isOpeningExistingFile, setIsOpeningExistingFile] = useState(false)
+  const [existingFileError, setExistingFileError] = useState<string | null>(null)
   const resetSnapshotRef = useRef<string | null>(null)
+  const { url: existingThumbnailPreview } = useProtectedFile(existingThumbnailUrl)
+  const existingFileName = useMemo(() => getFileNameFromPath(existingFileUrl ?? undefined), [existingFileUrl])
 
   useEffect(() => {
     const snapshot = JSON.stringify({
@@ -103,6 +123,35 @@ export const PatternForm = ({
     })
   }
 
+  const handleExistingFileOpen = async () => {
+    if (!existingFileUrl || isOpeningExistingFile) {
+      return
+    }
+    const resolvedUrl = resolveAssetUrl(existingFileUrl)
+    if (!resolvedUrl) {
+      setExistingFileError('Datei nicht verfügbar.')
+      return
+    }
+
+    setIsOpeningExistingFile(true)
+    setExistingFileError(null)
+
+    try {
+      const blob = await fileService.get(resolvedUrl)
+      const objectUrl = URL.createObjectURL(blob)
+      const newWindow = window.open(objectUrl, '_blank', 'noopener')
+      if (newWindow) {
+        newWindow.focus()
+      }
+      setTimeout(() => URL.revokeObjectURL(objectUrl), 60_000)
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Datei konnte nicht geöffnet werden.'
+      setExistingFileError(message)
+    } finally {
+      setIsOpeningExistingFile(false)
+    }
+  }
+
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     if (requireFile && !patternFile) {
@@ -136,6 +185,18 @@ export const PatternForm = ({
         <div>
           <FileUpload key={`pattern-file-${fileSeed}`} label={`Schnittmuster hochladen (max. ${maxFileSizeMB} MB)`} onFileChange={setPatternFile} />
           {patternFile ? <p className={styles.helper}>Ausgewählte Datei: {patternFile.name}</p> : null}
+          {!patternFile && existingFileUrl ? (
+            <div className={styles.previewCard}>
+              <span className={styles.previewLabel}>Aktuelle PDF-Datei</span>
+              <div className={styles.previewFileRow}>
+                <p className={styles.previewFileName}>{existingFileName ?? 'Schnittmuster.pdf'}</p>
+                <Button type="button" variant="secondary" onClick={handleExistingFileOpen} disabled={isOpeningExistingFile}>
+                  {isOpeningExistingFile ? 'Öffne …' : 'Anzeigen'}
+                </Button>
+              </div>
+              {existingFileError ? <p className={styles.previewError}>{existingFileError}</p> : null}
+            </div>
+          ) : null}
         </div>
         <div>
           <FileUpload
@@ -144,6 +205,12 @@ export const PatternForm = ({
             onFileChange={setThumbnail}
           />
           {thumbnail ? <p className={styles.helper}>Vorschaubild: {thumbnail.name}</p> : null}
+          {!thumbnail && existingThumbnailPreview ? (
+            <div className={styles.previewCard}>
+              <span className={styles.previewLabel}>Aktuelles Vorschaubild</span>
+              <img src={existingThumbnailPreview} alt="Aktuelles Vorschaubild" className={styles.previewImage} />
+            </div>
+          ) : null}
         </div>
       </div>
 
@@ -182,7 +249,10 @@ export const PatternForm = ({
         />
       </label>
 
-      <TagSelector categories={tagCategories} selected={selectedTags} onToggle={toggleTag} isLoading={areTagsLoading} />
+      <div>
+        <span className={styles.sectionTitle}>Kategorien & Tags</span>
+        <TagSelector categories={tagCategories} selected={selectedTags} onToggle={toggleTag} isLoading={areTagsLoading} />
+      </div>
 
       {localError ? <p className={styles.error}>{localError}</p> : null}
       {errorMessage ? <p className={styles.error}>{errorMessage}</p> : null}

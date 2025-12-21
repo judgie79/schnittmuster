@@ -2,6 +2,10 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-3);
+  padding: var(--space-2);
+  background: var(--color-surface);
 }
 
 .helper {
@@ -14,13 +18,14 @@
   border-radius: var(--radius-md);
   background: var(--color-muted-bg);
   font-size: 0.9rem;
+  color: var(--color-muted-strong, #334155);
 }
 
 .categorySection {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   padding: 0.75rem;
-  background: var(--color-surface);
+  background: var(--color-muted-bg);
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -45,15 +50,22 @@
 }
 
 .chip {
-  padding: 8px 12px;
-  border-radius: var(--radius-md);
+  padding: 8px 14px;
+  border-radius: 999px;
   border: 1px solid var(--color-border);
-  background-color: var(--color-surface);
+  background-color: #e2e8f0;
   cursor: pointer;
   font-size: 14px;
+  font-weight: 600;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  min-height: 34px;
+}
+
+.chip:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 .chipActive {
-  background-color: rgba(50, 184, 198, 0.2);
-  border-color: var(--color-primary);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.12);
 }
