@@ -1,4 +1,4 @@
-import { FaSearch } from 'react-icons/fa'
+import styles from './SearchBar.module.css'
 
 interface SearchBarProps {
   placeholder?: string
@@ -8,18 +8,15 @@ interface SearchBarProps {
 
 export const SearchBar = ({ placeholder = 'Suche Schnittmuster...', value, onChange }: SearchBarProps) => {
   return (
-    <div className="relative">
-      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-text-muted">
-        <FaSearch />
-      </div>
+    <label className={styles.wrapper}>
+      <span aria-hidden>🔍</span>
       <input
-        className="block w-full pl-10 pr-3 py-3 border border-border rounded-lg bg-surface text-text placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors shadow-sm"
+        className={styles.input}
         type="search"
         placeholder={placeholder}
         value={value}
         onChange={(event) => onChange(event.target.value)}
       />
-    </div>
+    </label>
   )
 }
-

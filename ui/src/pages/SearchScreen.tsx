@@ -6,6 +6,7 @@ import { FilterPanel } from '@/components/features/FilterPanel/FilterPanel'
 import type { FilterState } from '@/context/types'
 import type { PatternStatus } from 'shared-dtos'
 import { STATUS_LABELS, TAG_SECTION_CONFIG, type TagFilterKey } from '@/constants/tagFilters'
+import styles from './Page.module.css'
 
 interface ComputedSection {
   id: TagFilterKey
@@ -79,7 +80,7 @@ export const SearchScreen = () => {
   const noResults = canSearch && !isLoading && results.length === 0
 
   return (
-    <div className="p-4 pb-24 max-w-7xl mx-auto">
+    <section className={styles.section}>
       <SearchBar
         placeholder="Nach Namen suchen"
         value={queryValue}
@@ -88,8 +89,8 @@ export const SearchScreen = () => {
           setQuery(value)
         }}
       />
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mt-6">
-        <div className="lg:col-span-1">
+      <div className={styles.searchLayout}>
+        <div className={styles.filterColumn}>
           <FilterPanel
             sections={filterSections}
             onToggle={(sectionId, value) => toggleFilter(sectionId as TagFilterKey, value)}
@@ -99,15 +100,15 @@ export const SearchScreen = () => {
             onFavoriteToggle={toggleFavoriteOnly}
             activeFilterCount={activeFilterCount}
           />
-          {isLoadingTags && <p className="text-center text-text-muted py-4">Filter werden geladen ...</p>}
+          {isLoadingTags && <p className={styles.helperText}>Filter werden geladen ...</p>}
         </div>
-        <div className="lg:col-span-3">
-          {showInstruction && <p className="text-center text-text-muted py-4">Gib mindestens zwei Buchstaben ein oder wähle Filter aus.</p>}
-          {canSearch && isLoading && <p className="text-center text-text-muted py-4">Suchen ...</p>}
-          {noResults && <p className="text-center text-text-muted py-4">Keine Schnittmuster gefunden.</p>}
+        <div className={styles.resultsColumn}>
+          {showInstruction && <p className={styles.helperText}>Gib mindestens zwei Buchstaben ein oder wähle Filter aus.</p>}
+          {canSearch && isLoading && <p className={styles.helperText}>Suchen ...</p>}
+          {noResults && <p className={styles.helperText}>Keine Schnittmuster gefunden.</p>}
           {canSearch && !isLoading && results.length > 0 && <PatternGrid patterns={results} />}
         </div>
       </div>
-    </div>
+    </section>
   )
 }

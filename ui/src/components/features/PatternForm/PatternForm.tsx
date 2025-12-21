@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
+import { Button } from '@/components/common/Button'
 import { FileUpload } from '@/components/features/FileUpload/FileUpload'
 import { TagSelector } from '@/components/features/TagSelector/TagSelector'
 import type { PatternFormValues } from '@/types'
 import type { PatternStatus, TagCategoryDTO, TagDTO } from 'shared-dtos'
-import { FaHeart, FaRegHeart } from 'react-icons/fa'
+import styles from './PatternForm.module.css'
 
 const STATUS_OPTIONS: Array<{ value: PatternStatus; label: string }> = [
   { value: 'draft', label: 'Entwurf' },
@@ -25,8 +26,6 @@ export interface PatternFormProps {
   requireFile?: boolean
   uploadProgress?: number | null
   maxFileSizeBytes?: number
-  existingFileUrl?: string | null
-  existingThumbnailUrl?: string | null
 }
 
 const DEFAULT_VALUES: PatternFormValues = {
@@ -52,8 +51,6 @@ export const PatternForm = ({
   requireFile = false,
   uploadProgress = null,
   maxFileSizeBytes = 52_428_800,
-  existingFileUrl = null,
-  existingThumbnailUrl = null,
 }: PatternFormProps) => {
   const mergedInitial = useMemo(() => ({ ...DEFAULT_VALUES, ...initialValues }), [initialValues])
   const maxFileSizeMB = Math.round(maxFileSizeBytes / (1024 * 1024))
@@ -97,7 +94,6 @@ export const PatternForm = ({
     setThumbnail(mergedInitial.thumbnail ?? null)
     setSelectedTags(initialTags)
     setFileSeed((seed) => seed + 1)
-
   }, [initialTags, mergedInitial])
 
   const toggleTag = (tag: TagDTO) => {
@@ -135,24 +131,11 @@ export const PatternForm = ({
   }
 
   return (
-    <form className="space-y-6" onSubmit={handleSubmit}>
-      <div className="space-y-4 bg-surface p-4 rounded-xl border border-border shadow-sm">
+    <form className={styles.form} onSubmit={handleSubmit}>
+      <div className={styles.stack}>
         <div>
-          <FileUpload
-            key={`pattern-file-${fileSeed}`}
-            label={`Schnittmuster hochladen (max. ${maxFileSizeMB} MB)`}
-            onFileChange={setPatternFile}
-          />
-          {patternFile ? (
-            <p className="text-sm text-text-muted mt-1">Ausgewählte Datei: {patternFile.name}</p>
-          ) : existingFileUrl ? (
-            <div className="flex items-center gap-2 mt-2 p-2 bg-background rounded-lg border border-border">
-              <span className="text-sm text-text-muted">Aktuelle Datei hinterlegt.</span>
-              <a href={existingFileUrl} target="_blank" rel="noreferrer" className="text-primary text-sm font-medium hover:underline">
-                Öffnen
-              </a>
-            </div>
-          ) : null}
+          <FileUpload key={`pattern-file-${fileSeed}`} label={`Schnittmuster hochladen (max. ${maxFileSizeMB} MB)`} onFileChange={setPatternFile} />
+          {patternFile ? <p className={styles.helper}>Ausgewählte Datei: {patternFile.name}</p> : null}
         </div>
         <div>
           <FileUpload
@@ -160,108 +143,63 @@ export const PatternForm = ({
             label={`Vorschaubild (max. ${maxFileSizeMB} MB)`}
             onFileChange={setThumbnail}
           />
-          {thumbnail ? (
-            <p className="text-sm text-text-muted mt-1">Vorschaubild: {thumbnail.name}</p>
-          ) : existingThumbnailUrl ? (
-            <div className="mt-2">
-              <div className="w-24 h-24 rounded-lg overflow-hidden border border-border bg-background">
-                <img
-                  src={existingThumbnailUrl}
-                  alt={name ? `${name} Vorschaubild` : 'Aktuelles Vorschaubild'}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <span className="text-sm text-text-muted block mt-1">Aktuelles Vorschaubild</span>
-            </div>
-          ) : null}
+          {thumbnail ? <p className={styles.helper}>Vorschaubild: {thumbnail.name}</p> : null}
         </div>
       </div>
 
-      <div className="space-y-4 bg-surface p-4 rounded-xl border border-border shadow-sm">
-        <div>
-          <label className="block text-sm font-medium text-text-muted mb-1">Name</label>
-          <input 
-            type="text" 
-            value={name} 
-            onChange={(event) => setName(event.target.value)} 
-            required 
-            className="w-full p-3 rounded-lg border border-border bg-background text-text focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
-          />
-        </div>
+      <label>
+        <span className={styles.sectionTitle}>Name</span>
+        <input type="text" value={name} onChange={(event) => setName(event.target.value)} required />
+      </label>
 
-        <div>
-          <label className="block text-sm font-medium text-text-muted mb-1">Beschreibung</label>
-          <textarea 
-            value={description} 
-            onChange={(event) => setDescription(event.target.value)} 
-            className="w-full p-3 rounded-lg border border-border bg-background text-text focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all min-h-[100px]"
-          />
-        </div>
+      <label>
+        <span className={styles.sectionTitle}>Beschreibung</span>
+        <textarea value={description} onChange={(event) => setDescription(event.target.value)} />
+      </label>
 
-        <div>
-          <label className="block text-sm font-medium text-text-muted mb-1">Status</label>
-          <select 
-            value={status} 
-            onChange={(event) => setStatus(event.target.value as PatternStatus)}
-            className="w-full p-3 rounded-lg border border-border bg-background text-text focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
-          >
-            {STATUS_OPTIONS.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </div>
+      <label>
+        <span className={styles.sectionTitle}>Status</span>
+        <select value={status} onChange={(event) => setStatus(event.target.value as PatternStatus)}>
+          {STATUS_OPTIONS.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+      </label>
 
-        <label className="flex items-center gap-3 p-3 rounded-lg border border-border bg-background cursor-pointer hover:bg-surface transition-colors">
-          <input 
-            type="checkbox" 
-            checked={isFavorite} 
-            onChange={(event) => setIsFavorite(event.target.checked)} 
-            className="w-5 h-5 text-primary rounded focus:ring-primary border-gray-300"
-          />
-          <span className="flex items-center gap-2 font-medium">
-            {isFavorite ? <FaHeart className="text-primary" /> : <FaRegHeart className="text-text-muted" />}
-            Zu Favoriten hinzufügen
-          </span>
-        </label>
+      <label className={styles.checkboxRow}>
+        <input type="checkbox" checked={isFavorite} onChange={(event) => setIsFavorite(event.target.checked)} />
+        Zu Favoriten hinzufügen
+      </label>
 
-        <div>
-          <label className="block text-sm font-medium text-text-muted mb-1">Notizen</label>
-          <textarea
-            value={notes}
-            onChange={(event) => setNotes(event.target.value)}
-            placeholder="Optionale Hinweise"
-            className="w-full p-3 rounded-lg border border-border bg-background text-text focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all min-h-[80px]"
-          />
-        </div>
-      </div>
+      <label>
+        <span className={styles.sectionTitle}>Notizen</span>
+        <textarea
+          value={notes}
+          onChange={(event) => setNotes(event.target.value)}
+          placeholder="Optionale Hinweise"
+        />
+      </label>
 
-      <div className="bg-surface p-4 rounded-xl border border-border shadow-sm">
-        <TagSelector categories={tagCategories} selected={selectedTags} onToggle={toggleTag} isLoading={areTagsLoading} />
-      </div>
+      <TagSelector categories={tagCategories} selected={selectedTags} onToggle={toggleTag} isLoading={areTagsLoading} />
 
-      {localError ? <p className="text-error text-sm bg-error/10 p-3 rounded-lg">{localError}</p> : null}
-      {errorMessage ? <p className="text-error text-sm bg-error/10 p-3 rounded-lg">{errorMessage}</p> : null}
+      {localError ? <p className={styles.error}>{localError}</p> : null}
+      {errorMessage ? <p className={styles.error}>{errorMessage}</p> : null}
 
-      <div className="sticky bottom-0 bg-background/95 backdrop-blur-sm p-4 -mx-4 border-t border-border">
-        <button 
-          type="submit" 
-          disabled={!name || (requireFile && !patternFile) || isSubmitting}
-          className="w-full py-3 px-4 bg-primary text-primary-foreground rounded-xl font-medium shadow-sm hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-        >
+      <div className={styles.actions}>
+        <Button type="submit" disabled={!name || (requireFile && !patternFile) || isSubmitting}>
           {isSubmitting ? 'Speichern ...' : submitLabel}
-        </button>
+        </Button>
         {typeof uploadProgress === 'number' && (
-          <div className="mt-2" aria-live="polite">
-            <div className="h-2 bg-border rounded-full overflow-hidden">
-              <div className="h-full bg-primary transition-all duration-300" style={{ width: `${uploadProgress}%` }} />
+          <div className={styles.progressWrapper} aria-live="polite">
+            <div className={styles.progressTrack}>
+              <div className={styles.progressBar} style={{ width: `${uploadProgress}%` }} />
             </div>
-            <span className="text-xs text-text-muted mt-1 block text-center">{uploadProgress}% hochgeladen</span>
+            <span className={styles.helper}>{uploadProgress}% hochgeladen</span>
           </div>
         )}
       </div>
     </form>
   )
 }
-

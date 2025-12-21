@@ -179,6 +179,11 @@
   background: var(--color-surface);
 }
 
+.tagRow input[type='text'],
+.inlineForm input[type='text'],
+.inlineFormRow input[type='text'] {
+  min-width: 100px;
+}
 .inlineFormActions {
   display: flex;
   gap: 0.3rem;
@@ -207,13 +212,6 @@
 
 .tagRowInputs input[type='text'] {
   flex: 1;
-  min-width: 100px;
-}
-.tagRowInputs input[type='color'] {
-  max-width: 200px;
-}
-.inlineFormRow button {
-  max-width: 200px;
 }
 
 .tagRowActions {

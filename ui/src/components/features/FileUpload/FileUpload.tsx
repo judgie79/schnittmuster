@@ -1,7 +1,6 @@
 import type { ChangeEvent, DragEvent, KeyboardEvent } from 'react'
 import { useEffect, useId, useRef, useState } from 'react'
-import { FaCloudUploadAlt, FaFile, FaImage } from 'react-icons/fa'
-import { clsx } from 'clsx'
+import styles from './FileUpload.module.css'
 
 interface FileUploadProps {
   label: string
@@ -51,7 +50,18 @@ export const FileUpload = ({ label, onFileChange, accept }: FileUploadProps) => 
     }
   }
 
-  const handleDragLeave = () => {
+  const handleDragEnter = (event: DragEvent<HTMLDivElement>) => {
+    event.preventDefault()
+    if (!isDragging) {
+      setIsDragging(true)
+    }
+  }
+
+  const handleDragLeave = (event: DragEvent<HTMLDivElement>) => {
+    const nextTarget = event.relatedTarget as Node | null
+    if (nextTarget && event.currentTarget.contains(nextTarget)) {
+      return
+    }
     setIsDragging(false)
   }
 
@@ -71,63 +81,36 @@ export const FileUpload = ({ label, onFileChange, accept }: FileUploadProps) => 
   }, [previewUrl])
 
   return (
-    <div className="w-full">
-      <label id={labelId} htmlFor={inputId} className="block text-sm font-medium text-text-muted mb-2">
-        {label}
-      </label>
-      
+    <div>
+      <input
+        ref={inputRef}
+        id={inputId}
+        className={styles.input}
+        type="file"
+        accept={accept}
+        aria-labelledby={labelId}
+        onChange={handleChange}
+      />
       <div
         role="button"
         tabIndex={0}
+        aria-controls={inputId}
         aria-labelledby={labelId}
-        onKeyDown={handleKeyDown}
+        className={`${styles.dropzone} ${isDragging ? styles.dropzoneActive : ''}`}
         onClick={openFileDialog}
+        onKeyDown={handleKeyDown}
         onDrop={handleDrop}
         onDragOver={handleDragOver}
+        onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}
-        className={clsx(
-          "relative flex flex-col items-center justify-center w-full h-48 rounded-xl border-2 border-dashed transition-all cursor-pointer overflow-hidden",
-          isDragging 
-            ? "border-primary bg-primary/5" 
-            : "border-border bg-background hover:bg-surface hover:border-primary/50"
-        )}
       >
-        <input
-          ref={inputRef}
-          id={inputId}
-          type="file"
-          className="hidden"
-          onChange={handleChange}
-          accept={accept}
-          aria-hidden="true"
-        />
-
-        {previewUrl ? (
-          <img 
-            src={previewUrl} 
-            alt="Vorschau" 
-            className="absolute inset-0 w-full h-full object-cover opacity-50" 
-          />
-        ) : null}
-
-        <div className="relative z-10 flex flex-col items-center text-center p-4">
-          {previewUrl ? (
-            <FaImage className="text-primary mb-2" size={32} />
-          ) : fileName ? (
-            <FaFile className="text-primary mb-2" size={32} />
-          ) : (
-            <FaCloudUploadAlt className="text-text-muted mb-2" size={40} />
-          )}
-          
-          <p className="text-sm font-medium text-text">
-            {fileName ? fileName : 'Datei auswählen oder hierher ziehen'}
-          </p>
-          {!fileName && (
-            <p className="text-xs text-text-muted mt-1">
-              Klicken zum Durchsuchen
-            </p>
-          )}
-        </div>
+        <span id={labelId} className={styles.label}>
+          {label}
+        </span>
+        <p className={styles.hint}>Datei hierher ziehen oder</p>
+        <span className={styles.button}>Datei auswählen</span>
+        {fileName ? <p className={styles.fileName}>{fileName}</p> : null}
+        {previewUrl ? <img src={previewUrl} alt="Vorschau" className={styles.preview} /> : null}
       </div>
     </div>
   )
