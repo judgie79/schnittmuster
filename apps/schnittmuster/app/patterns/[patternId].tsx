@@ -3,6 +3,7 @@ import {
   ActivityIndicator,
   Alert,
   Image,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -11,9 +12,11 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link, useLocalSearchParams, useRouter } from 'expo-router';
-import * as Linking from 'expo-linking';
+import * as Print from 'expo-print';
+import * as Sharing from 'expo-sharing';
 import { resolveAssetUrl, useAuth, usePattern, usePatterns } from '@schnittmuster/core';
 import { TagDTO } from 'schnittmuster-manager-dtos';
+import { usePatternFile } from '../../hooks/usePatternFile';
 
 const getContrastColor = (hexColor: string) => {
   const hex = hexColor.replace('#', '');
@@ -30,6 +33,20 @@ export default function PatternDetailScreen() {
   const { data: pattern, isLoading, error } = usePattern(patternId);
   const { mutate } = usePatterns();
   const { user } = useAuth();
+  const {
+    fileName,
+    mimeType,
+    isPreparing: isFilePreparing,
+    error: fileError,
+    prepare,
+  } = usePatternFile(pattern?.fileUrl);
+  const [isSharing, setIsSharing] = React.useState(false);
+  const [isPrinting, setIsPrinting] = React.useState(false);
+  const [printError, setPrintError] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    setPrintError(null);
+  }, [pattern?.fileUrl]);
 
   const isOwner = user && pattern && user.id === pattern.ownerId;
   const isAdmin = Boolean(user?.adminRole);
@@ -55,15 +72,51 @@ export default function PatternDetailScreen() {
     ]);
   };
 
-  const handleOpenPdf = async () => {
+  const handleOpenFile = async () => {
     if (!pattern?.fileUrl) return;
-    const url = resolveAssetUrl(pattern.fileUrl);
-    if (!url) return;
-    const supported = await Linking.canOpenURL(url);
-    if (supported) {
-      await Linking.openURL(url);
-    } else {
-      Alert.alert('Fehler', 'Die Datei kann nicht geöffnet werden.');
+    try {
+      setIsSharing(true);
+      const sharingAvailable = await Sharing.isAvailableAsync();
+      if (!sharingAvailable) {
+        Alert.alert('Nicht unterstützt', 'Teilen ist auf diesem Gerät nicht verfügbar.');
+        return;
+      }
+
+      const handle = await prepare();
+      const shareMime = handle.mimeType ?? mimeType ?? undefined;
+      let shareUri = handle.uri;
+
+      if (Platform.OS === 'android' && handle.contentUri) {
+        shareUri = handle.contentUri;
+      }
+
+      await Sharing.shareAsync(shareUri, {
+        mimeType: shareMime,
+        dialogTitle: handle.fileName ?? 'Schnittmuster',
+      });
+    } catch (shareError) {
+      const message =
+        shareError instanceof Error ? shareError.message : 'Datei konnte nicht geöffnet werden.';
+      Alert.alert('Fehler', message);
+    } finally {
+      setIsSharing(false);
+    }
+  };
+
+  const handlePrint = async () => {
+    if (!pattern?.fileUrl) return;
+    try {
+      setIsPrinting(true);
+      setPrintError(null);
+      const handle = await prepare();
+      await Print.printAsync({ uri: handle.uri });
+    } catch (printIssue) {
+      const message =
+        printIssue instanceof Error ? printIssue.message : 'Drucken fehlgeschlagen.';
+      setPrintError(message);
+      Alert.alert('Fehler', message);
+    } finally {
+      setIsPrinting(false);
     }
   };
 
@@ -151,9 +204,48 @@ export default function PatternDetailScreen() {
           ) : null}
 
           {pattern.fileUrl ? (
-            <TouchableOpacity style={styles.primaryButtonLarge} onPress={handleOpenPdf}>
-              <Text style={styles.primaryButtonLabel}>PDF öffnen</Text>
-            </TouchableOpacity>
+            <View style={[styles.section, styles.fileSection]}>
+              <Text style={styles.sectionTitle}>Datei & Druck</Text>
+              <View style={styles.fileButtonGroup}>
+                <TouchableOpacity
+                  style={[
+                    styles.secondaryButtonLarge,
+                    styles.fileButton,
+                    (isFilePreparing || isSharing) && styles.buttonDisabled,
+                  ]}
+                  onPress={handleOpenFile}
+                  disabled={isFilePreparing || isSharing}
+                >
+                  <Text style={styles.secondaryButtonLabel}>
+                    {isSharing ? 'Wird geöffnet...' : 'Datei öffnen'}
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.primaryButtonLarge,
+                    styles.fileButton,
+                    (isFilePreparing || isPrinting) && styles.buttonDisabled,
+                  ]}
+                  onPress={handlePrint}
+                  disabled={isFilePreparing || isPrinting}
+                >
+                  <Text style={styles.primaryButtonLabel}>
+                    {isPrinting ? 'Wird gedruckt...' : 'Drucken'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+              {isFilePreparing ? (
+                <Text style={styles.fileStatusText}>Datei wird vorbereitet...</Text>
+              ) : fileName ? (
+                <Text style={styles.fileStatusText}>Bereit: {fileName}</Text>
+              ) : (
+                <Text style={styles.fileHelperText}>
+                  Die Datei wird beim ersten Öffnen sicher heruntergeladen.
+                </Text>
+              )}
+              {fileError ? <Text style={styles.fileErrorText}>{fileError.message}</Text> : null}
+              {printError ? <Text style={styles.fileErrorText}>{printError}</Text> : null}
+            </View>
           ) : null}
         </View>
       </ScrollView>
@@ -290,6 +382,17 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     fontSize: 16,
   },
+  secondaryButtonLarge: {
+    backgroundColor: '#e2e8f0',
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  secondaryButtonLabel: {
+    color: '#0f172a',
+    fontWeight: '700',
+    fontSize: 16,
+  },
   chipButton: {
     paddingHorizontal: 12,
     paddingVertical: 10,
@@ -314,5 +417,33 @@ const styles = StyleSheet.create({
   chipButtonLabel: {
     color: '#fff',
     fontWeight: '700',
+  },
+  fileSection: {
+    marginTop: 8,
+  },
+  fileButtonGroup: {
+    gap: 12,
+    marginTop: 8,
+  },
+  fileButton: {
+    width: '100%',
+  },
+  fileStatusText: {
+    marginTop: 8,
+    color: '#475569',
+    fontSize: 14,
+  },
+  fileHelperText: {
+    marginTop: 8,
+    color: '#94a3b8',
+    fontSize: 14,
+  },
+  fileErrorText: {
+    marginTop: 8,
+    color: '#dc2626',
+    fontSize: 14,
+  },
+  buttonDisabled: {
+    opacity: 0.6,
   },
 });

@@ -744,20 +744,7 @@
     "@babel/parser" "^7.27.2"
     "@babel/types" "^7.27.1"
 
-"@babel/traverse--for-generate-function-map@npm:@babel/traverse@^7.25.3":
-  version "7.28.5"
-  resolved "https://registry.npmjs.org/@babel/traverse/-/traverse-7.28.5.tgz"
-  integrity sha512-TCCj4t55U90khlYkVV/0TfkJkAkUg3jZFA3Neb7unZT8CPok7iiRfaX0F+WnqWqt7OxhOn0uBKXCw4lbL8W0aQ==
-  dependencies:
-    "@babel/code-frame" "^7.27.1"
-    "@babel/generator" "^7.28.5"
-    "@babel/helper-globals" "^7.28.0"
-    "@babel/parser" "^7.28.5"
-    "@babel/template" "^7.27.2"
-    "@babel/types" "^7.28.5"
-    debug "^4.3.1"
-
-"@babel/traverse@^7.25.3", "@babel/traverse@^7.27.1", "@babel/traverse@^7.28.0", "@babel/traverse@^7.28.3", "@babel/traverse@^7.28.4", "@babel/traverse@^7.28.5":
+"@babel/traverse--for-generate-function-map@npm:@babel/traverse@^7.25.3", "@babel/traverse@^7.25.3", "@babel/traverse@^7.27.1", "@babel/traverse@^7.28.0", "@babel/traverse@^7.28.3", "@babel/traverse@^7.28.4", "@babel/traverse@^7.28.5":
   version "7.28.5"
   resolved "https://registry.npmjs.org/@babel/traverse/-/traverse-7.28.5.tgz"
   integrity sha512-TCCj4t55U90khlYkVV/0TfkJkAkUg3jZFA3Neb7unZT8CPok7iiRfaX0F+WnqWqt7OxhOn0uBKXCw4lbL8W0aQ==
@@ -1793,7 +1780,7 @@
     "@tanstack/react-query" "^5.25.0"
     axios "^1.7.9"
     date-fns "^3.6.0"
-    schnittmuster-manager-dtos "file:../../../../Library/Caches/Yarn/v6/npm-@schnittmuster-core-0.0.1-89f375b2-04dc-4697-affb-ace67021093e-1766321507589/node_modules/shared-dtos"
+    schnittmuster-manager-dtos "file:../../../../Library/Caches/Yarn/v6/npm-@schnittmuster-core-0.0.1-388c1138-5e5f-43a8-bb3c-515c757a4a76-1766331442968/node_modules/shared-dtos"
     zustand "^4.5.5"
 
 "@sinclair/typebox@^0.27.8":
@@ -3584,6 +3571,11 @@ expo-modules-core@3.0.29:
   dependencies:
     invariant "^2.2.4"
 
+expo-print@~15.0.8:
+  version "15.0.8"
+  resolved "https://registry.yarnpkg.com/expo-print/-/expo-print-15.0.8.tgz#596c9f2302fb68d2db682f6f3e0c6596930b59dc"
+  integrity sha512-4O0Qzm0On5AmJIl9d+BT+ieTipFp658nHI4aX7vKEFPfj3dfQxG6rDJJpca+rrc9c4Ha8ZFYGvxJG5+4lFq2Pw==
+
 expo-router@~6.0.21:
   version "6.0.21"
   resolved "https://registry.npmjs.org/expo-router/-/expo-router-6.0.21.tgz"
@@ -3617,6 +3609,11 @@ expo-server@^1.0.5:
   version "1.0.5"
   resolved "https://registry.npmjs.org/expo-server/-/expo-server-1.0.5.tgz"
   integrity sha512-IGR++flYH70rhLyeXF0Phle56/k4cee87WeQ4mamS+MkVAVP+dDlOHf2nN06Z9Y2KhU0Gp1k+y61KkghF7HdhA==
+
+expo-sharing@~14.0.8:
+  version "14.0.8"
+  resolved "https://registry.yarnpkg.com/expo-sharing/-/expo-sharing-14.0.8.tgz#cfd5fcf77ab5f64cf3d192a40a925abb316d3545"
+  integrity sha512-A1pPr2iBrxypFDCWVAESk532HK+db7MFXbvO2sCV9ienaFXAk7lIBm6bkqgE6vzRd9O3RGdEGzYx80cYlc089Q==
 
 expo-splash-screen@~31.0.13:
   version "31.0.13"
