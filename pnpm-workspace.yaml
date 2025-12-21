@@ -1,6 +1,0 @@
-packages:
-  - 'backend'
-  - 'ui'
-  - 'shared-dtos'
-  - 'packages/*'
-  - 'apps/*'

@@ -1,5 +1,6 @@
 import type { MouseEvent } from 'react'
 import { Link } from 'react-router-dom'
+import { useProtectedFile } from '@/hooks'
 import type { PatternDTO } from 'shared-dtos'
 import styles from './PatternCard.module.css'
 
@@ -10,6 +11,7 @@ interface PatternCardProps {
 
 export const PatternCard = ({ pattern, onFavoriteToggle }: PatternCardProps) => {
   const tags = pattern.tags.slice(0, 3)
+  const { url: thumbnailBlobUrl } = useProtectedFile(pattern.thumbnailUrl)
   const handleFavoriteClick = (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault()
     event.stopPropagation()
@@ -20,7 +22,7 @@ export const PatternCard = ({ pattern, onFavoriteToggle }: PatternCardProps) => 
     <article className={styles.card}>
       <Link to={`/patterns/${pattern.id}`} className={styles.cardLink} aria-label={`${pattern.name} öffnen`}>
         <img
-          src={pattern.thumbnailUrl ?? 'https://placehold.co/600x400?text=Schnittmuster'}
+          src={thumbnailBlobUrl ?? pattern.thumbnailUrl ?? 'https://placehold.co/600x400?text=Schnittmuster'}
           alt={pattern.name}
           className={styles.thumbnail}
           loading="lazy"

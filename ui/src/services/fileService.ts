@@ -10,4 +10,11 @@ export const fileService = {
     })
     return response.data.data
   },
+
+  async get(fileUrl: string): Promise<Blob> {
+    const response = await apiClient.get<Blob>(fileUrl, {
+      responseType: 'blob',
+    })
+    return response.data
+  },
 }

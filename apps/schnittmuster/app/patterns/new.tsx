@@ -8,8 +8,9 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 import * as DocumentPicker from 'expo-document-picker';
@@ -102,6 +103,7 @@ export default function CreatePatternScreen() {
   };
 
   return (
+    <SafeAreaView style={styles.safeArea}>
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <Text style={styles.title}>Neues Schnittmuster</Text>
 
@@ -165,6 +167,7 @@ export default function CreatePatternScreen() {
         {isSubmitting ? <ActivityIndicator color="#fff" /> : <Text style={styles.primaryButtonLabel}>Erstellen</Text>}
       </TouchableOpacity>
     </ScrollView>
+    </SafeAreaView>
   );
 }
 

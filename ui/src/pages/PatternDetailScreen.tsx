@@ -6,9 +6,9 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/common/Button'
 import { Loader } from '@/components/common/Loader'
 import { Badge } from '@/components/common/Badge'
-import { usePattern, useTags } from '@/hooks'
+import { usePattern, useTags, useProtectedFile } from '@/hooks'
 import { useGlobalContext } from '@/context'
-import { patternService, tagService } from '@/services'
+import { patternService, tagService, fileService } from '@/services'
 import { createToast } from '@/utils'
 import type { PatternTagProposalDTO, TagProposalStatus } from 'shared-dtos'
 import styles from './Page.module.css'
@@ -27,10 +27,12 @@ export const PatternDetailScreen = () => {
   const { state, dispatch } = useGlobalContext()
   const { categories } = useTags()
   const { data, isLoading, error, refetch } = usePattern(patternId)
+  const { url: thumbnailBlobUrl } = useProtectedFile(data?.thumbnailUrl)
   const [proposalName, setProposalName] = useState('')
   const [proposalCategoryId, setProposalCategoryId] = useState('')
   const [proposalColor, setProposalColor] = useState(DEFAULT_PROPOSAL_COLOR)
   const [proposalError, setProposalError] = useState<string | null>(null)
+  const [isDownloadingFile, setIsDownloadingFile] = useState(false)
 
   const userId = state.auth.user?.id
   const isAdmin = Boolean(state.auth.user?.adminRole)
@@ -112,6 +114,27 @@ export const PatternDetailScreen = () => {
     rejectMutation.mutate(proposalId)
   }
 
+  const handleFileOpen = async () => {
+    if (!data?.fileUrl || isDownloadingFile) {
+      return
+    }
+    setIsDownloadingFile(true)
+    try {
+      const blob = await fileService.get(data.fileUrl)
+      const objectUrl = URL.createObjectURL(blob)
+      const newWindow = window.open(objectUrl, '_blank', 'noopener')
+      if (newWindow) {
+        newWindow.focus()
+      }
+      setTimeout(() => URL.revokeObjectURL(objectUrl), 60_000)
+    } catch (fetchError) {
+      const message = fetchError instanceof Error ? fetchError.message : 'Datei konnte nicht geladen werden.'
+      dispatch({ type: 'ADD_TOAST', payload: createToast(message, 'error') })
+    } finally {
+      setIsDownloadingFile(false)
+    }
+  }
+
   const getStatusClass = (status: TagProposalStatus) => {
     switch (status) {
       case 'approved':
@@ -138,7 +161,7 @@ export const PatternDetailScreen = () => {
   return (
     <section className={styles.section}>
       <img
-        src={data.thumbnailUrl ?? 'https://placehold.co/1200x800?text=Schnittmuster'}
+        src={thumbnailBlobUrl ?? 'https://placehold.co/1200x800?text=Schnittmuster'}
         alt={data.name}
         className={styles.detailImage}
       />
@@ -167,7 +190,13 @@ export const PatternDetailScreen = () => {
       </div>
 
       <div className={styles.actionGrid}>
-        <Button>📥 Datei öffnen</Button>
+        <Button
+          type="button"
+          onClick={handleFileOpen}
+          disabled={!data.fileUrl || isDownloadingFile}
+        >
+          {isDownloadingFile ? 'Datei öffnen …' : '📥 Datei öffnen'}
+        </Button>
         <Button variant="secondary">✓ Als genäht markieren</Button>
         <Button variant="ghost">★ Favorisieren</Button>
       </div>
