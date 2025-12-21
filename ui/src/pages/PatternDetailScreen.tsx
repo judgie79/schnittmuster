@@ -8,7 +8,7 @@ import { Loader } from '@/components/common/Loader'
 import { Badge } from '@/components/common/Badge'
 import { usePattern, useTags, useProtectedFile } from '@/hooks'
 import { useGlobalContext } from '@/context'
-import { patternService, tagService, patternPrinter } from '@/services'
+import { patternService, tagService, patternPrinter, fileService, type PatternPrintRenderer } from '@/services'
 import { createToast } from '@/utils'
 import type { PatternTagProposalDTO, TagProposalStatus } from 'shared-dtos'
 import styles from './Page.module.css'
@@ -34,6 +34,15 @@ const PROPOSAL_STATUS_LABELS: Record<TagProposalStatus, string> = {
 const DEFAULT_PROPOSAL_COLOR = '#2F6FED'
 const PRINT_SCALE_STORAGE_KEY = 'pattern-print-scale'
 const clampScaleValue = (value: number) => Math.min(150, Math.max(50, Math.round(value)))
+const SHOW_TAG_PROPOSALS = false
+const getFileExtension = (input?: string | null): string | undefined => {
+  if (!input) {
+    return undefined
+  }
+  const sanitized = input.split(/[?#]/)[0]
+  const match = sanitized.match(/\.([a-z0-9]+)$/i)
+  return match ? match[1].toLowerCase() : undefined
+}
 
 export const PatternDetailScreen = () => {
   const { patternId } = useParams()
@@ -43,6 +52,14 @@ export const PatternDetailScreen = () => {
   const { categories } = useTags()
   const { data, isLoading, error, refetch } = usePattern(patternId)
   const { url: thumbnailBlobUrl } = useProtectedFile(data?.thumbnailUrl)
+  const [fileMimeType, setFileMimeType] = useState<string | null>(null)
+  const fileExtension = useMemo(() => getFileExtension(data?.fileUrl), [data?.fileUrl])
+  const isPdfFile = useMemo(() => {
+    if (fileMimeType) {
+      return fileMimeType.toLowerCase().includes('pdf')
+    }
+    return fileExtension === 'pdf'
+  }, [fileExtension, fileMimeType])
   const [proposalName, setProposalName] = useState('')
   const [proposalCategoryId, setProposalCategoryId] = useState('')
   const [proposalColor, setProposalColor] = useState(DEFAULT_PROPOSAL_COLOR)
@@ -50,7 +67,9 @@ export const PatternDetailScreen = () => {
   const [printScale, setPrintScale] = useState(100)
   const [isPrinting, setIsPrinting] = useState(false)
   const [printError, setPrintError] = useState<string | null>(null)
+  const [printRenderer, setPrintRenderer] = useState<PatternPrintRenderer>('native')
   const scaleInputId = useId()
+  const rendererGroupName = useId()
 
   const userId = state.auth.user?.id
   const isAdmin = Boolean(state.auth.user?.adminRole)
@@ -84,7 +103,37 @@ export const PatternDetailScreen = () => {
     window.localStorage.setItem(PRINT_SCALE_STORAGE_KEY, String(printScale))
   }, [printScale])
 
-  const proposals = data?.proposedTags ?? []
+  useEffect(() => {
+    let isActive = true
+    const fetchMime = async () => {
+      if (!data?.fileUrl) {
+        setFileMimeType(null)
+        return
+      }
+      try {
+        const metadata = await fileService.getMetadata(data.fileUrl)
+        if (isActive) {
+          setFileMimeType(metadata.mimeType)
+        }
+      } catch {
+        if (isActive) {
+          setFileMimeType(null)
+        }
+      }
+    }
+    fetchMime()
+    return () => {
+      isActive = false
+    }
+  }, [data?.fileUrl])
+
+  useEffect(() => {
+    if (!isPdfFile && printRenderer === 'pdfjs') {
+      setPrintRenderer('native')
+    }
+  }, [isPdfFile, printRenderer])
+
+  const proposals = useMemo(() => data?.proposedTags ?? [], [data?.proposedTags])
   const pendingProposals = proposals.filter((proposal) => proposal.status === 'pending')
   const canProposeTag = Boolean(patternId) && Boolean(isOwner)
 
@@ -170,11 +219,18 @@ export const PatternDetailScreen = () => {
     setPrintError(null)
   }
 
+  const handleRendererChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const nextRenderer = event.target.value as PatternPrintRenderer
+    setPrintRenderer(nextRenderer)
+    setPrintError(null)
+  }
+
   const handlePrint = async () => {
     if (!data?.fileUrl) {
       setPrintError('Keine druckbare Datei gefunden.')
       return
     }
+    const renderer: PatternPrintRenderer = isPdfFile ? printRenderer : 'native'
     setIsPrinting(true)
     setPrintError(null)
     try {
@@ -182,6 +238,7 @@ export const PatternDetailScreen = () => {
         fileUrl: data.fileUrl,
         fileName: data.name,
         scale: printScale / 100,
+        renderer,
       })
       dispatch({ type: 'ADD_TOAST', payload: createToast('Druck vorbereitet – prüfe den Dialog.', 'success') })
     } catch (printIssue) {
@@ -278,6 +335,37 @@ export const PatternDetailScreen = () => {
         <p className={styles.helperText}>
           100% = Originalgröße. Passe die Skalierung an, falls dein Testquadrat zu groß oder klein ist.
         </p>
+        {isPdfFile ? (
+          <div className={styles.printRenderer}>
+            <span>Druck-Engine</span>
+            <div className={styles.printRendererOptions}>
+              <label className={styles.printRendererOption}>
+                <input
+                  type="radio"
+                  name={rendererGroupName}
+                  value="native"
+                  checked={printRenderer === 'native'}
+                  onChange={handleRendererChange}
+                />
+                Standard (Browser)
+              </label>
+              <label className={styles.printRendererOption}>
+                <input
+                  type="radio"
+                  name={rendererGroupName}
+                  value="pdfjs"
+                  checked={printRenderer === 'pdfjs'}
+                  onChange={handleRendererChange}
+                />
+                PDF.js (Beta)
+              </label>
+            </div>
+            <p className={styles.helperText}>
+              PDF.js rendert jede Seite verlustfrei im Browser und ermöglicht präzisere 1:1 Ausdrucke, kann aber
+              je nach Umfang länger laden.
+            </p>
+          </div>
+        ) : null}
         {printError ? <p className={styles.printError}>{printError}</p> : null}
       </div>
 
@@ -289,7 +377,7 @@ export const PatternDetailScreen = () => {
         <Button variant="ghost">★ Favorisieren</Button>
       </div>
 
-      {/* {canProposeTag ? (
+      {SHOW_TAG_PROPOSALS && canProposeTag ? (
         <div className={styles.proposalForm}>
           <h3>Neuen Tag vorschlagen</h3>
           <form className={styles.formGrid} onSubmit={handleProposalSubmit}>
@@ -328,7 +416,7 @@ export const PatternDetailScreen = () => {
         </div>
       ) : null}
 
-      {sortedProposals.length > 0 && (
+      {SHOW_TAG_PROPOSALS && sortedProposals.length > 0 ? (
         <section className={styles.proposalSection}>
           <header className={styles.sectionHeader}>
             <h3>Vorgeschlagene Tags</h3>
@@ -378,7 +466,7 @@ export const PatternDetailScreen = () => {
             ))}
           </div>
         </section>
-      )} */}
+      ) : null}
     </section>
   )
 }

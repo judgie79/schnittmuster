@@ -15,6 +15,12 @@ export class FileController {
     res.setHeader("Content-Disposition", `inline; filename="${encodeURIComponent(result.fileName)}"`);
     res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
 
+    if (request.method === "HEAD") {
+      result.stream.destroy();
+      res.status(200).end();
+      return;
+    }
+
     result.stream.on("error", (error) => {
       res.destroy(error);
     });

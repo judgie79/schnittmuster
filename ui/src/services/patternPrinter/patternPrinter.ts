@@ -1,13 +1,17 @@
 import { fileService } from '../fileService'
 import { resolveAssetUrl } from '@/utils/url'
 import { patternPrintHandlerFactory } from './factory'
+import { pdfJsPrintHandler } from './handlers'
 import type { PatternPrintMeta } from './types'
 
 export interface PatternPrintRequest {
   fileUrl?: string | null
   fileName?: string
   scale?: number
+  renderer?: PatternPrintRenderer
 }
+
+export type PatternPrintRenderer = 'native' | 'pdfjs'
 
 const getExtension = (input?: string): string | undefined => {
   if (!input) {
@@ -36,7 +40,7 @@ export const patternPrinter = {
     const resolvedUrl = resolveAssetUrl(request.fileUrl) ?? request.fileUrl
     const blob = await fileService.get(resolvedUrl)
     const meta = buildMeta(request.fileName ?? resolvedUrl, blob.type)
-    const handler = patternPrintHandlerFactory.resolve(meta)
+    const handler = resolveHandler(meta, request.renderer)
 
     if (!handler) {
       throw new Error('Dieser Dateityp wird aktuell nicht für den Druck unterstützt.')
@@ -57,4 +61,14 @@ export const patternPrinter = {
       window.setTimeout(() => URL.revokeObjectURL(blobUrl), 60_000)
     }
   },
+}
+
+const resolveHandler = (meta: PatternPrintMeta, renderer?: PatternPrintRenderer) => {
+  if (renderer === 'pdfjs') {
+    if (!pdfJsPrintHandler.canHandle(meta)) {
+      throw new Error('PDF.js Druck steht nur für PDF-Dateien zur Verfügung.')
+    }
+    return pdfJsPrintHandler
+  }
+  return patternPrintHandlerFactory.resolve(meta)
 }
