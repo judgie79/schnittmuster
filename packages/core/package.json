@@ -12,9 +12,11 @@
     "@tanstack/react-query": "^5.25.0",
     "axios": "^1.7.9",
     "date-fns": "^3.6.0",
-    "react": "^19.2.1",
-    "schnittmuster-manager-dtos": "workspace:*",
+    "schnittmuster-manager-dtos": "file:../../shared-dtos",
     "zustand": "^4.5.5"
+  },
+  "peerDependencies": {
+    "react": ">=18.3.0 <20"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",
