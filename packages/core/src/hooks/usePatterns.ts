@@ -6,10 +6,16 @@ import { usePatternStore } from '../store/patternStore';
 const PATTERNS_QUERY_KEY = ['patterns'];
 
 export const usePatterns = (page = 1) => {
-  const { filters, setFilters } = usePatternStore();
+  const { filters, setFilters, resetFilters } = usePatternStore();
   const queryClient = useQueryClient();
 
-  const requestFilters = filters as unknown as Record<string, unknown>;
+  const selectedTagIds = Object.values(filters.tagFilters ?? {}).flat();
+  const requestFilters: Record<string, unknown> = {
+    query: filters.query || undefined,
+    favoriteOnly: filters.favoriteOnly || undefined,
+    status: filters.status.length ? filters.status : undefined,
+    tagIds: selectedTagIds.length ? selectedTagIds : undefined,
+  };
 
   const query = useQuery({
     queryKey: [...PATTERNS_QUERY_KEY, page, filters],
@@ -57,6 +63,7 @@ export const usePatterns = (page = 1) => {
     ...query,
     filters,
     setFilters,
+    resetFilters,
     mutate: {
       create: (formData: FormData, options?: PatternRequestOptions) =>
         createMutation.mutateAsync({ formData, options }),
