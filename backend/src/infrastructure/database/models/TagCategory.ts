@@ -5,6 +5,7 @@ export interface TagCategoryAttributes {
   id: string;
   name: string;
   displayOrder: number;
+  userId: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -18,6 +19,7 @@ export class TagCategory
   public id!: string;
   public name!: string;
   public displayOrder!: number;
+  public userId!: string;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 }
@@ -32,13 +34,17 @@ TagCategory.init(
     name: {
       type: DataTypes.STRING(100),
       allowNull: false,
-      unique: true,
     },
     displayOrder: {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 0,
       field: "display_order",
+    },
+    userId: {
+      type: DataTypes.UUID,
+      allowNull: false,
+      field: "user_id",
     },
   },
   {

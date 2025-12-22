@@ -4,8 +4,21 @@ import { TagCategory, TagCategoryCreationAttributes } from "@infrastructure/data
 import { NotFoundError } from "@shared/errors";
 
 export class TagRepository {
-  async findAll(): Promise<Tag[]> {
-    return Tag.findAll({ include: [{ model: TagCategory, as: "category" }], order: [["name", "ASC"]] });
+  async findAll(userId?: string): Promise<Tag[]> {
+    const includeOptions: any = {
+      model: TagCategory,
+      as: "category",
+      required: true,
+    };
+
+    if (userId) {
+      includeOptions.where = { userId };
+    }
+
+    return Tag.findAll({
+      include: [includeOptions],
+      order: [["name", "ASC"]],
+    });
   }
 
   async findById(id: string): Promise<Tag | null> {
@@ -32,8 +45,14 @@ export class TagRepository {
     });
   }
 
-  async findAllCategoriesWithTags(): Promise<TagCategory[]> {
+  async findAllCategoriesWithTags(userId?: string): Promise<TagCategory[]> {
+    const where: any = {};
+    if (userId) {
+      where.userId = userId;
+    }
+
     return TagCategory.findAll({
+      where,
       include: [
         {
           model: Tag,

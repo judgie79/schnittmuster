@@ -4,6 +4,7 @@ export interface TagCategoryDTO {
   id: UUID
   name: string
   displayOrder?: number
+  userId: UUID
   tags: TagDTO[]
 }
 

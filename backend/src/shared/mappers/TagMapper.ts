@@ -14,6 +14,7 @@ export class TagMapper {
       id: category.id,
       name: category.name,
       displayOrder: category.displayOrder,
+      userId: category.userId,
       tags: includeTags ? this.toDTOList(tags) : [],
     };
   }

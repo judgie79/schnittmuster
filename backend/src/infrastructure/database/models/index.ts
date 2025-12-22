@@ -42,6 +42,9 @@ export function applyAssociations(): void {
   TagCategory.hasMany(Tag, { foreignKey: "tagCategoryId", as: "tags" });
   Tag.belongsTo(TagCategory, { foreignKey: "tagCategoryId", as: "category" });
 
+  TagCategory.belongsTo(User, { foreignKey: "userId", as: "user" });
+  User.hasMany(TagCategory, { foreignKey: "userId", as: "tagCategories" });
+
   User.hasMany(Pattern, { foreignKey: "userId", as: "patterns" });
   Pattern.belongsTo(User, { foreignKey: "userId", as: "user" });
 
