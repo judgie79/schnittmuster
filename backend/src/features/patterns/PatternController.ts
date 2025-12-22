@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { PatternService } from "./PatternService";
 import { asyncHandler } from "@middleware/errorHandler";
 import { AuthenticatedRequest } from "@middleware/auth";
-import type { PatternStatus } from "@shared/dtos";
+import type { PatternStatus } from "@schnittmuster/dtos";
 import { PATTERN_STATUS_VALUES, type PatternListFilters } from "./types";
 
 type UploadedFile = Express.Multer.File;

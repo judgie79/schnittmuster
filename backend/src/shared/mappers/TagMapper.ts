@@ -1,6 +1,6 @@
 import { Tag } from "@infrastructure/database/models/Tag";
 import { TagCategory } from "@infrastructure/database/models/TagCategory";
-import { TagCategoryDTO, TagDTO } from "@shared/dtos";
+import { TagCategoryDTO, TagDTO } from "@schnittmuster/dtos";
 
 interface CategoryMapperOptions {
   includeTags?: boolean;

@@ -4,7 +4,7 @@ import { SystemMetric } from "@infrastructure/database/models/SystemMetric";
 import { User } from "@infrastructure/database/models/User";
 import { Pattern } from "@infrastructure/database/models/Pattern";
 import { FileStorage } from "@infrastructure/database/models/FileStorage";
-import { SystemMetricsDTO, AnalyticsReportDTO } from "@shared/dtos";
+import { SystemMetricsDTO, AnalyticsReportDTO } from "@schnittmuster/dtos";
 
 const STORAGE_CAPACITY_GB = 250;
 

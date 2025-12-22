@@ -3,7 +3,7 @@ import { PatternRepository } from "@infrastructure/database/repositories/Pattern
 import { PatternTagProposalRepository } from "@infrastructure/database/repositories/PatternTagProposalRepository";
 import { TagRepository } from "@infrastructure/database/repositories/TagRepository";
 import { PatternTagProposal } from "@infrastructure/database/models/PatternTagProposal";
-import { PatternTagProposalDTO, TagProposalStatus } from "@shared/dtos";
+import { PatternTagProposalDTO, TagProposalStatus } from "@schnittmuster/dtos";
 import { PatternTagProposalMapper } from "@shared/mappers";
 import { AccessControlService } from "@features/access-control/AccessControlService";
 import { PatternTag } from "@infrastructure/database/models/PatternTag";

@@ -1,7 +1,7 @@
 import { Pattern } from "@infrastructure/database/models/Pattern";
 import { Tag } from "@infrastructure/database/models/Tag";
 import { PatternTagProposal } from "@infrastructure/database/models/PatternTagProposal";
-import { PatternDTO } from "@shared/dtos";
+import { PatternDTO } from "@schnittmuster/dtos";
 import { TagMapper } from "./TagMapper";
 import { PatternTagProposalMapper } from "./PatternTagProposalMapper";
 import { normalizeFilePathToDownloadUrl } from "@shared/utils/files";

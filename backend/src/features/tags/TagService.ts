@@ -1,6 +1,6 @@
 import { TagRepository } from "@infrastructure/database/repositories/TagRepository";
 import { TagMapper } from "@shared/mappers";
-import { TagCategoryDTO, TagDTO } from "@shared/dtos";
+import { TagCategoryDTO, TagDTO } from "@schnittmuster/dtos";
 import { AccessRight } from "@schnittmuster/dtos";
 import { Tag } from "@infrastructure/database/models/Tag";
 import { AccessControlService } from "@features/access-control/AccessControlService";

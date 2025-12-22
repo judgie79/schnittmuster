@@ -1,5 +1,5 @@
 import { PatternTagProposal } from "@infrastructure/database/models/PatternTagProposal";
-import { PatternTagProposalDTO } from "@shared/dtos";
+import { PatternTagProposalDTO } from "@schnittmuster/dtos";
 import { TagMapper } from "./TagMapper";
 import { UserMapper } from "./UserMapper";
 

@@ -1,4 +1,4 @@
-import type { PatternStatus } from "@shared/dtos";
+import type { PatternStatus } from "@schnittmuster/dtos";
 
 export interface PatternListFilters {
   query?: string;

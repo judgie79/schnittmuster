@@ -1,7 +1,7 @@
 import jwt, { SignOptions } from "jsonwebtoken";
 import { AuthRepository } from "./AuthRepository";
 import { UserMapper } from "@shared/mappers";
-import { UserDTO, UserCreateDTO } from "@shared/dtos";
+import { UserDTO, UserCreateDTO } from "@schnittmuster/dtos";
 import { validatePassword } from "@shared/validators/passwordValidator";
 import { ValidationError, NotFoundError, ForbiddenError } from "@shared/errors";
 import { authConfig } from "@config/auth";

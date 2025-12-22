@@ -2,7 +2,7 @@ import { Request, Response, NextFunction, RequestHandler } from "express";
 import jwt from "jsonwebtoken";
 import { authConfig } from "@config/auth";
 import { ForbiddenError } from "@shared/errors";
-import type { AdminRoleType } from "@shared/dtos";
+import type { AdminRoleType } from "@schnittmuster/dtos";
 import { AUTH_COOKIE_NAME } from "@features/auth/constants";
 
 export type AuthenticatedUser = {

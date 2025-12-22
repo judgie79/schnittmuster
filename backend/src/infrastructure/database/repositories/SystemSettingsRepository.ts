@@ -1,6 +1,6 @@
 import { SystemSetting } from "@infrastructure/database/models/SystemSetting";
 import { AdminActionLog } from "@infrastructure/database/models/AdminActionLog";
-import { SystemSettingsDTO } from "@shared/dtos";
+import { SystemSettingsDTO } from "@schnittmuster/dtos";
 
 const SETTINGS_KEY = "system";
 

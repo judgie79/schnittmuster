@@ -1,4 +1,4 @@
-import { SystemSettingsDTO } from "@shared/dtos";
+import { SystemSettingsDTO } from "@schnittmuster/dtos";
 import { SystemSettingsRepository } from "@infrastructure/database/repositories/SystemSettingsRepository";
 
 export class AdminSettingsService {

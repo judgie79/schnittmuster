@@ -1,4 +1,4 @@
-import { AdminUserDTO, AdminUserUpdateDTO, AdminUserBulkActionDTO, AdminActionLogDTO } from "@shared/dtos";
+import { AdminUserDTO, AdminUserUpdateDTO, AdminUserBulkActionDTO, AdminActionLogDTO } from "@schnittmuster/dtos";
 import {
   AdminUserRepository,
   UserFilters,

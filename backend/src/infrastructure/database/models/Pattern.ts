@@ -1,6 +1,6 @@
 import { DataTypes, Model, Optional } from "sequelize";
 import { sequelize } from "@config/database";
-import type { PatternStatus } from "@shared/dtos";
+import type { PatternStatus } from "@schnittmuster/dtos";
 
 export interface PatternAttributes {
   id: string;

@@ -7,7 +7,7 @@ import { ForbiddenError } from "@shared/errors";
 import { authConfig } from "@config/auth";
 import { environment } from "@config/environment";
 import { AUTH_COOKIE_NAME, REFRESH_COOKIE_NAME } from "./constants";
-import type { UserDTO } from "@shared/dtos";
+import type { UserDTO } from "@schnittmuster/dtos";
 
 const DEFAULT_ACCESS_MAX_AGE_MS = 15 * 60 * 1000;
 const DEFAULT_REFRESH_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;

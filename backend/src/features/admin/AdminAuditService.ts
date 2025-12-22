@@ -1,6 +1,6 @@
 import { AdminActionLog } from "@infrastructure/database/models/AdminActionLog";
 import { AdminNotification } from "@infrastructure/database/models/AdminNotification";
-import { AdminNotificationDTO, AdminActionLogDTO } from "@shared/dtos";
+import { AdminNotificationDTO, AdminActionLogDTO } from "@schnittmuster/dtos";
 import { NotFoundError } from "@shared/errors";
 
 const toActionDTO = (log: AdminActionLog): AdminActionLogDTO => ({

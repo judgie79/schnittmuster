@@ -1,5 +1,5 @@
 import { User } from "@infrastructure/database/models/User";
-import { UserDTO } from "@shared/dtos";
+import { UserDTO } from "@schnittmuster/dtos";
 
 const toIsoString = (value?: Date): string => (value ? value.toISOString() : new Date().toISOString());
 const toNullableIsoString = (value?: Date | null): string | null => (value ? value.toISOString() : null);
