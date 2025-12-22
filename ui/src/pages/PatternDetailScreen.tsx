@@ -1,15 +1,13 @@
-import clsx from 'clsx'
 import { useEffect, useMemo, useState, useId } from 'react'
-import type { ChangeEvent, FormEvent } from 'react'
+import type { ChangeEvent } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useAuthStore } from '@schnittmuster/core'
 import { Button } from '@/components/common/Button'
 import { Loader } from '@/components/common/Loader'
 import { Badge } from '@/components/common/Badge'
-import { usePattern, useTags, useProtectedFile } from '@/hooks'
+import { usePattern, useProtectedFile } from '@/hooks'
 import { useGlobalContext } from '@/context'
-import { patternService, tagService, patternPrinter, fileService, type PatternPrintRenderer } from '@/services'
+import { patternPrinter, fileService, type PatternPrintRenderer } from '@/services'
 import { createToast } from '@/utils'
 import styles from './Page.module.css'
 
@@ -40,11 +38,9 @@ const getFileExtension = (input?: string | null): string | undefined => {
 export const PatternDetailScreen = () => {
   const { patternId } = useParams()
   const navigate = useNavigate()
-  const queryClient = useQueryClient()
   const { dispatch } = useGlobalContext()
   const { user } = useAuthStore()
-  const { categories } = useTags()
-  const { data, isLoading, error, refetch } = usePattern(patternId)
+  const { data, isLoading, error } = usePattern(patternId)
   const { url: thumbnailBlobUrl } = useProtectedFile(data?.thumbnailUrl)
   const [fileMimeType, setFileMimeType] = useState<string | null>(null)
   const fileExtension = useMemo(() => getFileExtension(data?.fileUrl), [data?.fileUrl])

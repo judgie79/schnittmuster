@@ -3,8 +3,7 @@ import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native
 import { Stack } from 'expo-router';
 import Constants from 'expo-constants';
 import { StatusBar } from 'expo-status-bar';
-import { setApiBaseUrl, setStorageAdapter } from '@schnittmuster/core';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider, setApiBaseUrl, setStorageAdapter } from '@schnittmuster/core';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import 'react-native-reanimated';
 
@@ -61,13 +60,14 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider>
-      <QueryClientProvider client={queryClient}>
+      <QueryClientProvider client={queryClient} contextSharing>
         <ThemeProvider value={colorScheme === 'dark' ? CustomDarkTheme : CustomLightTheme}>
           <Stack screenOptions={{ headerShown: false }}>
             <Stack.Screen name="index" />
             <Stack.Screen name="patterns/new" options={{ presentation: 'card' }} />
             <Stack.Screen name="patterns/[patternId]" options={{ presentation: 'card' }} />
             <Stack.Screen name="patterns/[patternId]/edit" options={{ presentation: 'card' }} />
+            <Stack.Screen name="tags" options={{ presentation: 'card' }} />
           </Stack>
           <StatusBar style="auto" />
         </ThemeProvider>

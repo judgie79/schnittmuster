@@ -8,6 +8,7 @@ import styles from './AuthScreen.module.css'
 export const SignupScreen = () => {
   const [form, setForm] = useState({
     name: '',
+    username: '',
     email: '',
     password: '',
   })

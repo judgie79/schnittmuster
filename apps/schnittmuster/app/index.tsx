@@ -14,7 +14,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Link } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 import { useAuth, usePatterns, useTags } from '@schnittmuster/core';
 import type { PatternFilters } from '@schnittmuster/core';
 import type { TagCategoryDTO } from '@schnittmuster/dtos';
@@ -208,6 +208,7 @@ const TagFilterModal = ({ visible, filters, onClose, onApply }: TagFilterModalPr
 };
 
 const PatternList = () => {
+  const router = useRouter();
   const { items, isLoading, error, refetch, isRefetching, filters, setFilters } = usePatterns();
   const [isFilterVisible, setFilterVisible] = useState(false);
 
