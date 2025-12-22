@@ -7,6 +7,7 @@ import {
 } from 'react-native';
 import { useTags } from '@schnittmuster/core';
 import type { TagCategoryDTO, TagDTO } from 'schnittmuster-manager-dtos';
+import { getAppTheme } from '@/constants/theme';
 
 const getContrastColor = (hexColor: string) => {
   const hex = hexColor.replace('#', '');
@@ -24,6 +25,7 @@ type PatternTagEditorProps = {
 
 export const PatternTagEditor = ({ selectedTags, onChange }: PatternTagEditorProps) => {
   const { categories, isLoading, error } = useTags();
+  const theme = getAppTheme();
 
   const toggleTag = (tag: TagDTO) => {
     const isSelected = selectedTags.some((item) => item.id === tag.id);
@@ -37,7 +39,7 @@ export const PatternTagEditor = ({ selectedTags, onChange }: PatternTagEditorPro
   if (isLoading) {
     return (
       <View style={styles.messageContainer}>
-        <ActivityIndicator color="#2563eb" />
+        <ActivityIndicator color={theme.primary} />
         <Text style={styles.subtleText}>Tag-Kategorien werden geladen …</Text>
       </View>
     );
@@ -75,8 +77,8 @@ export const PatternTagEditor = ({ selectedTags, onChange }: PatternTagEditorPro
           <View style={styles.tagRow}>
             {category.tags.map((tag) => {
               const isActive = selectedTags.some((item) => item.id === tag.id);
-              const backgroundColor = isActive ? tag.colorHex || '#2563eb' : '#e2e8f0';
-              const textColor = isActive ? getContrastColor(backgroundColor) : '#0f172a';
+              const backgroundColor = isActive ? tag.colorHex || theme.primary : theme.badgeGray;
+              const textColor = isActive ? getContrastColor(backgroundColor) : theme.textPrimary;
 
               return (
                 <TouchableOpacity
@@ -85,7 +87,7 @@ export const PatternTagEditor = ({ selectedTags, onChange }: PatternTagEditorPro
                     styles.tagButton,
                     {
                       backgroundColor,
-                      borderColor: isActive ? 'transparent' : '#cbd5e1',
+                      borderColor: isActive ? 'transparent' : theme.border,
                     },
                   ]}
                   onPress={() => toggleTag(tag)}
@@ -103,25 +105,27 @@ export const PatternTagEditor = ({ selectedTags, onChange }: PatternTagEditorPro
   );
 };
 
+const theme = getAppTheme();
+
 const styles = StyleSheet.create({
   container: {
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#e2e8f0',
-    backgroundColor: '#fff',
+    borderColor: theme.border,
+    backgroundColor: theme.cardBackground,
     padding: 12,
   },
   messageContainer: {
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#e2e8f0',
-    backgroundColor: '#fff',
+    borderColor: theme.border,
+    backgroundColor: theme.cardBackground,
     padding: 12,
     alignItems: 'center',
   },
   subtleText: {
     fontSize: 13,
-    color: '#475569',
+    color: theme.textSecondary,
   },
   errorText: {
     color: '#dc2626',
@@ -137,11 +141,11 @@ const styles = StyleSheet.create({
   categoryTitle: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#0f172a',
+    color: theme.textPrimary,
   },
   categoryMeta: {
     fontSize: 12,
-    color: '#94a3b8',
+    color: theme.textSecondary,
   },
   tagRow: {
     flexDirection: 'row',

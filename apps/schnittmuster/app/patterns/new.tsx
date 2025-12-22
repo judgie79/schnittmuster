@@ -17,6 +17,7 @@ import * as DocumentPicker from 'expo-document-picker';
 import { usePatterns } from '@schnittmuster/core';
 import type { TagDTO } from 'schnittmuster-manager-dtos';
 import { PatternTagEditor } from '@/components/pattern-tag-editor';
+import { getAppTheme } from '@/constants/theme';
 
 export default function CreatePatternScreen() {
   const router = useRouter();
@@ -104,81 +105,92 @@ export default function CreatePatternScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
+      <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+          <Text style={styles.backIcon}>‹</Text>
+          <Text style={styles.backLabel}>Zurück</Text>
+        </TouchableOpacity>
       <Text style={styles.title}>Neues Schnittmuster</Text>
 
-      <View style={styles.field}>
-        <Text style={styles.label}>Name *</Text>
-        <TextInput
-          value={name}
-          onChangeText={setName}
-          placeholder="Name des Schnittmusters"
-          style={styles.input}
-        />
-      </View>
+        <View style={styles.content}>
+          <View style={styles.field}>
+            <Text style={styles.label}>Name *</Text>
+            <TextInput
+              value={name}
+              onChangeText={setName}
+              placeholder="Name des Schnittmusters"
+              style={styles.input}
+            />
+          </View>
 
-      <View style={styles.field}>
-        <Text style={styles.label}>Beschreibung</Text>
-        <TextInput
-          value={description}
-          onChangeText={setDescription}
-          placeholder="Kurzbeschreibung"
-          multiline
-          style={[styles.input, styles.multiline]}
-          textAlignVertical="top"
-        />
-      </View>
+          <View style={styles.field}>
+            <Text style={styles.label}>Beschreibung</Text>
+            <TextInput
+              value={description}
+              onChangeText={setDescription}
+              placeholder="Kurzbeschreibung"
+              multiline
+              style={[styles.input, styles.multiline]}
+              textAlignVertical="top"
+            />
+          </View>
 
-      <View style={styles.field}>
-        <Text style={styles.label}>Thumbnail</Text>
-        <TouchableOpacity style={styles.uploadBox} onPress={pickImage}>
-          {thumbnail ? (
-            <Image source={{ uri: thumbnail.uri }} style={styles.thumbnail} resizeMode="cover" />
-          ) : (
-            <Text style={styles.muted}>Bild auswählen</Text>
-          )}
-        </TouchableOpacity>
-      </View>
+          <View style={styles.field}>
+            <Text style={styles.label}>Thumbnail</Text>
+            <TouchableOpacity style={styles.uploadBox} onPress={pickImage}>
+              {thumbnail ? (
+                <Image source={{ uri: thumbnail.uri }} style={styles.thumbnail} resizeMode="cover" />
+              ) : (
+                <Text style={styles.muted}>Bild auswählen</Text>
+              )}
+            </TouchableOpacity>
+          </View>
 
-      <View style={styles.field}>
-        <Text style={styles.label}>PDF-Datei</Text>
-        <TouchableOpacity style={styles.uploadBox} onPress={pickDocument}>
-          {file ? (
-            <View style={{ alignItems: 'center' }}>
-              <Text style={styles.fileName}>{file.name}</Text>
-              {file.size ? <Text style={styles.fileMeta}>{(file.size / 1024 / 1024).toFixed(2)} MB</Text> : null}
-            </View>
-          ) : (
-            <Text style={styles.muted}>PDF auswählen</Text>
-          )}
-        </TouchableOpacity>
-      </View>
+          <View style={styles.field}>
+            <Text style={styles.label}>PDF-Datei</Text>
+            <TouchableOpacity style={styles.uploadBox} onPress={pickDocument}>
+              {file ? (
+                <View style={{ alignItems: 'center' }}>
+                  <Text style={styles.fileName}>{file.name}</Text>
+                  {file.size ? <Text style={styles.fileMeta}>{(file.size / 1024 / 1024).toFixed(2)} MB</Text> : null}
+                </View>
+              ) : (
+                <Text style={styles.muted}>PDF auswählen</Text>
+              )}
+            </TouchableOpacity>
+          </View>
 
-      <View style={styles.field}>
-        <Text style={styles.label}>Kategorien & Tags</Text>
-        <PatternTagEditor selectedTags={selectedTags} onChange={setSelectedTags} />
-      </View>
+          <View style={styles.field}>
+            <Text style={styles.label}>Kategorien & Tags</Text>
+            <PatternTagEditor selectedTags={selectedTags} onChange={setSelectedTags} />
+          </View>
 
-      <TouchableOpacity
-        onPress={handleSubmit}
-        disabled={isSubmitting}
-        style={[styles.primaryButton, isSubmitting && styles.buttonDisabled]}
-      >
-        {isSubmitting ? <ActivityIndicator color="#fff" /> : <Text style={styles.primaryButtonLabel}>Erstellen</Text>}
-      </TouchableOpacity>
+          <TouchableOpacity
+            onPress={handleSubmit}
+            disabled={isSubmitting}
+            style={[styles.primaryButton, isSubmitting && styles.buttonDisabled]}
+          >
+            {isSubmitting ? <ActivityIndicator color={theme.textLight} /> : <Text style={styles.primaryButtonLabel}>Erstellen</Text>}
+          </TouchableOpacity>
+      </View>
     </ScrollView>
     </SafeAreaView>
   );
 }
 
+const theme = getAppTheme();
+
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#f8fafc',
+    backgroundColor: theme.background,
   },
   container: {
     flex: 1,
-    backgroundColor: '#f8fafc',
+    backgroundColor: theme.background,
+  },
+  scrollContent: {
+    paddingBottom: 24,
   },
   content: {
     padding: 16,
@@ -187,7 +199,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: '800',
-    color: '#0f172a',
+    color: theme.textPrimary,
     marginBottom: 16,
   },
   field: {
@@ -195,12 +207,12 @@ const styles = StyleSheet.create({
   },
   label: {
     fontWeight: '700',
-    color: '#0f172a',
+    color: theme.textPrimary,
     marginBottom: 6,
   },
   input: {
-    backgroundColor: '#fff',
-    borderColor: '#e2e8f0',
+    backgroundColor: theme.cardBackground,
+    borderColor: theme.border,
     borderWidth: 1,
     borderRadius: 10,
     paddingHorizontal: 12,
@@ -212,13 +224,13 @@ const styles = StyleSheet.create({
   },
   uploadBox: {
     borderWidth: 1,
-    borderColor: '#cbd5e1',
+    borderColor: theme.border,
     borderStyle: 'dashed',
     borderRadius: 12,
     minHeight: 120,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: theme.cardBackground,
     padding: 12,
   },
   thumbnail: {
@@ -227,31 +239,39 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   muted: {
-    color: '#64748b',
+    color: theme.textSecondary,
   },
   fileName: {
     fontWeight: '700',
-    color: '#0f172a',
+    color: theme.textPrimary,
     textAlign: 'center',
   },
   fileMeta: {
-    color: '#64748b',
+    color: theme.textSecondary,
     fontSize: 12,
     marginTop: 4,
   },
   primaryButton: {
-    backgroundColor: '#2563eb',
+    backgroundColor: theme.primary,
     paddingVertical: 14,
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
   },
   primaryButtonLabel: {
-    color: '#fff',
+    color: theme.textLight,
     fontWeight: '700',
     fontSize: 16,
   },
   buttonDisabled: {
     opacity: 0.6,
+  },
+  backButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    marginBottom: 4,
   },
 });

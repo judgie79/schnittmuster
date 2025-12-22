@@ -9,6 +9,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import 'react-native-reanimated';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { getAppTheme } from '@/constants/theme';
 
 const queryClient = new QueryClient();
 
@@ -26,13 +27,42 @@ const apiBaseUrl = debuggerHost
 
 setApiBaseUrl(apiBaseUrl);
 
+// Create custom navigation themes using our app theme
+const appTheme = getAppTheme();
+
+const CustomLightTheme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    primary: appTheme.primary,
+    background: appTheme.background,
+    card: appTheme.cardBackground,
+    text: appTheme.textPrimary,
+    border: appTheme.border,
+    notification: appTheme.primaryDark,
+  },
+};
+
+const CustomDarkTheme = {
+  ...DarkTheme,
+  colors: {
+    ...DarkTheme.colors,
+    primary: appTheme.primaryLight,
+    background: appTheme.textPrimary,
+    card: appTheme.primaryDark,
+    text: appTheme.textLight,
+    border: appTheme.border,
+    notification: appTheme.primary,
+  },
+};
+
 export default function RootLayout() {
   const colorScheme = useColorScheme();
 
   return (
     <SafeAreaProvider>
       <QueryClientProvider client={queryClient}>
-        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+        <ThemeProvider value={colorScheme === 'dark' ? CustomDarkTheme : CustomLightTheme}>
           <Stack screenOptions={{ headerShown: false }}>
             <Stack.Screen name="index" />
             <Stack.Screen name="patterns/new" options={{ presentation: 'card' }} />

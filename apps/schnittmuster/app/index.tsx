@@ -18,6 +18,7 @@ import { Link } from 'expo-router';
 import { useAuth, usePatterns, useTags } from '@schnittmuster/core';
 import type { PatternFilters } from '@schnittmuster/core';
 import type { TagCategoryDTO } from 'schnittmuster-manager-dtos';
+import { getAppTheme } from '@/constants/theme';
 
 type TagFilterSelections = Record<string, string[]>;
 
@@ -127,7 +128,7 @@ const TagFilterModal = ({ visible, filters, onClose, onApply }: TagFilterModalPr
           </View>
           {showLoadingState ? (
             <View style={styles.modalMessage}>
-              <ActivityIndicator color="#2563eb" />
+              <ActivityIndicator color={theme.primary} />
               <Text style={styles.modalMessageText}>Kategorien werden geladen …</Text>
             </View>
           ) : error ? (
@@ -331,7 +332,7 @@ export default function HomeScreen() {
     return (
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.centered}>
-          <ActivityIndicator size="large" color="#2563eb" />
+          <ActivityIndicator size="large" color={theme.primary} />
         </View>
       </SafeAreaView>
     );
@@ -387,10 +388,12 @@ export default function HomeScreen() {
   );
 }
 
+const theme = getAppTheme();
+
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#f8fafc',
+    backgroundColor: theme.background,
   },
   listWrapper: {
     flex: 1,
@@ -407,11 +410,11 @@ const styles = StyleSheet.create({
   listHeaderTitle: {
     fontSize: 22,
     fontWeight: '800',
-    color: '#0f172a',
+    color: theme.textPrimary,
   },
   listHeaderSubtitle: {
     fontSize: 13,
-    color: '#475569',
+    color: theme.textSecondary,
     marginTop: 2,
   },
   filterButton: {
@@ -421,18 +424,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 999,
-    backgroundColor: '#e2e8f0',
+    backgroundColor: theme.badgeGray,
   },
   filterButtonLabel: {
     fontWeight: '700',
-    color: '#0f172a',
+    color: theme.textPrimary,
   },
   filterBadge: {
     minWidth: 26,
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 999,
-    backgroundColor: '#2563eb',
+    backgroundColor: theme.primary,
     alignItems: 'center',
   },
   filterBadgeLabel: {
@@ -443,7 +446,7 @@ const styles = StyleSheet.create({
   header: {
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: '#0f172a',
+    backgroundColor: theme.primary,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -483,11 +486,11 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: '800',
     marginBottom: 24,
-    color: '#0f172a',
+    color: theme.textPrimary,
   },
   input: {
-    backgroundColor: '#fff',
-    borderColor: '#e2e8f0',
+    backgroundColor: theme.cardBackground,
+    borderColor: theme.border,
     borderWidth: 1,
     borderRadius: 10,
     paddingHorizontal: 14,
@@ -496,17 +499,17 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   primaryButton: {
-    backgroundColor: '#2563eb',
+    backgroundColor: theme.primary,
     paddingVertical: 14,
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
   },
   secondaryButton: {
-    backgroundColor: '#fff',
+    backgroundColor: theme.cardBackground,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#cbd5e1',
+    borderColor: theme.border,
     paddingVertical: 14,
     alignItems: 'center',
     justifyContent: 'center',
@@ -520,7 +523,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   secondaryButtonLabel: {
-    color: '#0f172a',
+    color: theme.textPrimary,
     fontSize: 16,
     fontWeight: '700',
   },
@@ -535,8 +538,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 14,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#e2e8f0',
-    backgroundColor: '#fff',
+    borderBottomColor: theme.border,
+    backgroundColor: theme.cardBackground,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
@@ -545,11 +548,11 @@ const styles = StyleSheet.create({
   listItemTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#0f172a',
+    color: theme.textPrimary,
     marginBottom: 4,
   },
   listItemMeta: {
-    color: '#64748b',
+    color: theme.textSecondary,
     fontSize: 14,
   },
   listItemThumbnail: {
@@ -589,7 +592,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#e2e8f0',
   },
   listTagOverflowLabel: {
-    color: '#0f172a',
+    color: theme.textPrimary,
   },
   chevron: {
     fontSize: 22,
@@ -601,7 +604,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   modalCard: {
-    backgroundColor: '#fff',
+    backgroundColor: theme.cardBackground,
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
     paddingBottom: 24,
@@ -619,11 +622,11 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 20,
     fontWeight: '800',
-    color: '#0f172a',
+    color: theme.textPrimary,
   },
   modalCloseLabel: {
     fontWeight: '700',
-    color: '#2563eb',
+    color: theme.primary,
   },
   modalMessage: {
     paddingHorizontal: 20,
@@ -652,7 +655,7 @@ const styles = StyleSheet.create({
   modalSectionTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#0f172a',
+    color: theme.textPrimary,
     marginBottom: 6,
   },
   modalTagRow: {
@@ -696,7 +699,7 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#0f172a',
+    color: theme.textPrimary,
   },
   emptyCopy: {
     color: '#64748b',
@@ -709,7 +712,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#2563eb',
+    backgroundColor: theme.primary,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',

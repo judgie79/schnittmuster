@@ -17,6 +17,7 @@ import * as DocumentPicker from 'expo-document-picker';
 import { resolveAssetUrl, usePattern, usePatterns } from '@schnittmuster/core';
 import type { TagDTO } from 'schnittmuster-manager-dtos';
 import { PatternTagEditor } from '@/components/pattern-tag-editor';
+import { getAppTheme } from '@/constants/theme';
 
 export default function EditPatternScreen() {
   const { patternId } = useLocalSearchParams<{ patternId?: string }>();
@@ -113,7 +114,7 @@ export default function EditPatternScreen() {
   if (isLoading) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#2563eb" />
+        <ActivityIndicator size="large" color={theme.primary} />
       </View>
     );
   }
@@ -185,7 +186,7 @@ export default function EditPatternScreen() {
           style={[styles.primaryButton, isSubmitting && styles.buttonDisabled]}
         >
           {isSubmitting ? (
-            <ActivityIndicator color="#fff" />
+            <ActivityIndicator color={theme.textLight} />
           ) : (
             <Text style={styles.primaryButtonLabel}>Speichern</Text>
           )}
@@ -195,14 +196,16 @@ export default function EditPatternScreen() {
   );
 }
 
+const theme = getAppTheme();
+
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#f8fafc',
+    backgroundColor: theme.background,
   },
   container: {
     flex: 1,
-    backgroundColor: '#f8fafc',
+    backgroundColor: theme.background,
   },
   content: {
     padding: 16,
@@ -222,17 +225,17 @@ const styles = StyleSheet.create({
   },
   backIcon: {
     fontSize: 20,
-    color: '#0f172a',
+    color: theme.textPrimary,
     marginTop: -2,
   },
   backLabel: {
-    color: '#0f172a',
+    color: theme.textPrimary,
     fontWeight: '700',
   },
   title: {
     fontSize: 24,
     fontWeight: '800',
-    color: '#0f172a',
+    color: theme.textPrimary,
     marginBottom: 16,
   },
   field: {
@@ -240,12 +243,12 @@ const styles = StyleSheet.create({
   },
   label: {
     fontWeight: '700',
-    color: '#0f172a',
+    color: theme.textPrimary,
     marginBottom: 6,
   },
   input: {
-    backgroundColor: '#fff',
-    borderColor: '#e2e8f0',
+    backgroundColor: theme.cardBackground,
+    borderColor: theme.border,
     borderWidth: 1,
     borderRadius: 10,
     paddingHorizontal: 12,
@@ -257,13 +260,13 @@ const styles = StyleSheet.create({
   },
   uploadBox: {
     borderWidth: 1,
-    borderColor: '#cbd5e1',
+    borderColor: theme.border,
     borderStyle: 'dashed',
     borderRadius: 12,
     minHeight: 120,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: theme.cardBackground,
     padding: 12,
   },
   thumbnail: {
@@ -272,27 +275,27 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   muted: {
-    color: '#64748b',
+    color: theme.textSecondary,
   },
   fileName: {
     fontWeight: '700',
-    color: '#0f172a',
+    color: theme.textPrimary,
     textAlign: 'center',
   },
   fileMeta: {
-    color: '#64748b',
+    color: theme.textSecondary,
     fontSize: 12,
     marginTop: 4,
   },
   primaryButton: {
-    backgroundColor: '#2563eb',
+    backgroundColor: theme.primary,
     paddingVertical: 14,
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
   },
   primaryButtonLabel: {
-    color: '#fff',
+    color: theme.textLight,
     fontWeight: '700',
     fontSize: 16,
   },

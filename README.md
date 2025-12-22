@@ -13,7 +13,7 @@ Ein Open-Source Projekt für Hobbynäher und professionelle Schneider zur zentra
 ### ✨ Kern-Funktionalität
 
 - **📋 Schnittmuster-Verwaltung**: Hochladen, organisieren und kategorisieren von PDF-Schnittmustern
-- **🏷️ Tag-basiertes System**: 6 Kategorien (Zielgruppe, Kleidungsart, Hersteller, Lizenz, Größe, Status)
+- **🏷️ Tag-basiertes System**:  Kategorien mit Tags
 - **🔐 Zentrale Authentication & Authorization**:
   - Email/Passwort & Google OAuth2
   - JWT-basierte Authentifizierung

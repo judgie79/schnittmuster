@@ -17,6 +17,7 @@ import * as Sharing from 'expo-sharing';
 import { resolveAssetUrl, useAuth, usePattern, usePatterns } from '@schnittmuster/core';
 import { TagDTO } from 'schnittmuster-manager-dtos';
 import { usePatternFile } from '../../hooks/usePatternFile';
+import { getAppTheme } from '@/constants/theme';
 
 const getContrastColor = (hexColor: string) => {
   const hex = hexColor.replace('#', '');
@@ -161,11 +162,9 @@ export default function PatternDetailScreen() {
 
           {canEdit && (
             <View style={styles.actionRow}>
-              <Link href={`/patterns/${pattern.id}/edit`} asChild>
-                <TouchableOpacity style={[styles.chipButton, styles.primaryButton, styles.actionButton]}>
-                  <Text style={styles.chipButtonLabel}>Bearbeiten</Text>
-                </TouchableOpacity>
-              </Link>
+              <TouchableOpacity style={[styles.chipButton, styles.primaryButton, styles.actionButton]} onPress={() => router.push(`/patterns/${pattern.id}/edit`)}>
+                <Text style={styles.chipButtonLabel}>Bearbeiten</Text>
+              </TouchableOpacity>
               <TouchableOpacity style={[styles.chipButton, styles.dangerButton, styles.actionButton]} onPress={handleDelete}>
                 <Text style={styles.chipButtonLabel}>Löschen</Text>
               </TouchableOpacity>
@@ -253,14 +252,16 @@ export default function PatternDetailScreen() {
   );
 }
 
+const theme = getAppTheme();
+
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#f8fafc',
+    backgroundColor: theme.background,
   },
   container: {
     flex: 1,
-    backgroundColor: '#f8fafc',
+    backgroundColor: theme.background,
   },
   scrollContent: {
     paddingBottom: 24,
@@ -284,7 +285,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   coverPlaceholderText: {
-    color: '#475569',
+    color: theme.textSecondary,
   },
   content: {
     paddingHorizontal: 16,
@@ -306,11 +307,11 @@ const styles = StyleSheet.create({
   },
   backIcon: {
     fontSize: 20,
-    color: '#0f172a',
+    color: theme.textPrimary,
     marginTop: -2,
   },
   backLabel: {
-    color: '#0f172a',
+    color: theme.textPrimary,
     fontWeight: '700',
   },
   actionRow: {
@@ -322,7 +323,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: '800',
-    color: '#0f172a',
+    color: theme.textPrimary,
     flex: 1,
   },
   badgeRow: {
@@ -330,14 +331,14 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   badge: {
-    backgroundColor: '#e2e8f0',
+    backgroundColor: theme.badgeGray,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 999,
     alignSelf: 'flex-start',
   },
   badgeLabel: {
-    color: '#475569',
+    color: theme.textSecondary,
     fontWeight: '700',
     textTransform: 'capitalize',
   },
@@ -347,11 +348,11 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#0f172a',
+    color: theme.textPrimary,
     marginBottom: 6,
   },
   bodyText: {
-    color: '#334155',
+    color: theme.textSecondary,
     fontSize: 15,
     lineHeight: 22,
   },
@@ -371,25 +372,25 @@ const styles = StyleSheet.create({
     textTransform: 'capitalize',
   },
   primaryButtonLarge: {
-    backgroundColor: '#0f172a',
+    backgroundColor: theme.primary,
     paddingVertical: 14,
     borderRadius: 12,
     alignItems: 'center',
     marginTop: 12,
   },
   primaryButtonLabel: {
-    color: '#fff',
+    color: theme.textLight,
     fontWeight: '700',
     fontSize: 16,
   },
   secondaryButtonLarge: {
-    backgroundColor: '#e2e8f0',
+    backgroundColor: theme.badgeGray,
     paddingVertical: 14,
     borderRadius: 12,
     alignItems: 'center',
   },
   secondaryButtonLabel: {
-    color: '#0f172a',
+    color: theme.textPrimary,
     fontWeight: '700',
     fontSize: 16,
   },
@@ -398,8 +399,8 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#cbd5e1',
-    backgroundColor: '#e2e8f0',
+    borderColor: theme.border,
+    backgroundColor: theme.badgeGray,
   },
   actionButton: {
     marginRight: 8,
@@ -407,15 +408,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   primaryButton: {
-    backgroundColor: '#2563eb',
-    borderColor: '#1d4ed8',
+    backgroundColor: theme.primary,
+    borderColor: theme.primaryDark,
   },
   dangerButton: {
     backgroundColor: '#ef4444',
     borderColor: '#dc2626',
   },
   chipButtonLabel: {
-    color: '#fff',
+    color: theme.textLight,
     fontWeight: '700',
   },
   fileSection: {
@@ -430,7 +431,7 @@ const styles = StyleSheet.create({
   },
   fileStatusText: {
     marginTop: 8,
-    color: '#475569',
+    color: theme.textSecondary,
     fontSize: 14,
   },
   fileHelperText: {
