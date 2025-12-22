@@ -1,6 +1,6 @@
 import { apiClient } from './api';
-import { ApiResponse, PatternTagProposalDTO, TagCategoryDTO, TagDTO } from 'schnittmuster-manager-dtos';
-import { TagCategoryPayload, TagCategoryUpdatePayload, TagPayload, TagUpdatePayload } from '../types/tags';
+import type { ApiResponse, PatternTagProposalDTO, TagCategoryDTO, TagDTO } from 'schnittmuster-manager-dtos';
+import type { TagCategoryPayload, TagCategoryUpdatePayload, TagPayload, TagUpdatePayload } from '../types/tags';
 
 export const tagService = {
   async getCategories(): Promise<TagCategoryDTO[]> {

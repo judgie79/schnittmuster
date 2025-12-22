@@ -1,4 +1,4 @@
-import { apiClient } from './api'
+import { apiClient } from '@schnittmuster/core'
 import type {
   ApiResponse,
   AdminUserDTO,

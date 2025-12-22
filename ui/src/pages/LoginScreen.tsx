@@ -10,21 +10,19 @@ export const LoginScreen = () => {
   const [password, setPassword] = useState('')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const navigate = useNavigate()
-  const { login, isLoading, state } = useAuth()
+  const { login, isLoading, isAuthenticated, user } = useAuth()
 
   useEffect(() => {
-    if (state.isAuthenticated) {
-      const destination = state.user?.adminRole ? '/admin' : '/dashboard'
+    if (isAuthenticated) {
+      const destination = user?.adminRole ? '/admin' : '/dashboard'
       navigate(destination, { replace: true })
     }
-  }, [state.isAuthenticated, state.user?.adminRole, navigate])
+  }, [isAuthenticated, user?.adminRole, navigate])
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     try {
-      const user = await login({ email, password })
-      const destination = user?.adminRole ? '/admin' : '/dashboard'
-      navigate(destination, { replace: true })
+      login({ email, password })
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : 'Login fehlgeschlagen')
     }

@@ -3,7 +3,7 @@ import { PatternService } from "./PatternService";
 import { asyncHandler } from "@middleware/errorHandler";
 import { AuthenticatedRequest } from "@middleware/auth";
 import type { PatternStatus } from "@shared/dtos";
-import { PATTERN_STATUS_VALUES, TAG_FILTER_PARAM_KEYS, type PatternListFilters } from "./types";
+import { PATTERN_STATUS_VALUES, type PatternListFilters } from "./types";
 
 type UploadedFile = Express.Multer.File;
 type UploadedFileMap = Record<string, UploadedFile[]>;
@@ -90,7 +90,7 @@ export class PatternController {
 
   private buildListFilters(query: Request["query"]): PatternListFilters {
     const params = query as Record<string, unknown>;
-    const tagIds = TAG_FILTER_PARAM_KEYS.flatMap((key) => this.parseStringArray(params[key]));
+    const tagIds = this.parseTagIds(params.tagIds);
     const favoriteOnly = this.parseBoolean(params.favoriteOnly);
     const queryText = typeof params.query === "string" ? params.query.trim() : undefined;
 
@@ -98,7 +98,7 @@ export class PatternController {
       query: queryText?.length ? queryText : undefined,
       statuses: this.parseStatuses(params.status),
       favoriteOnly: favoriteOnly === true ? true : undefined,
-      tagIds: tagIds.length ? tagIds : undefined,
+      tagIds,
     };
   }
 

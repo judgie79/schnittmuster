@@ -4,8 +4,8 @@ import { useAuth } from '@/hooks'
 import styles from './BottomNav.module.css'
 
 export const BottomNav = () => {
-  const { state } = useAuth()
-  const isAdmin = Boolean(state.user?.adminRole)
+  const { user } = useAuth()
+  const isAdmin = Boolean(user?.adminRole)
   const items = BOTTOM_NAV_ITEMS.filter((item) => (item.requiresAdmin ? isAdmin : true))
 
   return (

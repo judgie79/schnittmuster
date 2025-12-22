@@ -1,4 +1,4 @@
-import { ApiResponse as SharedApiResponse, PaginationInfo } from 'schnittmuster-manager-dtos';
+import type { ApiResponse as SharedApiResponse, PaginationInfo } from 'schnittmuster-manager-dtos';
 
 export type ApiResponse<T> = SharedApiResponse<T>;
 

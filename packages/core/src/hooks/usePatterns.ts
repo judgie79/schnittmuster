@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { patternService } from '../services/patterns';
-import { PatternRequestOptions } from '../types/patterns';
+import type { PatternRequestOptions } from '../types/patterns';
 import { usePatternStore } from '../store/patternStore';
 
 const PATTERNS_QUERY_KEY = ['patterns'];
@@ -10,15 +10,16 @@ export const usePatterns = (page = 1) => {
   const queryClient = useQueryClient();
 
   const selectedTagIds = Object.values(filters.tagFilters ?? {}).flat();
-  const requestFilters: Record<string, unknown> = {
-    query: filters.query || undefined,
-    favoriteOnly: filters.favoriteOnly || undefined,
-    status: filters.status.length ? filters.status : undefined,
-    tagIds: selectedTagIds.length ? selectedTagIds : undefined,
-  };
+  
+  // Build clean request filters - only include defined values
+  const requestFilters: Record<string, unknown> = {};
+  if (filters.query) requestFilters.query = filters.query;
+  if (filters.favoriteOnly) requestFilters.favoriteOnly = filters.favoriteOnly;
+  if (filters.status.length) requestFilters.status = filters.status;
+  if (selectedTagIds.length) requestFilters.tagIds = selectedTagIds;
 
   const query = useQuery({
-    queryKey: [...PATTERNS_QUERY_KEY, page, filters],
+    queryKey: [...PATTERNS_QUERY_KEY, page, requestFilters],
     queryFn: () =>
       patternService.list({
         page,

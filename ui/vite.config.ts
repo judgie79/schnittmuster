@@ -8,6 +8,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
+      '@schnittmuster/core': fileURLToPath(new URL('../packages/core/src', import.meta.url)),
     },
   },
 })

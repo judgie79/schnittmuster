@@ -4,8 +4,7 @@ import { useAuth } from '@/hooks'
 import styles from './Page.module.css'
 
 export const ProfileScreen = () => {
-  const { state } = useAuth()
-  const user = state.user
+  const { user } = useAuth()
 
   if (!user) {
     return <p>Bitte einloggen.</p>

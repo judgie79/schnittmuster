@@ -78,10 +78,29 @@ export const useSearch = () => {
 
   const queryReady = filters.query.trim().length >= 2
   const filterReady = hasActiveFilters(filters)
-  const requestFilters = useMemo(() => filters as unknown as Record<string, unknown>, [filters])
+  
+  // Flatten all tag filter arrays into a single tagIds array
+  const tagIds = useMemo(() => {
+    const ids: string[] = []
+    if (filters.zielgruppe?.length) ids.push(...filters.zielgruppe)
+    if (filters.kleidungsart?.length) ids.push(...filters.kleidungsart)
+    if (filters.hersteller?.length) ids.push(...filters.hersteller)
+    if (filters.lizenz?.length) ids.push(...filters.lizenz)
+    if (filters.groesse?.length) ids.push(...filters.groesse)
+    return ids
+  }, [filters.zielgruppe, filters.kleidungsart, filters.hersteller, filters.lizenz, filters.groesse])
+  
+  const requestFilters = useMemo(() => {
+    const params: Record<string, unknown> = {}
+    if (filters.query) params.query = filters.query
+    if (filters.favoriteOnly) params.favoriteOnly = filters.favoriteOnly
+    if (filters.status?.length) params.status = filters.status
+    if (tagIds.length) params.tagIds = tagIds
+    return params
+  }, [filters.query, filters.favoriteOnly, filters.status, tagIds])
 
   const searchQuery = useQuery({
-    queryKey: ['patternSearch', filters],
+    queryKey: ['patternSearch', requestFilters],
     queryFn: () => patternService.list({ filters: requestFilters }),
     enabled: queryReady || filterReady,
   })

@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState, useId } from 'react'
 import type { ChangeEvent, FormEvent } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useAuthStore } from '@schnittmuster/core'
 import { Button } from '@/components/common/Button'
 import { Loader } from '@/components/common/Loader'
 import { Badge } from '@/components/common/Badge'
@@ -48,7 +49,8 @@ export const PatternDetailScreen = () => {
   const { patternId } = useParams()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
-  const { state, dispatch } = useGlobalContext()
+  const { dispatch } = useGlobalContext()
+  const { user } = useAuthStore()
   const { categories } = useTags()
   const { data, isLoading, error, refetch } = usePattern(patternId)
   const { url: thumbnailBlobUrl } = useProtectedFile(data?.thumbnailUrl)
@@ -71,8 +73,8 @@ export const PatternDetailScreen = () => {
   const scaleInputId = useId()
   const rendererGroupName = useId()
 
-  const userId = state.auth.user?.id
-  const isAdmin = Boolean(state.auth.user?.adminRole)
+  const userId = user?.id
+  const isAdmin = Boolean(user?.adminRole)
   const isOwner = data?.ownerId === userId
   const canEdit = Boolean(patternId && (isOwner || isAdmin))
 

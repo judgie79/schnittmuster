@@ -1,13 +1,7 @@
-import type { PatternStatus, TagDTO } from './models'
+import type { PatternStatus, TagDTO } from 'shared-dtos'
 
-export interface AuthCredentials {
-  email: string
-  password: string
-}
-
-export interface SignupPayload extends AuthCredentials {
-  name: string
-}
+// Re-export core types
+export type { AuthCredentials, SignupPayload } from '@schnittmuster/core'
 
 export interface PatternFormValues {
   name: string

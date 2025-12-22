@@ -14,6 +14,3 @@ export const PATTERN_STATUS_VALUES: PatternStatus[] = [
   "getestet",
   "archiviert",
 ];
-
-export const TAG_FILTER_PARAM_KEYS = ["zielgruppe", "kleidungsart", "hersteller", "lizenz", "groesse"] as const;
-export type TagFilterParamKey = (typeof TAG_FILTER_PARAM_KEYS)[number];

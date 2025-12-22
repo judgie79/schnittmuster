@@ -1,4 +1,4 @@
-import axios, { AxiosInstance, InternalAxiosRequestConfig } from 'axios';
+import axios, { type AxiosInstance, type InternalAxiosRequestConfig } from 'axios';
 import { REQUEST_TIMEOUT, STORAGE_KEYS } from '../utils/constants';
 import { getStorage } from '../utils/storage';
 

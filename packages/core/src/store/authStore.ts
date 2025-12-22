@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { UserDTO } from 'schnittmuster-manager-dtos';
+import type { UserDTO } from 'schnittmuster-manager-dtos';
 
 interface AuthState {
   user: UserDTO | null;

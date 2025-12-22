@@ -9,7 +9,7 @@ export const useTagProposals = () => {
 
   const query = useQuery<PatternTagProposalDTO[], Error>({
     queryKey: TAG_PROPOSALS_QUERY_KEY,
-    queryFn: () => tagService.getProposals(),
+    queryFn: () => tagService.listProposals(),
     staleTime: 30 * 1000,
   })
 

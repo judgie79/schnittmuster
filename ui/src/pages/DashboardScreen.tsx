@@ -4,13 +4,12 @@ import { SearchBar } from '@/components/features/SearchBar/SearchBar'
 import { Button } from '@/components/common/Button'
 import { Loader } from '@/components/common/Loader'
 import { usePatterns, useTags } from '@/hooks'
-import { getFilterKeyForCategory, type TagFilterKey } from '@/constants/tagFilters'
 import styles from './Page.module.css'
 
 interface QuickFilter {
   label: string
   tagId: string
-  key: TagFilterKey
+  categoryId: string
 }
 
 export const DashboardScreen = () => {
@@ -25,20 +24,28 @@ export const DashboardScreen = () => {
   const quickFilters = useMemo<QuickFilter[]>(() => {
     const entries: QuickFilter[] = []
     categories.forEach((category) => {
-      const key = getFilterKeyForCategory(category.name)
-      if (!key) return
       category.tags.slice(0, 3).forEach((tag) => {
-        entries.push({ label: tag.name, tagId: tag.id, key })
+        entries.push({ label: tag.name, tagId: tag.id, categoryId: category.id })
       })
     })
     return entries.slice(0, 8)
   }, [categories])
 
   const handleQuickFilterToggle = (filter: QuickFilter) => {
-    const current = filters[filter.key] ?? []
-    const isActive = current.includes(filter.tagId)
-    const nextValues = isActive ? current.filter((value) => value !== filter.tagId) : [filter.tagId]
-    setFilters({ [filter.key]: nextValues })
+    const currentTagFilters = filters.tagFilters || {}
+    const currentCategoryTags = currentTagFilters[filter.categoryId] || []
+    const isActive = currentCategoryTags.includes(filter.tagId)
+    
+    const nextCategoryTags = isActive 
+      ? currentCategoryTags.filter((id) => id !== filter.tagId)
+      : [...currentCategoryTags, filter.tagId]
+    
+    setFilters({ 
+      tagFilters: {
+        ...currentTagFilters,
+        [filter.categoryId]: nextCategoryTags
+      }
+    })
   }
 
   const handleFavoriteToggle = () => {
@@ -65,10 +72,11 @@ export const DashboardScreen = () => {
           {filters.favoriteOnly ? 'Favoriten aktiv' : 'Nur Favoriten'}
         </Button>
         {quickFilters.map((filter) => {
-          const isActive = filters[filter.key]?.includes(filter.tagId)
+          const categoryTags = filters.tagFilters?.[filter.categoryId] || []
+          const isActive = categoryTags.includes(filter.tagId)
           return (
             <Button
-              key={`${filter.key}-${filter.tagId}`}
+              key={`${filter.categoryId}-${filter.tagId}`}
               type="button"
               variant={isActive ? 'primary' : 'secondary'}
               onClick={() => handleQuickFilterToggle(filter)}
