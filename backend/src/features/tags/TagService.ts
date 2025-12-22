@@ -27,6 +27,21 @@ export class TagService {
     );
   }
 
+  async listAllTags(): Promise<TagDTO[]> {
+    const tags = await this.tagRepository.findAll();
+    return TagMapper.toDTOList(tags);
+  }
+
+  async listAllCategories(): Promise<TagCategoryDTO[]> {
+    const categories = await this.tagRepository.findAllCategoriesWithTags();
+    return categories.map((category) =>
+      TagMapper.toCategoryDTO(category, {
+        includeTags: true,
+        tags: (category.get("tags") as Tag[] | undefined) ?? [],
+      })
+    );
+  }
+
   async create(
     userId: string,
     payload: { name: string; tagCategoryId: string; colorHex: string }

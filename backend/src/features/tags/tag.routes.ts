@@ -11,6 +11,9 @@ const resolveTagOwner = async (req: AuthenticatedRequest): Promise<string | unde
 
 router.use(authenticate);
 
+router.get("/admin/categories", authorize({ roles: ["admin"] }), tagController.listAllCategories);
+router.get("/admin/tags", authorize({ roles: ["admin"] }), tagController.listAllTags);
+
 router.get("/categories", tagController.listCategories);
 router.post(
   "/categories",

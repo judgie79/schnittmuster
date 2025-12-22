@@ -53,6 +53,16 @@ export class TagController {
     await this.tagService.removeCategory(req.params.id, request.user!.id);
     res.status(204).send();
   });
+
+  listAllTags = asyncHandler(async (_req: Request, res: Response) => {
+    const tags = await this.tagService.listAllTags();
+    res.json({ success: true, data: tags });
+  });
+
+  listAllCategories = asyncHandler(async (_req: Request, res: Response) => {
+    const categories = await this.tagService.listAllCategories();
+    res.json({ success: true, data: categories });
+  });
 }
 
 export const tagController = new TagController();

@@ -5,7 +5,7 @@ import { Button } from '@/components/common/Button'
 import { Card } from '@/components/common/Card'
 import { Loader } from '@/components/common/Loader'
 import { useGlobalContext } from '@/context'
-import { useTagProposals, useTags } from '@/hooks'
+import { useTagProposals, useAllTags } from '@/hooks'
 import { tagService } from '@/services'
 import { createToast } from '@/utils'
 import type { TagCategoryDTO, TagDTO } from '@schnittmuster/dtos'
@@ -17,7 +17,7 @@ const emptyTagDraft = { name: '', colorHex: '#4e8cff' }
 export const AdminTagsScreen = () => {
   const queryClient = useQueryClient()
   const { dispatch } = useGlobalContext()
-  const { categories, isLoading, isFetching, refetch: refetchTags } = useTags()
+  const { categories, isLoading, isFetching, refetch: refetchTags } = useAllTags()
   const {
     data: proposalData,
     isLoading: areProposalsLoading,
@@ -81,7 +81,7 @@ export const AdminTagsScreen = () => {
   }
 
   const invalidateTags = async () => {
-    await queryClient.invalidateQueries({ queryKey: ['tagCategories'] })
+    await queryClient.invalidateQueries({ queryKey: ['allTagCategories'] })
   }
 
   const handleCreateCategory = async (event: FormEvent<HTMLFormElement>) => {
@@ -302,6 +302,9 @@ export const AdminTagsScreen = () => {
                     }
                     placeholder="Reihenfolge"
                   />
+                  <small className={styles.notificationMeta} style={{ fontSize: '0.75rem', marginLeft: '8px' }}>
+                    User: {category.userId?.substring(0, 8)}...
+                  </small>
                   <div className={styles.inlineFormActions}>
                     <Button type="submit" variant="secondary">
                       Speichern

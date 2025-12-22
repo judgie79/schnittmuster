@@ -52,6 +52,23 @@ export const SignupScreen = () => {
           />
         </div>
 
+
+        <div className={styles.fieldGroup}>
+          <label className={styles.label} htmlFor="name">
+            Name
+          </label>
+          <input
+            id="username"
+            name="username"
+            className={styles.input}
+            type="text"
+            placeholder="Benutzername"
+            required
+            value={form.username}
+            onChange={handleChange}
+          />
+        </div>
+
         <div className={styles.fieldGroup}>
           <label className={styles.label} htmlFor="email">
             E-Mail-Adresse

@@ -14,3 +14,16 @@ export const useTags = () => {
     categories: query.data ?? [],
   };
 };
+
+export const useAllTags = () => {
+  const query = useQuery<TagCategoryDTO[], Error>({
+    queryKey: ['allTagCategories'],
+    queryFn: () => tagService.getAllCategories(),
+    staleTime: 5 * 60 * 1000,
+  });
+
+  return {
+    ...query,
+    categories: query.data ?? [],
+  };
+};

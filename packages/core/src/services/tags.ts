@@ -8,6 +8,16 @@ export const tagService = {
     return response.data.data;
   },
 
+  async getAllCategories(): Promise<TagCategoryDTO[]> {
+    const response = await apiClient.get<ApiResponse<TagCategoryDTO[]>>('/tags/admin/categories');
+    return response.data.data;
+  },
+
+  async getAllTags(): Promise<TagDTO[]> {
+    const response = await apiClient.get<ApiResponse<TagDTO[]>>('/tags/admin/tags');
+    return response.data.data;
+  },
+
   async createCategory(payload: TagCategoryPayload): Promise<TagCategoryDTO> {
     const response = await apiClient.post<ApiResponse<TagCategoryDTO>>('/tags/categories', payload);
     return response.data.data;
