@@ -12,12 +12,8 @@ export interface ToastItem {
 
 export interface FilterState {
   query: string
-  zielgruppe: string[]
-  kleidungsart: string[]
-  hersteller: string[]
-  lizenz: string[]
-  groesse: string[]
-  status: string[]
+  status: string[],
+  tagIds: string[],
   favoriteOnly: boolean
 }
 

@@ -5,31 +5,15 @@ import { useGlobalContext } from '@/context'
 import type { FilterState } from '@/context/types'
 import { defaultFilters } from '@/context/reducer'
 
-type MultiSelectFilterKey = 'zielgruppe' | 'kleidungsart' | 'hersteller' | 'lizenz' | 'groesse' | 'status'
-
-const hasArrayValues = (values: string[]) => values.length > 0
-
 const hasActiveFilters = (filters: FilterState) => {
   return (
-    filters.favoriteOnly ||
-      hasArrayValues(filters.zielgruppe) ||
-      hasArrayValues(filters.kleidungsart) ||
-      hasArrayValues(filters.hersteller) ||
-      hasArrayValues(filters.lizenz) ||
-      hasArrayValues(filters.groesse) ||
-      hasArrayValues(filters.status)
+    filters.favoriteOnly || filters.tagIds.length > 0
   )
 }
 
 const countActiveFilters = (filters: FilterState) => {
   const base = filters.favoriteOnly ? 1 : 0
-  const arrayTotals =
-    filters.zielgruppe.length +
-    filters.kleidungsart.length +
-    filters.hersteller.length +
-    filters.lizenz.length +
-    filters.groesse.length +
-    filters.status.length
+  const arrayTotals = filters.tagIds.length;
 
   return base + arrayTotals
 }
@@ -56,14 +40,14 @@ export const useSearch = () => {
   }, [setFilters])
 
   const toggleFilter = useCallback(
-    (key: MultiSelectFilterKey, value: string) => {
-      const currentValues = filters[key]
+    (value: string) => {
+      const currentValues = filters.tagIds;
       const exists = currentValues.includes(value)
       const nextValues = exists
         ? currentValues.filter((entry) => entry !== value)
         : [...currentValues, value]
 
-      setFilters({ [key]: nextValues } as Partial<FilterState>)
+      setFilters({tagIds: nextValues})
     },
     [filters, setFilters]
   )
@@ -82,13 +66,9 @@ export const useSearch = () => {
   // Flatten all tag filter arrays into a single tagIds array
   const tagIds = useMemo(() => {
     const ids: string[] = []
-    if (filters.zielgruppe?.length) ids.push(...filters.zielgruppe)
-    if (filters.kleidungsart?.length) ids.push(...filters.kleidungsart)
-    if (filters.hersteller?.length) ids.push(...filters.hersteller)
-    if (filters.lizenz?.length) ids.push(...filters.lizenz)
-    if (filters.groesse?.length) ids.push(...filters.groesse)
+    if (filters.tagIds?.length) ids.push(...filters.tagIds)
     return ids
-  }, [filters.zielgruppe, filters.kleidungsart, filters.hersteller, filters.lizenz, filters.groesse])
+  }, [filters.tagIds])
   
   const requestFilters = useMemo(() => {
     const params: Record<string, unknown> = {}

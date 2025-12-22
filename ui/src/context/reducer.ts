@@ -2,11 +2,7 @@ import type { GlobalAction, GlobalState } from './types'
 
 export const defaultFilters = {
   query: '',
-  zielgruppe: [],
-  kleidungsart: [],
-  hersteller: [],
-  lizenz: [],
-  groesse: [],
+  tagIds: [],
   status: [],
   favoriteOnly: false,
 }

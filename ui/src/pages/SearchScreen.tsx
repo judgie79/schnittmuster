@@ -5,11 +5,11 @@ import { SearchBar } from '@/components/features/SearchBar/SearchBar'
 import { FilterPanel } from '@/components/features/FilterPanel/FilterPanel'
 import type { FilterState } from '@/context/types'
 import type { PatternStatus } from 'shared-dtos'
-import { STATUS_LABELS, TAG_SECTION_CONFIG, type TagFilterKey } from '@/constants/tagFilters'
+import { STATUS_LABELS } from '@/constants/tagFilters'
 import styles from './Page.module.css'
 
 interface ComputedSection {
-  id: TagFilterKey
+  id: string
   title: string
   description?: string
   options: { label: string; value: string }[]
@@ -51,19 +51,12 @@ export const SearchScreen = () => {
   )
 
   const tagSections = useMemo<ComputedSection[]>(() => {
-    return TAG_SECTION_CONFIG.reduce<ComputedSection[]>((acc, section) => {
-      const category = categories.find(
-        (entry) => entry.name.toLowerCase() === section.categoryName.toLowerCase()
-      )
-      if (!category) {
-        return acc
-      }
+    return categories.reduce<ComputedSection[]>((acc, category) => {
       acc.push({
-        id: section.id,
-        title: section.title,
-        description: section.description,
+        id: category.id,
+        title: category.name,
         options: category.tags.map((tag) => ({ label: tag.name, value: tag.id })),
-        selectedValues: filters[section.id],
+        selectedValues: filters.tagIds,
       })
       return acc
     }, [])
@@ -71,8 +64,8 @@ export const SearchScreen = () => {
 
   const filterSections = useMemo<ComputedSection[]>(() => [...tagSections, statusSection], [statusSection, tagSections])
 
-  const handleClearSection = (sectionId: TagFilterKey) => {
-    setFilters({ [sectionId]: [] } as Partial<FilterState>)
+  const handleClearSection = () => {
+    setFilters({ tagIds: [] } as Partial<FilterState>)
   }
 
   const canSearch = filters.query.trim().length >= 2 || hasActiveFilters
@@ -93,8 +86,8 @@ export const SearchScreen = () => {
         <div className={styles.filterColumn}>
           <FilterPanel
             sections={filterSections}
-            onToggle={(sectionId, value) => toggleFilter(sectionId as TagFilterKey, value)}
-            onClearSection={(sectionId) => handleClearSection(sectionId as TagFilterKey)}
+            onToggle={(value) => toggleFilter(value)}
+            onClearSection={() => handleClearSection()}
             onClearAll={clearFilters}
             favoriteOnly={filters.favoriteOnly}
             onFavoriteToggle={toggleFavoriteOnly}
