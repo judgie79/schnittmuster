@@ -2,8 +2,8 @@ import { Request, Response } from "express";
 import { PatternService } from "./PatternService";
 import { asyncHandler } from "@middleware/errorHandler";
 import { AuthenticatedRequest } from "@middleware/auth";
-import type { PatternStatus } from "@schnittmuster/dtos";
-import { PATTERN_STATUS_VALUES, type PatternListFilters } from "./types";
+import { PatternStatus } from "@schnittmuster/dtos";
+import { type PatternListFilters } from "./types";
 
 type UploadedFile = Express.Multer.File;
 type UploadedFileMap = Record<string, UploadedFile[]>;
@@ -71,7 +71,7 @@ export class PatternController {
   private parseStatuses(input: unknown): PatternStatus[] | undefined {
     const values = this.parseStringArray(input).map((value) => value.toLowerCase());
     const statuses = values.filter((value): value is PatternStatus =>
-      PATTERN_STATUS_VALUES.includes(value as PatternStatus)
+      Object.values(PatternStatus).includes(value as PatternStatus)
     );
     return statuses.length ? statuses : undefined;
   }

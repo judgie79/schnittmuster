@@ -21,7 +21,7 @@ const countActiveFilters = (filters: FilterState) => {
 export const useSearch = () => {
   const { state, dispatch } = useGlobalContext()
   const filters = state.patterns.filters
-  const timeoutRef = useRef<ReturnType<typeof window.setTimeout>>()
+  const timeoutRef = useRef<ReturnType<typeof window.setTimeout> | null>(null)
 
   const setFilters = useCallback(
     (nextFilters: Partial<FilterState>) => {
@@ -32,7 +32,7 @@ export const useSearch = () => {
 
   const debouncedSetQuery = useMemo(() => {
     return (value: string) => {
-      window.clearTimeout(timeoutRef.current)
+      window.clearTimeout(timeoutRef.current ?? undefined)
       timeoutRef.current = window.setTimeout(() => {
         setFilters({ query: value })
       }, 300)
@@ -87,7 +87,7 @@ export const useSearch = () => {
 
   useEffect(() => {
     return () => {
-      window.clearTimeout(timeoutRef.current)
+      window.clearTimeout(timeoutRef.current ?? undefined)
     }
   }, [])
 

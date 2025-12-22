@@ -1,4 +1,4 @@
-import type { PatternStatus } from "@schnittmuster/dtos";
+import { PatternStatus } from "@schnittmuster/dtos";
 
 export interface PatternListFilters {
   query?: string;
@@ -6,11 +6,3 @@ export interface PatternListFilters {
   favoriteOnly?: boolean;
   tagIds?: string[];
 }
-
-export const PATTERN_STATUS_VALUES: PatternStatus[] = [
-  "draft",
-  "geplant",
-  "genaeht",
-  "getestet",
-  "archiviert",
-];

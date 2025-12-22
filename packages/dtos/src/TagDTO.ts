@@ -1,4 +1,4 @@
-import type { UUID } from './types'
+import type { UUID } from './types.js'
 
 export interface TagCategoryDTO {
   id: UUID

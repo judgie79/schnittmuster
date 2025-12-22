@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { fileService } from '@/services'
+import { fileService } from '@schnittmuster/core'
 import { resolveAssetUrl } from '@/utils/url'
 
 export const useProtectedFile = (sourceUrl?: string) => {

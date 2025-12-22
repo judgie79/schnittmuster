@@ -1,4 +1,4 @@
-import { fileService } from '../fileService'
+import { fileService } from '@schnittmuster/core'
 import { resolveAssetUrl } from '@/utils/url'
 import { patternPrintHandlerFactory } from './factory'
 import { pdfJsPrintHandler } from './handlers'

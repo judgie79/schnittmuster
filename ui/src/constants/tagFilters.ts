@@ -1,9 +1,0 @@
-import type { PatternStatus } from '@schnittmuster/dtos'
-
-export const STATUS_LABELS: Record<PatternStatus, string> = {
-  draft: 'Entwurf',
-  geplant: 'Geplant',
-  genaeht: 'Genäht',
-  getestet: 'Getestet',
-  archiviert: 'Archiviert',
-}

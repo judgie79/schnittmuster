@@ -1,5 +1,5 @@
-import type { ISODateString, UUID } from './types'
-import type { RoleDTO } from './RoleDTO'
+import type { ISODateString, UUID } from './types.js'
+import type { RoleDTO } from './RoleDTO.js'
 
 export type AuthProvider = 'local' | 'google'
 export type AdminRoleType = 'super_admin' | 'admin' | 'moderator'

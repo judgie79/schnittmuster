@@ -4,8 +4,9 @@ import { PatternForm } from '@/components/features/PatternForm/PatternForm'
 import { Loader } from '@/components/common/Loader'
 import { useGlobalContext } from '@/context'
 import { usePatterns, useTags } from '@/hooks'
-import type { PatternFormValues } from '@/types'
-import { buildPatternFormData, createToast } from '@/utils'
+import type { PatternFormValues } from '@schnittmuster/core'
+import { buildPatternFormData } from '@schnittmuster/core'
+import { createToast } from '@/utils'
 import styles from './Page.module.css'
 
 export const AddPatternScreen = () => {

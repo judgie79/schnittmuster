@@ -3,6 +3,5 @@ export { apiClient, authService, patternService, tagService } from '@schnittmust
 export type { PatternRequestOptions } from '@schnittmuster/core'
 
 // UI-specific services
-export * from './fileService'
 export * from './adminService'
 export * from './patternPrinter'

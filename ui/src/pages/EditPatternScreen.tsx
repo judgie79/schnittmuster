@@ -6,8 +6,9 @@ import { Loader } from '@/components/common/Loader'
 import { useGlobalContext } from '@/context'
 import { usePattern, useTags } from '@/hooks'
 import { patternService } from '@/services'
-import type { PatternFormValues } from '@/types'
-import { buildPatternFormData, createToast } from '@/utils'
+import type { PatternFormValues } from '@schnittmuster/core'
+import { buildPatternFormData } from '@schnittmuster/core'
+import { createToast } from '@/utils'
 import styles from './Page.module.css'
 
 export const EditPatternScreen = () => {

@@ -1,4 +1,4 @@
-import type { AccessRight, ISODateString, ResourceType, UUID } from './types'
+import type { AccessRight, ISODateString, ResourceType, UUID } from './types.js'
 
 export interface ResourceDTO {
   id: UUID

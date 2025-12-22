@@ -1,4 +1,4 @@
-import type { PatternFormValues } from '@/types'
+import type { PatternFormValues } from './patternFormValues'
 
 const appendIfDefined = (formData: FormData, key: string, value?: string | null) => {
   if (value && value.trim().length > 0) {

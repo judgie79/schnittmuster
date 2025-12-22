@@ -1,4 +1,4 @@
-import type { ISODateString, UUID, UserRole } from './types'
+import type { ISODateString, UUID, UserRole } from './types.js'
 
 export interface RoleDTO {
   id: UUID

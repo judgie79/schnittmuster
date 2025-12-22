@@ -3,19 +3,12 @@ import { Button } from '@/components/common/Button'
 import { FileUpload } from '@/components/features/FileUpload/FileUpload'
 import { TagSelector } from '@/components/features/TagSelector/TagSelector'
 import { useProtectedFile } from '@/hooks'
-import { fileService } from '@/services'
 import { resolveAssetUrl } from '@/utils/url'
-import type { PatternFormValues } from '@/types'
-import type { PatternStatus, TagCategoryDTO, TagDTO } from '@schnittmuster/dtos'
+import type { PatternFormValues } from '@schnittmuster/core'
+import { fileService, STATUS_LABELS } from '@schnittmuster/core'
+import type { TagCategoryDTO, TagDTO } from '@schnittmuster/dtos'
+import { PatternStatus } from '@schnittmuster/dtos'
 import styles from './PatternForm.module.css'
-
-const STATUS_OPTIONS: Array<{ value: PatternStatus; label: string }> = [
-  { value: 'draft', label: 'Entwurf' },
-  { value: 'geplant', label: 'Geplant' },
-  { value: 'genaeht', label: 'Genäht' },
-  { value: 'getestet', label: 'Getestet' },
-  { value: 'archiviert', label: 'Archiviert' },
-]
 
 export interface PatternFormProps {
   initialValues?: Partial<PatternFormValues>
@@ -36,7 +29,7 @@ export interface PatternFormProps {
 const DEFAULT_VALUES: PatternFormValues = {
   name: '',
   description: '',
-  status: 'draft',
+  status: PatternStatus.draft,
   isFavorite: false,
   file: null,
   thumbnail: null,
@@ -227,9 +220,9 @@ export const PatternForm = ({
       <label>
         <span className={styles.sectionTitle}>Status</span>
         <select value={status} onChange={(event) => setStatus(event.target.value as PatternStatus)}>
-          {STATUS_OPTIONS.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
+          {Object.entries(STATUS_LABELS).map(element => (
+            <option key={element[0]} value={element[0]}>
+              {element[1]}
             </option>
           ))}
         </select>

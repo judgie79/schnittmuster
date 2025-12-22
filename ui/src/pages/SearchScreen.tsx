@@ -5,7 +5,7 @@ import { SearchBar } from '@/components/features/SearchBar/SearchBar'
 import { FilterPanel } from '@/components/features/FilterPanel/FilterPanel'
 import type { FilterState } from '@/context/types'
 import type { PatternStatus } from '@schnittmuster/dtos'
-import { STATUS_LABELS } from '@/constants/tagFilters'
+import { STATUS_LABELS } from '@schnittmuster/core'
 import styles from './Page.module.css'
 
 interface ComputedSection {

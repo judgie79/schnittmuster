@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Directory, File, Paths } from 'expo-file-system'
-import { resolveAssetUrl, STORAGE_KEYS, getStorage } from '@schnittmuster/core'
+import { resolveAssetUrl, STORAGE_KEYS, getStorage, parseFileName } from '@schnittmuster/core'
 
 export interface PatternFileHandle {
   uri: string
@@ -20,42 +20,8 @@ interface UsePatternFileResult {
 }
 
 const DIRECTORY_SUFFIX = 'pattern-files'
-const FALLBACK_NAME = 'schnittmuster-datei.pdf'
 
-const parseFileName = (contentDisposition?: string | null) => {
-  if (!contentDisposition) {
-    return null
-  }
-  const matches = /filename\*=UTF-8''([^;]+)|filename="?([^";]+)"?/i.exec(contentDisposition)
-  if (!matches) {
-    return null
-  }
-  if (matches[1]) {
-    try {
-      return decodeURIComponent(matches[1])
-    } catch {
-      return matches[1]
-    }
-  }
-  return matches[2] ?? null
-}
 
-const sanitizeFileName = (input?: string | null) => {
-  if (!input) {
-    return FALLBACK_NAME
-  }
-  const normalized = input.trim().replace(/[/\\]/g, '_')
-  return normalized.length ? normalized : FALLBACK_NAME
-}
-
-const getExtension = (input?: string | null) => {
-  if (!input) {
-    return undefined
-  }
-  const sanitized = input.split(/[?#]/)[0]
-  const match = sanitized.match(/\.([a-z0-9]+)$/i)
-  return match ? match[1].toLowerCase() : undefined
-}
 
 const buildDownloadDirectory = () => {
   const baseDirectory = Paths.cache ?? Paths.document
@@ -72,43 +38,6 @@ const ensureDirectory = () => {
     }
   }
   return directory
-}
-
-const guessFileNameFromUrl = (input: string) => {
-  const sanitized = input.split(/[?#]/)[0]
-  const segments = sanitized.split('/')
-  const candidate = segments.pop() || FALLBACK_NAME
-  try {
-    return decodeURIComponent(candidate)
-  } catch {
-    return candidate
-  }
-}
-
-const buildAuthHeaders = async () => {
-  const headers: Record<string, string> = { Accept: '*/*' }
-  const token = await getStorage().getItem(STORAGE_KEYS.accessToken)
-  if (token) {
-    headers.Authorization = `Bearer ${token}`
-  }
-  return headers
-}
-
-const fetchRemoteMetadata = async (url: string, headers: Record<string, string>) => {
-  try {
-    const response = await fetch(url, {
-      method: 'HEAD',
-      headers,
-    })
-    if (!response.ok) {
-      return { mimeType: null, fileName: null }
-    }
-    const mimeType = response.headers.get('content-type')
-    const fileName = parseFileName(response.headers.get('content-disposition'))
-    return { mimeType: mimeType ?? null, fileName }
-  } catch {
-    return { mimeType: null, fileName: null }
-  }
 }
 
 const downloadPatternFile = async (fileUrl: string): Promise<PatternFileHandle> => {

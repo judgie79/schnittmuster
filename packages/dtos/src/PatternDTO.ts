@@ -1,7 +1,16 @@
-import type { ISODateString, UUID } from './types'
-import type { TagDTO } from './TagDTO'
+import type { ISODateString, UUID } from './types.js'
+import type { TagDTO } from './TagDTO.js'
 
-export type PatternStatus = 'draft' | 'geplant' | 'genaeht' | 'getestet' | 'archiviert'
+//export type PatternStatus = 'draft' | 'geplant' | 'genaeht' | 'getestet' | 'archiviert'
+
+
+export enum PatternStatus {
+  draft = 'draft',
+  geplant = 'geplant',
+  genaeht = 'genaeht',
+  getestet = 'getestet',
+  archiviert = 'archiviert',
+}
 
 export interface PatternDTO {
   id: UUID

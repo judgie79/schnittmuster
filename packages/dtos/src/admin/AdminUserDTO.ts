@@ -1,4 +1,4 @@
-import type { UserDTO } from '../UserDTO'
+import type { UserDTO } from '../UserDTO.js'
 
 export interface AdminUserDTO extends UserDTO {
   admin_role: 'super_admin' | 'admin' | 'moderator'

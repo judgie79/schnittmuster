@@ -13,7 +13,7 @@ export type AuthenticatedUser = {
 };
 
 export type AuthenticatedRequest = Request & {
-  user?: AuthenticatedUser;
+  user: AuthenticatedUser;
 };
 
 export const authenticate: RequestHandler = (req: Request, _res: Response, next: NextFunction): void => {
@@ -39,9 +39,13 @@ export const authenticate: RequestHandler = (req: Request, _res: Response, next:
 
   try {
     const payload = jwt.verify(token, authConfig.jwt.accessSecret) as jwt.JwtPayload;
+    if (!payload.userId || !payload.sub) {
+      next(new ForbiddenError("Invalid token payload"));
+      return;
+    }
     request.user = {
-      id: String(payload.userId ?? ""),
-      email: String(payload.sub ?? ""),
+      id: String(payload.userId),
+      email: String(payload.sub),
       provider: String(payload.provider ?? "local"),
       adminRole: (payload.adminRole as AdminRoleType | undefined) ?? undefined,
     };

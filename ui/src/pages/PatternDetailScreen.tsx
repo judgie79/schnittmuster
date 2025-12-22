@@ -1,27 +1,15 @@
 import { useEffect, useMemo, useState, useId } from 'react'
 import type { ChangeEvent } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { useAuthStore } from '@schnittmuster/core'
+import { useAuthStore, getContrastColor, fileService } from '@schnittmuster/core'
 import { Button } from '@/components/common/Button'
 import { Loader } from '@/components/common/Loader'
 import { Badge } from '@/components/common/Badge'
 import { usePattern, useProtectedFile } from '@/hooks'
 import { useGlobalContext } from '@/context'
-import { patternPrinter, fileService, type PatternPrintRenderer } from '@/services'
+import { patternPrinter, type PatternPrintRenderer } from '@/services'
 import { createToast } from '@/utils'
 import styles from './Page.module.css'
-
-const getContrastColor = (hexColor?: string) => {
-  if (!hexColor) {
-    return '#0f172a'
-  }
-  const hex = hexColor.replace('#', '')
-  const r = parseInt(hex.substring(0, 2), 16)
-  const g = parseInt(hex.substring(2, 4), 16)
-  const b = parseInt(hex.substring(4, 6), 16)
-  const yiq = (r * 299 + g * 587 + b * 114) / 1000
-  return yiq >= 128 ? '#0f172a' : '#f8fafc'
-}
 
 const PRINT_SCALE_STORAGE_KEY = 'pattern-print-scale'
 const clampScaleValue = (value: number) => Math.min(150, Math.max(50, Math.round(value)))

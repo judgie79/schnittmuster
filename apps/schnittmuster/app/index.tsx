@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link, useRouter } from 'expo-router';
-import { useAuth, usePatterns, useTags } from '@schnittmuster/core';
+import { useAuth, usePatterns, useTags, getContrastColor } from '@schnittmuster/core';
 import type { PatternFilters } from '@schnittmuster/core';
 import type { TagCategoryDTO } from '@schnittmuster/dtos';
 import { getAppTheme } from '@/constants/theme';
@@ -49,15 +49,6 @@ const pruneEmptySelections = (selection: TagFilterSelections): TagFilterSelectio
     }
     return acc;
   }, {} as TagFilterSelections);
-
-const getContrastColor = (hexColor: string) => {
-  const hex = hexColor.replace('#', '');
-  const r = parseInt(hex.substring(0, 2), 16);
-  const g = parseInt(hex.substring(2, 4), 16);
-  const b = parseInt(hex.substring(4, 6), 16);
-  const yiq = (r * 299 + g * 587 + b * 114) / 1000;
-  return yiq >= 128 ? '#0f172a' : '#f8fafc';
-};
 
 const countActiveTagFilters = (filters: TagFilterSelections = {}) =>
   Object.values(filters).reduce((total, tagIds) => total + tagIds.length, 0);

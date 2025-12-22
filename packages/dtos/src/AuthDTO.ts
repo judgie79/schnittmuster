@@ -1,5 +1,5 @@
-import type { AccessRight, ISODateString, ResourceType, UUID } from './types'
-import type { RoleDTO } from './RoleDTO'
+import type { AccessRight, ISODateString, ResourceType, UUID } from './types.js'
+import type { RoleDTO } from './RoleDTO.js'
 
 export interface AuthTokenDTO {
   accessToken: string
