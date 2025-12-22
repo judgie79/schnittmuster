@@ -68,6 +68,7 @@ export default function RootLayout() {
             <Stack.Screen name="patterns/[patternId]" options={{ presentation: 'card' }} />
             <Stack.Screen name="patterns/[patternId]/edit" options={{ presentation: 'card' }} />
             <Stack.Screen name="tags" options={{ presentation: 'card' }} />
+            <Stack.Screen name="measurements" options={{ presentation: 'card' }} />
           </Stack>
           <StatusBar style="auto" />
         </ThemeProvider>

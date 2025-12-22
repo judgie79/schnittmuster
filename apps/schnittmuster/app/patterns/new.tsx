@@ -15,9 +15,19 @@ import { useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 import * as DocumentPicker from 'expo-document-picker';
 import { usePatterns } from '@schnittmuster/core';
-import type { TagDTO } from '@schnittmuster/dtos';
+import type { TagDTO, FabricRequirementsDTO, MeasurementTypeDTO } from '@schnittmuster/dtos';
 import { PatternTagEditor } from '@/components/pattern-tag-editor';
+import { PatternMeasurementEditor } from '@/components/pattern-measurement-editor';
+import { FabricRequirements } from '@/components/fabric-requirements';
 import { getAppTheme } from '@/constants/theme';
+
+type MeasurementInput = {
+  measurementTypeId: string;
+  measurementType: MeasurementTypeDTO;
+  value?: number;
+  notes?: string;
+  isRequired: boolean;
+};
 
 export default function CreatePatternScreen() {
   const router = useRouter();
@@ -28,6 +38,8 @@ export default function CreatePatternScreen() {
   const [file, setFile] = useState<DocumentPicker.DocumentPickerAsset | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedTags, setSelectedTags] = useState<TagDTO[]>([]);
+  const [selectedMeasurements, setSelectedMeasurements] = useState<MeasurementInput[]>([]);
+  const [fabricRequirements, setFabricRequirements] = useState<FabricRequirementsDTO>({});
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -93,7 +105,27 @@ export default function CreatePatternScreen() {
         formData.append('tagIds', JSON.stringify(selectedTags.map((tag) => tag.id)));
       }
 
-      await mutate.create(formData);
+      if (fabricRequirements.fabricWidth || fabricRequirements.fabricLength || fabricRequirements.fabricType) {
+        formData.append('fabricRequirements', JSON.stringify(fabricRequirements));
+      }
+
+      const createdPattern = await mutate.create(formData);
+      
+      // Add measurements if any were selected
+      if (selectedMeasurements.length > 0 && createdPattern?.id) {
+        const { measurementService } = await import('@schnittmuster/core');
+        await Promise.all(
+          selectedMeasurements.map((measurement) =>
+            measurementService.addPatternMeasurement(createdPattern.id, {
+              measurementTypeId: measurement.measurementTypeId,
+              value: measurement.value,
+              notes: measurement.notes,
+              isRequired: measurement.isRequired,
+            })
+          )
+        );
+      }
+      
       Alert.alert('Erfolg', 'Schnittmuster erstellt.');
       router.back();
     } catch (err: any) {
@@ -163,6 +195,22 @@ export default function CreatePatternScreen() {
           <View style={styles.field}>
             <Text style={styles.label}>Kategorien & Tags</Text>
             <PatternTagEditor selectedTags={selectedTags} onChange={setSelectedTags} />
+          </View>
+
+          <View style={styles.field}>
+            <Text style={styles.label}>Messungen</Text>
+            <PatternMeasurementEditor
+              selectedMeasurements={selectedMeasurements}
+              onChange={setSelectedMeasurements}
+            />
+          </View>
+
+          <View style={styles.field}>
+            <Text style={styles.label}>Stoffanforderungen</Text>
+            <FabricRequirements
+              fabricRequirements={fabricRequirements}
+              onChange={setFabricRequirements}
+            />
           </View>
 
           <TouchableOpacity

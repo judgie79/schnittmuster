@@ -14,7 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
-import { resolveAssetUrl, useAuth, usePattern, usePatterns, getContrastColor } from '@schnittmuster/core';
+import { resolveAssetUrl, useAuth, usePattern, usePatterns, usePatternMeasurements, getContrastColor } from '@schnittmuster/core';
 import { TagDTO } from '@schnittmuster/dtos';
 import { usePatternFile } from '../../hooks/usePatternFile';
 import { getAppTheme } from '@/constants/theme';
@@ -23,6 +23,7 @@ export default function PatternDetailScreen() {
   const { patternId } = useLocalSearchParams<{ patternId?: string }>();
   const router = useRouter();
   const { data: pattern, isLoading, error } = usePattern(patternId);
+  const { measurements } = usePatternMeasurements(patternId);
   const { mutate } = usePatterns();
   const { user } = useAuth();
   const {
@@ -192,6 +193,47 @@ export default function PatternDetailScreen() {
               </View>
             </View>
           ) : null}
+
+          {measurements.length > 0 && (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Messungen</Text>
+              {measurements.map((measurement) => (
+                <View key={measurement.id} style={styles.measurementItem}>
+                  <View style={styles.measurementHeader}>
+                    <Text style={styles.measurementName}>{measurement.measurementType.name}</Text>
+                    {measurement.isRequired && (
+                      <View style={styles.requiredBadge}>
+                        <Text style={styles.requiredText}>Erforderlich</Text>
+                      </View>
+                    )}
+                  </View>
+                  <Text style={styles.measurementValue}>
+                    {measurement.value
+                      ? `${measurement.value} ${measurement.measurementType.unit}`
+                      : 'Kein Wert angegeben'}
+                  </Text>
+                  {measurement.notes && (
+                    <Text style={styles.measurementNotes}>{measurement.notes}</Text>
+                  )}
+                </View>
+              ))}
+            </View>
+          )}
+
+          {pattern.fabricRequirements && (pattern.fabricRequirements.fabricWidth || pattern.fabricRequirements.fabricLength || pattern.fabricRequirements.fabricType) && (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Stoffanforderungen</Text>
+              {pattern.fabricRequirements.fabricWidth && (
+                <Text style={styles.fabricDetail}>Breite: {pattern.fabricRequirements.fabricWidth} cm</Text>
+              )}
+              {pattern.fabricRequirements.fabricLength && (
+                <Text style={styles.fabricDetail}>Länge: {pattern.fabricRequirements.fabricLength} cm</Text>
+              )}
+              {pattern.fabricRequirements.fabricType && (
+                <Text style={styles.fabricDetail}>Stoffart: {pattern.fabricRequirements.fabricType}</Text>
+              )}
+            </View>
+          )}
 
           {pattern.fileUrl ? (
             <View style={[styles.section, styles.fileSection]}>
@@ -437,5 +479,48 @@ const styles = StyleSheet.create({
   },
   buttonDisabled: {
     opacity: 0.6,
+  },
+  measurementItem: {
+    backgroundColor: '#f8fafc',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 8,
+  },
+  measurementHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 4,
+  },
+  measurementName: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: theme.textPrimary,
+  },
+  measurementValue: {
+    fontSize: 14,
+    color: theme.textPrimary,
+    marginBottom: 4,
+  },
+  measurementNotes: {
+    fontSize: 13,
+    color: theme.textSecondary,
+    fontStyle: 'italic',
+  },
+  requiredBadge: {
+    backgroundColor: '#fef3c7',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  requiredText: {
+    fontSize: 11,
+    color: '#92400e',
+    fontWeight: '600',
+  },
+  fabricDetail: {
+    fontSize: 15,
+    color: theme.textPrimary,
+    marginBottom: 6,
   },
 });

@@ -238,6 +238,12 @@ const PatternList = () => {
         >
           <Text style={styles.manageTagsButtonText}>🏷️</Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => router.push('/measurements')}
+          style={styles.manageTagsButton}
+        >
+          <Text style={styles.manageTagsButtonText}>📏</Text>
+        </TouchableOpacity>
         <TouchableOpacity style={styles.filterButton} onPress={() => setFilterVisible(true)}>
           <Text style={styles.filterButtonLabel}>Filter</Text>
           {hasActiveFilters ? (

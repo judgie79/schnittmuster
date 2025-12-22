@@ -14,15 +14,26 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 import * as DocumentPicker from 'expo-document-picker';
-import { resolveAssetUrl, usePattern, usePatterns } from '@schnittmuster/core';
-import type { TagDTO } from '@schnittmuster/dtos';
+import { resolveAssetUrl, usePattern, usePatterns, usePatternMeasurements } from '@schnittmuster/core';
+import type { TagDTO, FabricRequirementsDTO, MeasurementTypeDTO } from '@schnittmuster/dtos';
 import { PatternTagEditor } from '@/components/pattern-tag-editor';
+import { PatternMeasurementEditor } from '@/components/pattern-measurement-editor';
+import { FabricRequirements } from '@/components/fabric-requirements';
 import { getAppTheme } from '@/constants/theme';
+
+type MeasurementInput = {
+  measurementTypeId: string;
+  measurementType: MeasurementTypeDTO;
+  value?: number;
+  notes?: string;
+  isRequired: boolean;
+};
 
 export default function EditPatternScreen() {
   const { patternId } = useLocalSearchParams<{ patternId?: string }>();
   const router = useRouter();
   const { data: pattern, isLoading } = usePattern(patternId);
+  const { measurements: existingMeasurements } = usePatternMeasurements(patternId);
   const { mutate } = usePatterns();
 
   const [name, setName] = useState('');
@@ -31,14 +42,37 @@ export default function EditPatternScreen() {
   const [file, setFile] = useState<DocumentPicker.DocumentPickerAsset | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedTags, setSelectedTags] = useState<TagDTO[]>([]);
+  const [selectedMeasurements, setSelectedMeasurements] = useState<MeasurementInput[]>([]);
+  const [fabricRequirements, setFabricRequirements] = useState<FabricRequirementsDTO>({});
 
   useEffect(() => {
     if (pattern) {
       setName(pattern.name);
       setDescription(pattern.description || '');
       setSelectedTags(pattern.tags ?? []);
+      if (pattern.fabricRequirements) {
+        setFabricRequirements({
+          fabricWidth: pattern.fabricRequirements.fabricWidth,
+          fabricLength: pattern.fabricRequirements.fabricLength,
+          fabricType: pattern.fabricRequirements.fabricType,
+        });
+      }
     }
   }, [pattern]);
+
+  useEffect(() => {
+    if (existingMeasurements.length > 0) {
+      setSelectedMeasurements(
+        existingMeasurements.map((m) => ({
+          measurementTypeId: m.measurementTypeId,
+          measurementType: m.measurementType,
+          value: m.value ?? undefined,
+          notes: m.notes,
+          isRequired: m.isRequired,
+        }))
+      );
+    }
+  }, [existingMeasurements]);
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -101,7 +135,47 @@ export default function EditPatternScreen() {
         formData.append('tagIds', JSON.stringify(selectedTags.map((tag) => tag.id)));
       }
 
+      if (fabricRequirements.fabricWidth || fabricRequirements.fabricLength || fabricRequirements.fabricType) {
+        formData.append('fabricRequirements', JSON.stringify(fabricRequirements));
+      }
+
       await mutate.update(patternId as string, formData);
+
+      // Handle measurements separately
+      const { measurementService } = await import('@schnittmuster/core');
+      
+      // Get current measurements to compare
+      const existingIds = new Set(existingMeasurements.map((m) => m.measurementTypeId));
+      const selectedIds = new Set(selectedMeasurements.map((m) => m.measurementTypeId));
+      
+      // Delete removed measurements
+      for (const existing of existingMeasurements) {
+        if (!selectedIds.has(existing.measurementTypeId)) {
+          await measurementService.deletePatternMeasurement(patternId as string, existing.id);
+        }
+      }
+      
+      // Add or update measurements
+      for (const measurement of selectedMeasurements) {
+        const existing = existingMeasurements.find((m) => m.measurementTypeId === measurement.measurementTypeId);
+        if (existing) {
+          // Update existing
+          await measurementService.updatePatternMeasurement(patternId as string, existing.id, {
+            value: measurement.value,
+            notes: measurement.notes,
+            isRequired: measurement.isRequired,
+          });
+        } else {
+          // Add new
+          await measurementService.addPatternMeasurement(patternId as string, {
+            measurementTypeId: measurement.measurementTypeId,
+            value: measurement.value,
+            notes: measurement.notes,
+            isRequired: measurement.isRequired,
+          });
+        }
+      }
+      
       Alert.alert('Erfolg', 'Schnittmuster aktualisiert.');
       router.back();
     } catch (err: any) {
@@ -178,6 +252,23 @@ export default function EditPatternScreen() {
         <View style={styles.field}>
           <Text style={styles.label}>Kategorien & Tags</Text>
           <PatternTagEditor selectedTags={selectedTags} onChange={setSelectedTags} />
+        </View>
+
+        <View style={styles.field}>
+          <Text style={styles.label}>Messungen</Text>
+          <PatternMeasurementEditor
+            selectedMeasurements={selectedMeasurements}
+            onChange={setSelectedMeasurements}
+            patternId={patternId}
+          />
+        </View>
+
+        <View style={styles.field}>
+          <Text style={styles.label}>Stoffanforderungen</Text>
+          <FabricRequirements
+            fabricRequirements={fabricRequirements}
+            onChange={setFabricRequirements}
+          />
         </View>
 
         <TouchableOpacity
