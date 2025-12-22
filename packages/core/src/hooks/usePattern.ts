@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { patternService } from '../services/patterns';
-import type { PatternDTO } from 'schnittmuster-manager-dtos';
+import type { PatternDTO } from '@schnittmuster/dtos';
 
 export const usePattern = (patternId: string | undefined) => {
   return useQuery<PatternDTO, Error>({

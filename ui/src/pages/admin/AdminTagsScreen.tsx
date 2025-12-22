@@ -8,7 +8,7 @@ import { useGlobalContext } from '@/context'
 import { useTagProposals, useTags } from '@/hooks'
 import { tagService } from '@/services'
 import { createToast } from '@/utils'
-import type { TagCategoryDTO, TagDTO } from 'shared-dtos'
+import type { TagCategoryDTO, TagDTO } from '@schnittmuster/dtos'
 import styles from './AdminPage.module.css'
 
 const emptyCategoryDraft = { name: '', displayOrder: '' }

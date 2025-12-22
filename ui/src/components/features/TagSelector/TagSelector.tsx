@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import type { TagCategoryDTO, TagDTO } from 'shared-dtos'
+import type { TagCategoryDTO, TagDTO } from '@schnittmuster/dtos'
 import styles from './TagSelector.module.css'
 
 const getContrastColor = (hexColor?: string) => {

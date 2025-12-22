@@ -4,7 +4,7 @@ import { PatternGrid } from '@/components/features/PatternGrid/PatternGrid'
 import { SearchBar } from '@/components/features/SearchBar/SearchBar'
 import { FilterPanel } from '@/components/features/FilterPanel/FilterPanel'
 import type { FilterState } from '@/context/types'
-import type { PatternStatus } from 'shared-dtos'
+import type { PatternStatus } from '@schnittmuster/dtos'
 import { STATUS_LABELS } from '@/constants/tagFilters'
 import styles from './Page.module.css'
 

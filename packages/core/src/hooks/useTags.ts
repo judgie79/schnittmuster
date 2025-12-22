@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { tagService } from '../services/tags';
-import type { TagCategoryDTO } from 'schnittmuster-manager-dtos';
+import type { TagCategoryDTO } from '@schnittmuster/dtos';
 
 export const useTags = () => {
   const query = useQuery<TagCategoryDTO[], Error>({

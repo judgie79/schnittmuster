@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { authService } from '../services/auth';
 import { useAuthStore } from '../store/authStore';
 import type { AuthCredentials, SignupPayload } from '../types';
-import type { UserDTO } from 'schnittmuster-manager-dtos';
+import type { UserDTO } from '@schnittmuster/dtos';
 
 const PROFILE_QUERY_KEY = ['profile'];
 

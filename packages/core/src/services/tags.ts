@@ -1,5 +1,5 @@
 import { apiClient } from './api';
-import type { ApiResponse, PatternTagProposalDTO, TagCategoryDTO, TagDTO } from 'schnittmuster-manager-dtos';
+import type { ApiResponse, PatternTagProposalDTO, TagCategoryDTO, TagDTO } from '@schnittmuster/dtos';
 import type { TagCategoryPayload, TagCategoryUpdatePayload, TagPayload, TagUpdatePayload } from '../types/tags';
 
 export const tagService = {

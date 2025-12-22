@@ -1,6 +1,6 @@
 import { Resource } from "@infrastructure/database/models/Resource";
 import { ResourceAccess } from "@infrastructure/database/models/ResourceAccess";
-import { ResourceDTO, ResourceAccessDTO } from "schnittmuster-manager-dtos";
+import { ResourceDTO, ResourceAccessDTO } from "@schnittmuster/dtos";
 
 const toIsoString = (value?: Date): string => (value ? value.toISOString() : new Date().toISOString());
 

@@ -1,5 +1,5 @@
 import { apiClient } from '@schnittmuster/core'
-import type { ApiResponse } from 'shared-dtos'
+import type { ApiResponse } from '@schnittmuster/dtos'
 import { resolveAssetUrl } from '@/utils/url'
 
 const parseFileName = (contentDisposition?: string | null) => {

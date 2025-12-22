@@ -17,7 +17,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link } from 'expo-router';
 import { useAuth, usePatterns, useTags } from '@schnittmuster/core';
 import type { PatternFilters } from '@schnittmuster/core';
-import type { TagCategoryDTO } from 'schnittmuster-manager-dtos';
+import type { TagCategoryDTO } from '@schnittmuster/dtos';
 import { getAppTheme } from '@/constants/theme';
 
 type TagFilterSelections = Record<string, string[]>;

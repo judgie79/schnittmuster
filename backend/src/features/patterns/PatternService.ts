@@ -1,7 +1,7 @@
 import { PatternRepository } from "@infrastructure/database/repositories/PatternRepository";
 import { PatternMapper } from "@shared/mappers";
 import { PatternCreateDTO, PatternDTO, PatternUpdateDTO, PatternStatus } from "@shared/dtos";
-import { AccessRight } from "schnittmuster-manager-dtos";
+import { AccessRight } from "@schnittmuster/dtos";
 import { PaginatedResult } from "@shared/types";
 import { validatePagination } from "@config/pagination";
 import { NotFoundError } from "@shared/errors";

@@ -20,4 +20,4 @@ export type {
   AnalyticsReportDTO,
   AdminActionLogDTO,
   AdminNotificationDTO,
-} from "schnittmuster-manager-dtos";
+} from "@schnittmuster/dtos";

@@ -15,7 +15,7 @@ import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import { resolveAssetUrl, useAuth, usePattern, usePatterns } from '@schnittmuster/core';
-import { TagDTO } from 'schnittmuster-manager-dtos';
+import { TagDTO } from '@schnittmuster/dtos';
 import { usePatternFile } from '../../hooks/usePatternFile';
 import { getAppTheme } from '@/constants/theme';
 

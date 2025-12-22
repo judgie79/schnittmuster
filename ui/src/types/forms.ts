@@ -1,4 +1,4 @@
-import type { PatternStatus, TagDTO } from 'shared-dtos'
+import type { PatternStatus, TagDTO } from '@schnittmuster/dtos'
 
 // Re-export core types
 export type { AuthCredentials, SignupPayload } from '@schnittmuster/core'

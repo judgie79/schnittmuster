@@ -1,6 +1,6 @@
 import type { AxiosProgressEvent } from 'axios';
 import { apiClient } from './api';
-import type { ApiResponse, PatternDTO, PatternTagProposalDTO } from 'schnittmuster-manager-dtos';
+import type { ApiResponse, PatternDTO, PatternTagProposalDTO } from '@schnittmuster/dtos';
 import type { PaginatedResponse, PatternListParams, PatternRequestOptions, TagProposalPayload } from '../types/patterns';
 
 const handleProgress = (event: AxiosProgressEvent, onUploadProgress?: (progress: number) => void) => {

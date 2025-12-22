@@ -5,4 +5,4 @@ export type {
   AuthProvider,
   AdminRoleType,
   AdminStatusType,
-} from "schnittmuster-manager-dtos";
+} from "@schnittmuster/dtos";

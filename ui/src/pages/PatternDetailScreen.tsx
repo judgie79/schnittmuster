@@ -11,7 +11,7 @@ import { usePattern, useTags, useProtectedFile } from '@/hooks'
 import { useGlobalContext } from '@/context'
 import { patternService, tagService, patternPrinter, fileService, type PatternPrintRenderer } from '@/services'
 import { createToast } from '@/utils'
-import type { PatternTagProposalDTO, TagProposalStatus } from 'shared-dtos'
+import type { PatternTagProposalDTO, TagProposalStatus } from '@schnittmuster/dtos'
 import styles from './Page.module.css'
 
 const getContrastColor = (hexColor?: string) => {

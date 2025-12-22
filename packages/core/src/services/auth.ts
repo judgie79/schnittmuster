@@ -2,7 +2,7 @@ import { apiClient } from './api';
 import { STORAGE_KEYS } from '../utils/constants';
 import { getStorage } from '../utils/storage';
 import type { AuthCredentials, SignupPayload } from '../types';
-import type { ApiResponse, UserDTO } from 'schnittmuster-manager-dtos';
+import type { ApiResponse, UserDTO } from '@schnittmuster/dtos';
 
 const persistTokens = async (accessToken?: string, refreshToken?: string) => {
   if (accessToken) {

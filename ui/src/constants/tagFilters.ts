@@ -1,4 +1,4 @@
-import type { PatternStatus } from 'shared-dtos'
+import type { PatternStatus } from '@schnittmuster/dtos'
 
 export const STATUS_LABELS: Record<PatternStatus, string> = {
   draft: 'Entwurf',

@@ -9,7 +9,7 @@ import type {
   SystemSettingsDTO,
   AdminNotificationDTO,
   AdminActionLogDTO,
-} from 'shared-dtos'
+} from '@schnittmuster/dtos'
 import type { PaginatedResponse } from '@/types'
 
 export type AdminAnalyticsPeriod = 'daily' | 'weekly' | 'monthly'

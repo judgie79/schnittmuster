@@ -15,7 +15,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 import * as DocumentPicker from 'expo-document-picker';
 import { resolveAssetUrl, usePattern, usePatterns } from '@schnittmuster/core';
-import type { TagDTO } from 'schnittmuster-manager-dtos';
+import type { TagDTO } from '@schnittmuster/dtos';
 import { PatternTagEditor } from '@/components/pattern-tag-editor';
 import { getAppTheme } from '@/constants/theme';
 

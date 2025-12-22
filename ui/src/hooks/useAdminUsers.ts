@@ -2,7 +2,7 @@ import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tansta
 import { useState } from 'react'
 import { adminService } from '@/services'
 import type { PaginatedResponse } from '@/types'
-import type { AdminUserDTO, AdminUserUpdateDTO } from 'shared-dtos'
+import type { AdminUserDTO, AdminUserUpdateDTO } from '@schnittmuster/dtos'
 
 const USERS_QUERY_KEY = ['admin', 'users'] as const
 

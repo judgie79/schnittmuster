@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import type { PatternTagProposalDTO } from 'shared-dtos'
+import type { PatternTagProposalDTO } from '@schnittmuster/dtos'
 import { tagService } from '@/services'
 
 const TAG_PROPOSALS_QUERY_KEY = ['tagProposals'] as const

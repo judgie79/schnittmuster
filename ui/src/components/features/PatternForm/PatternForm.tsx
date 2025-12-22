@@ -6,7 +6,7 @@ import { useProtectedFile } from '@/hooks'
 import { fileService } from '@/services'
 import { resolveAssetUrl } from '@/utils/url'
 import type { PatternFormValues } from '@/types'
-import type { PatternStatus, TagCategoryDTO, TagDTO } from 'shared-dtos'
+import type { PatternStatus, TagCategoryDTO, TagDTO } from '@schnittmuster/dtos'
 import styles from './PatternForm.module.css'
 
 const STATUS_OPTIONS: Array<{ value: PatternStatus; label: string }> = [

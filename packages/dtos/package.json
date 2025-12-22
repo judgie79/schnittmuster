@@ -1,5 +1,5 @@
 {
-  "name": "schnittmuster-manager-dtos",
+  "name": "@schnittmuster/dtos",
   "author": "Michael Richter",
   "license": "MIT",
   "description": "DTOs für Schnittmuster Manager - Tag-basierte Schnittmuster Verwaltung",

@@ -3,7 +3,7 @@ import { Role } from "@infrastructure/database/models/Role";
 import { User } from "@infrastructure/database/models/User";
 import { UserRole } from "@infrastructure/database/models/UserRole";
 import { NotFoundError } from "@shared/errors";
-import { RoleDTO, UserRole as UserRoleName } from "schnittmuster-manager-dtos";
+import { RoleDTO, UserRole as UserRoleName } from "@schnittmuster/dtos";
 import { RoleMapper } from "@shared/mappers";
 
 export class RoleService {

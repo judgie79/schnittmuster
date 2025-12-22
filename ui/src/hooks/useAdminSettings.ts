@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { adminService } from '@/services'
-import type { SystemSettingsDTO } from 'shared-dtos'
+import type { SystemSettingsDTO } from '@schnittmuster/dtos'
 
 const SETTINGS_QUERY_KEY = ['admin', 'settings'] as const
 

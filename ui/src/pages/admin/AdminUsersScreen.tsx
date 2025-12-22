@@ -4,7 +4,7 @@ import { Card } from '@/components/common/Card'
 import { Loader } from '@/components/common/Loader'
 import { useAdminUsers } from '@/hooks'
 import styles from './AdminPage.module.css'
-import type { AdminUserDTO } from 'shared-dtos'
+import type { AdminUserDTO } from '@schnittmuster/dtos'
 
 const ROLE_OPTIONS: Array<{ label: string; value: AdminUserDTO['admin_role'] | 'all' }> = [
   { label: 'Alle Rollen', value: 'all' },

@@ -6,7 +6,7 @@ import {
   View,
 } from 'react-native';
 import { useTags } from '@schnittmuster/core';
-import type { TagCategoryDTO, TagDTO } from 'schnittmuster-manager-dtos';
+import type { TagCategoryDTO, TagDTO } from '@schnittmuster/dtos';
 import { getAppTheme } from '@/constants/theme';
 
 const getContrastColor = (hexColor: string) => {

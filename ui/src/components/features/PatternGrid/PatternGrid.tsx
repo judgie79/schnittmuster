@@ -1,4 +1,4 @@
-import type { PatternDTO } from 'shared-dtos'
+import type { PatternDTO } from '@schnittmuster/dtos'
 import { PatternCard } from '../PatternCard/PatternCard'
 import styles from './PatternGrid.module.css'
 

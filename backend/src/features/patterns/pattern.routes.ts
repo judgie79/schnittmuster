@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router, RequestHandler } from "express";
 import multer from "multer";
 import { body } from "express-validator";
 import { patternController } from "./PatternController";
@@ -9,10 +9,11 @@ import { PatternRepository } from "@infrastructure/database/repositories/Pattern
 import { tagProposalController } from "@features/tags/TagProposalController";
 
 const upload = multer({ storage: multer.memoryStorage() });
-const uploadFields = upload.fields([
+const uploadFieldsHandler = upload.fields([
   { name: "file", maxCount: 1 },
   { name: "thumbnail", maxCount: 1 },
 ]);
+const uploadFieldsMiddleware: RequestHandler = (req, res, next) => uploadFieldsHandler(req, res, next);
 const router: Router = Router();
 const patternRepository = new PatternRepository();
 
@@ -36,7 +37,7 @@ router.get(
 
 router.post(
   "/",
-  uploadFields,
+  uploadFieldsMiddleware,
   [body("name").isLength({ min: 3 }), body("description").optional().isString()],
   validateRequest,
   patternController.create
@@ -63,7 +64,7 @@ router.put(
     resourceType: "pattern",
     resourceOwnerResolver: resolvePatternOwner,
   }),
-  uploadFields,
+  uploadFieldsMiddleware,
   [body("name").optional().isLength({ min: 3 })],
   validateRequest,
   patternController.update

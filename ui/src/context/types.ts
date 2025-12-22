@@ -1,4 +1,4 @@
-import type { PatternDTO, PaginationInfo, TagCategoryDTO, TagDTO, UserDTO } from 'shared-dtos'
+import type { PatternDTO, PaginationInfo, TagCategoryDTO, TagDTO, UserDTO } from '@schnittmuster/dtos'
 
 export type ThemeMode = 'light' | 'dark' | 'auto'
 export type TextSize = 'normal' | 'large'

@@ -7,7 +7,7 @@ import {
   ResourceDTO,
   ResourceAccessDTO,
   ResourceType,
-} from "schnittmuster-manager-dtos";
+} from "@schnittmuster/dtos";
 import { ResourceMapper } from "@shared/mappers";
 
 export interface CreateResourceParams {

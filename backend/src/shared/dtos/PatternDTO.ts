@@ -5,4 +5,4 @@ export type {
   PatternStatus,
   PatternTagProposalDTO,
   TagProposalStatus,
-} from "schnittmuster-manager-dtos";
+} from "@schnittmuster/dtos";

@@ -1,7 +1,7 @@
 import type { MouseEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { useProtectedFile } from '@/hooks'
-import type { PatternDTO } from 'shared-dtos'
+import type { PatternDTO } from '@schnittmuster/dtos'
 import styles from './PatternCard.module.css'
 
 interface PatternCardProps {

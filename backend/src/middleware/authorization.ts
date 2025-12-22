@@ -1,5 +1,5 @@
 import { NextFunction, Request, RequestHandler, Response } from "express";
-import { AccessRight, ResourceType, UserRole } from "schnittmuster-manager-dtos";
+import { AccessRight, ResourceType, UserRole } from "@schnittmuster/dtos";
 import { ForbiddenError, NotFoundError } from "@shared/errors";
 import { RoleService } from "@features/access-control/RoleService";
 import { AccessControlService } from "@features/access-control/AccessControlService";

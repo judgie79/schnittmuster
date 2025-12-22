@@ -1,4 +1,4 @@
 export type {
   TagCategoryDTO,
   TagDTO,
-} from "schnittmuster-manager-dtos";
+} from "@schnittmuster/dtos";

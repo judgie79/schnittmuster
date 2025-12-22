@@ -1,5 +1,5 @@
 import { Role } from "@infrastructure/database/models/Role";
-import { RoleDTO } from "schnittmuster-manager-dtos";
+import { RoleDTO } from "@schnittmuster/dtos";
 
 const toIsoString = (value?: Date): string => (value ? value.toISOString() : new Date().toISOString());
 
