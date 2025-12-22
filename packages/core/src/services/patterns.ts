@@ -1,7 +1,7 @@
 import type { AxiosProgressEvent } from 'axios';
 import { apiClient } from './api';
-import type { ApiResponse, PatternDTO, PatternTagProposalDTO } from '@schnittmuster/dtos';
-import type { PaginatedResponse, PatternListParams, PatternRequestOptions, TagProposalPayload } from '../types/patterns';
+import type { ApiResponse, PatternDTO } from '@schnittmuster/dtos';
+import type { PaginatedResponse, PatternListParams, PatternRequestOptions } from '../types/patterns';
 
 const handleProgress = (event: AxiosProgressEvent, onUploadProgress?: (progress: number) => void) => {
   if (!onUploadProgress || !event.total) return;
@@ -53,16 +53,6 @@ export const patternService = {
 
   async removeTag(patternId: string, tagId: string): Promise<PatternDTO> {
     const response = await apiClient.delete<ApiResponse<PatternDTO>>(`/patterns/${patternId}/tags/${tagId}`);
-    return response.data.data;
-  },
-
-  async listTagProposals(patternId: string): Promise<PatternTagProposalDTO[]> {
-    const response = await apiClient.get<ApiResponse<PatternTagProposalDTO[]>>(`/patterns/${patternId}/tag-proposals`);
-    return response.data.data;
-  },
-
-  async createTagProposal(patternId: string, payload: TagProposalPayload): Promise<PatternTagProposalDTO> {
-    const response = await apiClient.post<ApiResponse<PatternTagProposalDTO>>(`/patterns/${patternId}/tag-proposals`, payload);
     return response.data.data;
   },
 };

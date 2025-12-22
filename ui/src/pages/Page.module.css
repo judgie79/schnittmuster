@@ -142,15 +142,7 @@
   font-size: 0.9rem;
 }
 
-.proposalForm {
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-3);
-  padding: var(--space-2);
-  background: var(--color-surface);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-}
+
 
 .formGrid {
   display: grid;
@@ -166,8 +158,7 @@
 }
 
 .formGrid input,
-.formGrid select,
-.proposalForm textarea {
+.formGrid select {
   padding: 0.5rem 0.75rem;
   border-radius: var(--radius-2);
   border: 1px solid var(--color-border);
@@ -177,66 +168,6 @@
 .errorMessage {
   color: var(--color-danger, #b32222);
   font-size: 0.9rem;
-}
-
-.proposalSection {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-}
-
-.proposalList {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-}
-
-.proposalCard {
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-3);
-  padding: var(--space-1);
-  background: var(--color-surface);
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.proposalHeader {
-  display: flex;
-  justify-content: space-between;
-  gap: var(--space-1);
-  align-items: center;
-}
-
-.proposalTitle {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.proposalActions {
-  display: flex;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-}
-
-.proposalStatus {
-  font-size: 0.8rem;
-}
-
-.proposalStatusApproved {
-  background: rgba(52, 168, 83, 0.15);
-  color: #257942;
-}
-
-.proposalStatusRejected {
-  background: rgba(244, 67, 54, 0.15);
-  color: #b12a1c;
-}
-
-.proposalStatusPending {
-  background: rgba(255, 193, 7, 0.2);
-  color: #8a6100;
 }
 
 @media (max-width: 900px) {

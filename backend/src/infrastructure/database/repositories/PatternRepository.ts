@@ -5,7 +5,6 @@ import { PatternNote } from "@infrastructure/database/models/PatternNote";
 import { NotFoundError } from "@shared/errors";
 import { buildPaginationMeta } from "@shared/utils/helpers";
 import { PaginatedResult } from "@shared/types";
-import { PatternTagProposal } from "@infrastructure/database/models/PatternTagProposal";
 import { TagCategory } from "@infrastructure/database/models/TagCategory";
 import { User } from "@infrastructure/database/models/User";
 import type { PatternListFilters } from "@features/patterns/types";
@@ -154,16 +153,7 @@ export class PatternRepository {
   async getWithTags(id: string): Promise<Pattern | null> {
     return this.findById(id, {
       include: [
-        { model: Tag, as: "tags" },
-        {
-          model: PatternTagProposal,
-          as: "tagProposals",
-          include: [
-            { model: TagCategory, as: "category" },
-            { model: Tag, as: "tag" },
-            { model: User, as: "proposedBy" },
-          ],
-        },
+        { model: Tag, as: "tags" }
       ],
     });
   }

@@ -48,11 +48,6 @@ export class PatternService {
     }
     await this.assertPatternPermissions(pattern, userId, ["read"]);
     const dto = PatternMapper.toDTOWithRelations(pattern);
-    if (dto.proposedTags) {
-      dto.proposedTags = dto.proposedTags.filter(
-        (proposal) => proposal.status === "approved" || proposal.proposedByUserId === userId
-      );
-    }
     return dto;
   }
 

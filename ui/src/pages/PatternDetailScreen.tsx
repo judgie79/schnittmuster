@@ -11,7 +11,6 @@ import { usePattern, useTags, useProtectedFile } from '@/hooks'
 import { useGlobalContext } from '@/context'
 import { patternService, tagService, patternPrinter, fileService, type PatternPrintRenderer } from '@/services'
 import { createToast } from '@/utils'
-import type { PatternTagProposalDTO, TagProposalStatus } from '@schnittmuster/dtos'
 import styles from './Page.module.css'
 
 const getContrastColor = (hexColor?: string) => {
@@ -26,16 +25,9 @@ const getContrastColor = (hexColor?: string) => {
   return yiq >= 128 ? '#0f172a' : '#f8fafc'
 }
 
-const PROPOSAL_STATUS_LABELS: Record<TagProposalStatus, string> = {
-  pending: 'Ausstehend',
-  approved: 'Freigegeben',
-  rejected: 'Abgelehnt',
-}
-
-const DEFAULT_PROPOSAL_COLOR = '#2F6FED'
 const PRINT_SCALE_STORAGE_KEY = 'pattern-print-scale'
 const clampScaleValue = (value: number) => Math.min(150, Math.max(50, Math.round(value)))
-const SHOW_TAG_PROPOSALS = false
+
 const getFileExtension = (input?: string | null): string | undefined => {
   if (!input) {
     return undefined
@@ -62,10 +54,6 @@ export const PatternDetailScreen = () => {
     }
     return fileExtension === 'pdf'
   }, [fileExtension, fileMimeType])
-  const [proposalName, setProposalName] = useState('')
-  const [proposalCategoryId, setProposalCategoryId] = useState('')
-  const [proposalColor, setProposalColor] = useState(DEFAULT_PROPOSAL_COLOR)
-  const [proposalError, setProposalError] = useState<string | null>(null)
   const [printScale, setPrintScale] = useState(100)
   const [isPrinting, setIsPrinting] = useState(false)
   const [printError, setPrintError] = useState<string | null>(null)
@@ -77,12 +65,6 @@ export const PatternDetailScreen = () => {
   const isAdmin = Boolean(user?.adminRole)
   const isOwner = data?.ownerId === userId
   const canEdit = Boolean(patternId && (isOwner || isAdmin))
-
-  useEffect(() => {
-    if (!proposalCategoryId && categories.length) {
-      setProposalCategoryId(categories[0].id)
-    }
-  }, [categories, proposalCategoryId])
 
   useEffect(() => {
     if (typeof window === 'undefined') {
@@ -135,76 +117,6 @@ export const PatternDetailScreen = () => {
     }
   }, [isPdfFile, printRenderer])
 
-  const proposals = useMemo(() => data?.proposedTags ?? [], [data?.proposedTags])
-  const pendingProposals = proposals.filter((proposal) => proposal.status === 'pending')
-  const canProposeTag = Boolean(patternId) && Boolean(isOwner)
-
-  const proposalMutation = useMutation({
-    mutationFn: () =>
-      patternId
-        ? patternService.createTagProposal(patternId, {
-            name: proposalName.trim(),
-            tagCategoryId: proposalCategoryId,
-            colorHex: proposalColor,
-          })
-        : Promise.reject(new Error('Missing Pattern ID')),
-    onSuccess: () => {
-      setProposalName('')
-      setProposalError(null)
-      dispatch({ type: 'ADD_TOAST', payload: createToast('Tag vorgeschlagen', 'success') })
-      refetch()
-    },
-    onError: (mutationError) => {
-      const message = mutationError instanceof Error ? mutationError.message : 'Vorschlag fehlgeschlagen'
-      setProposalError(message)
-      dispatch({ type: 'ADD_TOAST', payload: createToast(message, 'error') })
-    },
-  })
-
-  const approveMutation = useMutation({
-    mutationFn: (proposalId: string) => tagService.approveProposal(proposalId),
-    onSuccess: () => {
-      dispatch({ type: 'ADD_TOAST', payload: createToast('Tag freigegeben', 'success') })
-      refetch()
-      queryClient.invalidateQueries({ queryKey: ['tagCategories'] })
-      queryClient.invalidateQueries({ queryKey: ['tagProposals'] })
-    },
-    onError: (mutationError) => {
-      const message = mutationError instanceof Error ? mutationError.message : 'Konnte Vorschlag nicht freigeben'
-      dispatch({ type: 'ADD_TOAST', payload: createToast(message, 'error') })
-    },
-  })
-
-  const rejectMutation = useMutation({
-    mutationFn: (proposalId: string) => tagService.rejectProposal(proposalId),
-    onSuccess: () => {
-      dispatch({ type: 'ADD_TOAST', payload: createToast('Vorschlag abgelehnt', 'info') })
-      refetch()
-      queryClient.invalidateQueries({ queryKey: ['tagCategories'] })
-      queryClient.invalidateQueries({ queryKey: ['tagProposals'] })
-    },
-    onError: (mutationError) => {
-      const message = mutationError instanceof Error ? mutationError.message : 'Konnte Vorschlag nicht ablehnen'
-      dispatch({ type: 'ADD_TOAST', payload: createToast(message, 'error') })
-    },
-  })
-
-  const handleProposalSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    if (!proposalName.trim() || !proposalCategoryId || proposalMutation.isPending) {
-      return
-    }
-    proposalMutation.mutate()
-  }
-
-  const handleApprove = (proposalId: string) => {
-    approveMutation.mutate(proposalId)
-  }
-
-  const handleReject = (proposalId: string) => {
-    rejectMutation.mutate(proposalId)
-  }
-
   const handleEditNavigate = () => {
     if (!patternId) {
       return
@@ -252,20 +164,6 @@ export const PatternDetailScreen = () => {
     }
   }
 
-  const getStatusClass = (status: TagProposalStatus) => {
-    switch (status) {
-      case 'approved':
-        return styles.proposalStatusApproved
-      case 'rejected':
-        return styles.proposalStatusRejected
-      default:
-        return styles.proposalStatusPending
-    }
-  }
-
-  const sortedProposals = useMemo<PatternTagProposalDTO[]>(() => {
-    return [...proposals].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-  }, [proposals])
 
   if (isLoading) {
     return <Loader />
@@ -378,97 +276,6 @@ export const PatternDetailScreen = () => {
         <Button variant="secondary">✓ Als genäht markieren</Button>
         <Button variant="ghost">★ Favorisieren</Button>
       </div>
-
-      {SHOW_TAG_PROPOSALS && canProposeTag ? (
-        <div className={styles.proposalForm}>
-          <h3>Neuen Tag vorschlagen</h3>
-          <form className={styles.formGrid} onSubmit={handleProposalSubmit}>
-            <label>
-              <span>Bezeichnung</span>
-              <input
-                type="text"
-                value={proposalName}
-                onChange={(event) => setProposalName(event.target.value)}
-                placeholder="z. B. Oversized"
-                required
-              />
-            </label>
-            <label>
-              <span>Kategorie</span>
-              <select value={proposalCategoryId} onChange={(event) => setProposalCategoryId(event.target.value)} required>
-                {categories.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label>
-              <span>Farbe</span>
-              <input type="color" value={proposalColor} onChange={(event) => setProposalColor(event.target.value)} />
-            </label>
-            <Button
-              type="submit"
-              disabled={!proposalName.trim() || !proposalCategoryId || proposalMutation.isPending}
-            >
-              {proposalMutation.isPending ? 'Sende Vorschlag ...' : 'Tag vorschlagen'}
-            </Button>
-          </form>
-          {proposalError ? <p className={styles.errorMessage}>{proposalError}</p> : null}
-        </div>
-      ) : null}
-
-      {SHOW_TAG_PROPOSALS && sortedProposals.length > 0 ? (
-        <section className={styles.proposalSection}>
-          <header className={styles.sectionHeader}>
-            <h3>Vorgeschlagene Tags</h3>
-            <span className={styles.helperText}>
-              {pendingProposals.length ? `${pendingProposals.length} offen` : 'Nichts offen'}
-            </span>
-          </header>
-          <div className={styles.proposalList}>
-            {sortedProposals.map((proposal) => (
-              <article key={proposal.id} className={styles.proposalCard}>
-                <div className={styles.proposalHeader}>
-                  <div className={styles.proposalTitle}>
-                    <span className={styles.colorDot} style={{ backgroundColor: proposal.colorHex }} aria-hidden />
-                    <div>
-                      <strong>{proposal.name}</strong>
-                      <p className={styles.helperText}>{proposal.category?.name ?? 'Kategorie unbekannt'}</p>
-                    </div>
-                  </div>
-                  <Badge className={clsx(styles.proposalStatus, getStatusClass(proposal.status))}>
-                    {PROPOSAL_STATUS_LABELS[proposal.status]}
-                  </Badge>
-                </div>
-                <p className={styles.helperText}>
-                  Vorgeschlagen von {proposal.proposedBy?.username ?? 'Unbekannt'} ·{' '}
-                  {new Date(proposal.createdAt).toLocaleDateString('de-DE')}
-                </p>
-                {isAdmin && proposal.status === 'pending' ? (
-                  <div className={styles.proposalActions}>
-                    <Button
-                      type="button"
-                      onClick={() => handleApprove(proposal.id)}
-                      disabled={approveMutation.isPending || rejectMutation.isPending}
-                    >
-                      Freigeben
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      onClick={() => handleReject(proposal.id)}
-                      disabled={approveMutation.isPending || rejectMutation.isPending}
-                    >
-                      Ablehnen
-                    </Button>
-                  </div>
-                ) : null}
-              </article>
-            ))}
-          </div>
-        </section>
-      ) : null}
     </section>
   )
 }

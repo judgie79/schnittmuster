@@ -1,5 +1,5 @@
 import { apiClient } from './api';
-import type { ApiResponse, PatternTagProposalDTO, TagCategoryDTO, TagDTO } from '@schnittmuster/dtos';
+import type { ApiResponse, TagCategoryDTO, TagDTO } from '@schnittmuster/dtos';
 import type { TagCategoryPayload, TagCategoryUpdatePayload, TagPayload, TagUpdatePayload } from '../types/tags';
 
 export const tagService = {
@@ -54,19 +54,5 @@ export const tagService = {
 
   async deleteTag(tagId: string): Promise<void> {
     await apiClient.delete(`/tags/${tagId}`);
-  },
-
-  async listProposals(): Promise<PatternTagProposalDTO[]> {
-    const response = await apiClient.get<ApiResponse<PatternTagProposalDTO[]>>('/tags/proposals');
-    return response.data.data;
-  },
-
-  async approveProposal(proposalId: string): Promise<TagDTO> {
-    const response = await apiClient.post<ApiResponse<TagDTO>>(`/tags/proposals/${proposalId}/approve`);
-    return response.data.data;
-  },
-
-  async rejectProposal(proposalId: string): Promise<void> {
-    await apiClient.post(`/tags/proposals/${proposalId}/reject`);
   },
 };

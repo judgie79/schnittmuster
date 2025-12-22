@@ -236,10 +236,16 @@ const PatternList = () => {
   return (
     <View style={styles.listWrapper}>
       <View style={styles.listHeaderRow}>
-        <View>
+        <View style={{ flex: 1 }}>
           <Text style={styles.listHeaderTitle}>Schnittmuster</Text>
           <Text style={styles.listHeaderSubtitle}>Passe die Liste mit Filtern an.</Text>
         </View>
+        <TouchableOpacity
+          onPress={() => router.push('/tags')}
+          style={styles.manageTagsButton}
+        >
+          <Text style={styles.manageTagsButtonText}>🏷️</Text>
+        </TouchableOpacity>
         <TouchableOpacity style={styles.filterButton} onPress={() => setFilterVisible(true)}>
           <Text style={styles.filterButtonLabel}>Filter</Text>
           {hasActiveFilters ? (
@@ -726,5 +732,15 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: '800',
     marginTop: -2,
+  },
+  manageTagsButton: {
+    padding: 10,
+    backgroundColor: theme.cardBackground,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  manageTagsButtonText: {
+    fontSize: 20,
   },
 });

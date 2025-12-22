@@ -4,7 +4,6 @@ import { Tag } from "./Tag";
 import { Pattern } from "./Pattern";
 import { PatternTag } from "./PatternTag";
 import { PatternNote } from "./PatternNote";
-import { PatternTagProposal } from "./PatternTagProposal";
 import { FileStorage } from "./FileStorage";
 import { Role } from "./Role";
 import { UserRole } from "./UserRole";
@@ -24,7 +23,6 @@ export const models = {
   Pattern,
   PatternTag,
   PatternNote,
-  PatternTagProposal,
   FileStorage,
   Role,
   UserRole,
@@ -63,13 +61,6 @@ export function applyAssociations(): void {
 
   Pattern.hasMany(PatternNote, { foreignKey: "patternId", as: "notes" });
   PatternNote.belongsTo(Pattern, { foreignKey: "patternId", as: "pattern" });
-
-  Pattern.hasMany(PatternTagProposal, { foreignKey: "patternId", as: "tagProposals" });
-  PatternTagProposal.belongsTo(Pattern, { foreignKey: "patternId", as: "pattern" });
-  PatternTagProposal.belongsTo(TagCategory, { foreignKey: "tagCategoryId", as: "category" });
-  PatternTagProposal.belongsTo(Tag, { foreignKey: "tagId", as: "tag" });
-  PatternTagProposal.belongsTo(User, { foreignKey: "userId", as: "proposedBy" });
-  PatternTagProposal.belongsTo(User, { foreignKey: "approvedByUserId", as: "approvedBy" });
 
   Pattern.belongsTo(FileStorage, { foreignKey: "fileStorageId", as: "fileStorage" });
   FileStorage.hasOne(Pattern, { foreignKey: "fileStorageId", as: "pattern" });

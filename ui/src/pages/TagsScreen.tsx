@@ -5,19 +5,19 @@ import { Button } from '@/components/common/Button'
 import { Card } from '@/components/common/Card'
 import { Loader } from '@/components/common/Loader'
 import { useGlobalContext } from '@/context'
-import { useAllTags } from '@/hooks'
+import { useTags } from '@/hooks'
 import { tagService } from '@/services'
 import { createToast } from '@/utils'
 import type { TagCategoryDTO, TagDTO } from '@schnittmuster/dtos'
-import styles from './AdminPage.module.css'
+import styles from './Page.module.css'
 
 const emptyCategoryDraft = { name: '', displayOrder: '' }
 const emptyTagDraft = { name: '', colorHex: '#4e8cff' }
 
-export const AdminTagsScreen = () => {
+export const TagsScreen = () => {
   const queryClient = useQueryClient()
   const { dispatch } = useGlobalContext()
-  const { categories, isLoading, isFetching, refetch: refetchTags } = useAllTags()
+  const { categories, isLoading, isFetching, refetch: refetchTags } = useTags()
 
   const [categoryForm, setCategoryForm] = useState(emptyCategoryDraft)
   const [categoryDrafts, setCategoryDrafts] = useState<Record<string, { name: string; displayOrder: string }>>({})
@@ -69,7 +69,7 @@ export const AdminTagsScreen = () => {
   }
 
   const invalidateTags = async () => {
-    await queryClient.invalidateQueries({ queryKey: ['allTagCategories'] })
+    await queryClient.invalidateQueries({ queryKey: ['tagCategories'] })
   }
 
   const handleCreateCategory = async (event: FormEvent<HTMLFormElement>) => {
@@ -109,7 +109,7 @@ export const AdminTagsScreen = () => {
   }
 
   const handleDeleteCategory = async (categoryId: string) => {
-    if (!window.confirm('Kategorie wirklich löschen?')) {
+    if (!window.confirm('Kategorie wirklich löschen? Alle zugehörigen Tags werden ebenfalls gelöscht.')) {
       return
     }
     try {
@@ -187,58 +187,60 @@ export const AdminTagsScreen = () => {
     <section className={styles.section}>
       <header className={styles.sectionHeader}>
         <div>
-          <h2>Tags & Kategorien</h2>
-          <p className={styles.notificationMeta}>Verwalte Kategorien, Tags und Vorschläge</p>
+          <h2>Meine Tags</h2>
+          <p style={{ color: 'var(--text-secondary)', marginTop: '4px' }}>
+            Verwalte deine Kategorien und Tags für Schnittmuster
+          </p>
         </div>
-        <div className={styles.actions}>
-          <Button
-            variant="secondary"
-            onClick={() => {
-              refetchTags()
-            }}
-            disabled={isFetching}
-          >
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <Button variant="secondary" onClick={() => refetchTags()} disabled={isFetching}>
             Aktualisieren
           </Button>
         </div>
       </header>
 
-      <div className={styles.managementGrid}>
+      <div style={{ display: 'grid', gap: '16px', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))' }}>
         <Card>
-          <h3>Kategorie anlegen</h3>
-          <form className={styles.inlineForm} onSubmit={handleCreateCategory}>
+          <h3>Neue Kategorie</h3>
+          <form style={{ display: 'flex', flexDirection: 'column', gap: '12px' }} onSubmit={handleCreateCategory}>
             <label>
-              <span>Name*</span>
+              <span style={{ display: 'block', marginBottom: '4px', fontWeight: '500' }}>Name*</span>
               <input
                 type="text"
                 value={categoryForm.name}
                 onChange={(event) => setCategoryForm((prev) => ({ ...prev, name: event.target.value }))}
                 required
+                style={{ width: '100%' }}
               />
             </label>
             <label>
-              <span>Anzeige-Reihenfolge</span>
+              <span style={{ display: 'block', marginBottom: '4px', fontWeight: '500' }}>Reihenfolge</span>
               <input
                 type="number"
                 value={categoryForm.displayOrder}
                 min={0}
                 onChange={(event) => setCategoryForm((prev) => ({ ...prev, displayOrder: event.target.value }))}
+                style={{ width: '100%' }}
               />
             </label>
             <Button type="submit" disabled={!categoryForm.name.trim()}>
-              Kategorie speichern
+              Kategorie erstellen
             </Button>
           </form>
         </Card>
 
         <Card>
-          <h3>Kategorie bearbeiten</h3>
-          <div className={styles.inlineForm}>
+          <h3>Kategorien bearbeiten</h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             {categories.length === 0 ? (
-              <p className={styles.notificationMeta}>Noch keine Kategorien vorhanden.</p>
+              <p style={{ color: 'var(--text-secondary)' }}>Noch keine Kategorien vorhanden.</p>
             ) : (
               categories.map((category) => (
-                <form key={category.id} className={styles.inlineFormRow} onSubmit={(event) => handleUpdateCategory(event, category.id)}>
+                <form
+                  key={category.id}
+                  style={{ display: 'flex', gap: '8px', alignItems: 'center' }}
+                  onSubmit={(event) => handleUpdateCategory(event, category.id)}
+                >
                   <input
                     type="text"
                     value={categoryDrafts[category.id]?.name ?? category.name}
@@ -252,6 +254,7 @@ export const AdminTagsScreen = () => {
                       }))
                     }
                     placeholder="Name"
+                    style={{ flex: 1, minWidth: '100px' }}
                   />
                   <input
                     type="number"
@@ -266,16 +269,14 @@ export const AdminTagsScreen = () => {
                       }))
                     }
                     placeholder="Reihenfolge"
+                    style={{ width: '100px' }}
                   />
-                  <small className={styles.notificationMeta} style={{ fontSize: '0.75rem', marginLeft: '8px' }}>
-                    User: {category.userId?.substring(0, 8)}...
-                  </small>
-                  <div className={styles.inlineFormActions}>
-                    <Button type="submit" variant="secondary">
+                  <div style={{ display: 'flex', gap: '4px' }}>
+                    <Button type="submit" variant="secondary" style={{ whiteSpace: 'nowrap' }}>
                       Speichern
                     </Button>
                     <Button type="button" variant="ghost" onClick={() => handleDeleteCategory(category.id)}>
-                      Entfernen
+                      Löschen
                     </Button>
                   </div>
                 </form>
@@ -286,51 +287,60 @@ export const AdminTagsScreen = () => {
       </div>
 
       <Card>
-        <div className={styles.sectionHeader}>
-          <div>
+        <div style={{ marginBottom: '16px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
             <h3>Tags verwalten</h3>
-            <p className={styles.notificationMeta}>
-              {selectedCategory ? `${selectedCategory.tags.length} Tags in ${selectedCategory.name}` : 'Kategorie auswählen'}
-            </p>
+            <select
+              value={selectedCategoryId}
+              onChange={(event) => setSelectedCategoryId(event.target.value)}
+              style={{ padding: '8px 12px' }}
+            >
+              <option value="">Kategorie wählen</option>
+              {categories.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
           </div>
-          <select value={selectedCategoryId} onChange={(event) => setSelectedCategoryId(event.target.value)}>
-            <option value="">Kategorie wählen</option>
-            {categories.map((category) => (
-              <option key={category.id} value={category.id}>
-                {category.name}
-              </option>
-            ))}
-          </select>
+          <p style={{ color: 'var(--text-secondary)' }}>
+            {selectedCategory ? `${selectedCategory.tags.length} Tags in ${selectedCategory.name}` : 'Bitte wähle eine Kategorie aus'}
+          </p>
         </div>
 
         {selectedCategory ? (
           <>
-            <form className={styles.inlineFormRow} onSubmit={handleCreateTag}>
+            <form
+              style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '16px' }}
+              onSubmit={handleCreateTag}
+            >
               <input
                 type="text"
                 value={tagForm.name}
                 onChange={(event) => setTagForm((prev) => ({ ...prev, name: event.target.value }))}
                 placeholder="Tag-Name"
                 required
+                style={{ flex: 1 }}
               />
               <input
                 type="color"
                 value={tagForm.colorHex}
                 onChange={(event) => setTagForm((prev) => ({ ...prev, colorHex: event.target.value }))}
                 aria-label="Farbe"
+                style={{ width: '60px', height: '40px' }}
               />
-              <Button type="submit" disabled={!tagForm.name.trim()}>
+              <Button type="submit" className={styles.primaryButton} style={{ maxWidth: '200px'}} disabled={!tagForm.name.trim()}>
                 Tag hinzufügen
               </Button>
             </form>
 
-            <div className={styles.tagRows}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               {selectedCategory.tags.length === 0 ? (
-                <p className={styles.notificationMeta}>Keine Tags in dieser Kategorie.</p>
+                <p style={{ color: 'var(--text-secondary)' }}>Keine Tags in dieser Kategorie.</p>
               ) : (
                 selectedCategory.tags.map((tag) => (
-                  <div key={tag.id} className={styles.tagRow}>
-                    <div className={styles.tagRowInputs}>
+                  <div key={tag.id} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', gap: '8px', flex: 1 }}>
                       <input
                         type="text"
                         value={tagDrafts[tag.id]?.name ?? tag.name}
@@ -340,6 +350,7 @@ export const AdminTagsScreen = () => {
                             [tag.id]: { ...(prev[tag.id] ?? { name: '', colorHex: '#4e8cff' }), name: event.target.value },
                           }))
                         }
+                        style={{ flex: 1 }}
                       />
                       <input
                         type="color"
@@ -351,14 +362,15 @@ export const AdminTagsScreen = () => {
                           }))
                         }
                         aria-label="Farbe wählen"
+                        style={{ width: '60px', height: '40px' }}
                       />
                     </div>
-                    <div className={styles.tagRowActions}>
+                    <div style={{ display: 'flex', gap: '4px' }}>
                       <Button type="button" variant="secondary" onClick={() => handleUpdateTag(tag)}>
                         Speichern
                       </Button>
                       <Button type="button" variant="ghost" onClick={() => handleDeleteTag(tag.id)}>
-                        Entfernen
+                        Löschen
                       </Button>
                     </div>
                   </div>
@@ -367,7 +379,7 @@ export const AdminTagsScreen = () => {
             </div>
           </>
         ) : (
-          <p className={styles.notificationMeta}>Bitte wähle eine Kategorie aus, um Tags zu verwalten.</p>
+          <p style={{ color: 'var(--text-secondary)' }}>Bitte wähle eine Kategorie aus, um Tags zu verwalten.</p>
         )}
       </Card>
     </section>

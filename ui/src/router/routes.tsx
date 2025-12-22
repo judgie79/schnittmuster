@@ -9,6 +9,7 @@ import { EditPatternScreen } from '@/pages/EditPatternScreen'
 import { SearchScreen } from '@/pages/SearchScreen'
 import { SettingsScreen } from '@/pages/SettingsScreen'
 import { ProfileScreen } from '@/pages/ProfileScreen'
+import { TagsScreen } from '@/pages/TagsScreen'
 import { NotFoundScreen } from '@/pages/NotFoundScreen'
 import { PrivateRoute } from './PrivateRoute'
 import { AdminRoute } from './AdminRoute'
@@ -34,6 +35,7 @@ export const routes: RouteObject[] = [
           { path: '/patterns/search', element: <SearchScreen /> },
           { path: '/settings', element: <SettingsScreen /> },
           { path: '/profile', element: <ProfileScreen /> },
+          { path: '/tags', element: <TagsScreen /> },
           {
             element: <AdminRoute />,
             children: [

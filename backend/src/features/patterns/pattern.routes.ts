@@ -6,7 +6,6 @@ import { authenticate, AuthenticatedRequest } from "@middleware/auth";
 import { authorize } from "@middleware/authorization";
 import { validateRequest } from "@shared/validators/inputValidator";
 import { PatternRepository } from "@infrastructure/database/repositories/PatternRepository";
-import { tagProposalController } from "@features/tags/TagProposalController";
 
 const upload = multer({ storage: multer.memoryStorage() });
 const uploadFieldsHandler = upload.fields([
@@ -42,19 +41,6 @@ router.post(
   validateRequest,
   patternController.create
 );
-
-router.post(
-  "/:id/tag-proposals",
-  [
-    body("name").isString().isLength({ min: 2 }),
-    body("tagCategoryId").isUUID(),
-    body("colorHex").matches(/^#[0-9A-Fa-f]{6}$/),
-  ],
-  validateRequest,
-  tagProposalController.createForPattern
-);
-
-router.get("/:id/tag-proposals", tagProposalController.listForPattern);
 
 router.put(
   "/:id",

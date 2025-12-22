@@ -15,8 +15,8 @@
 - Storage: default in-memory with `setStorageAdapter` to override (old app sets AsyncStorage). Token keys: `schnittmuster.access_token`, `schnittmuster.refresh_token`.
 - API client: Axios with base URL (default `http://localhost:5001/api/v1`, settable via `setApiBaseUrl`); adds Authorization header from storage; has 401 interceptor to refresh tokens via `/auth/refresh` using stored refresh token.
 - Auth service: `/auth/login`, `/auth/register`, `/auth/logout`, `/auth/profile`; persists tokens on login/signup; removes tokens on logout.
-- Pattern service: list (`/patterns`, pagination/filters), get (`/patterns/:id`), create/update with FormData (upload progress optional), delete, assign/remove tags, tag proposals CRUD.
-- Tag service: tag categories CRUD, tags CRUD/search, proposals approve/reject; base endpoints `/tags/categories`, `/tags`, `/tags/search`, `/tags/proposals`.
+- Pattern service: list (`/patterns`, pagination/filters), get (`/patterns/:id`), create/update with FormData (upload progress optional), delete, assign/remove tags.
+- Tag service: tag categories CRUD, tags CRUD/search,  base endpoints `/tags/categories`, `/tags`, `/tags/search`.
 - Hooks:
   - `useAuth`: Keeps session via `getProfile`, exposes login/signup/logout mutations, `user`, `isAuthenticated`, `isLoading`, `error`.
   - `usePatterns(page?)`: React Query list; exposes `items`, `pagination`, `filters`, setters, and `mutate` helpers `create/update/remove`.
@@ -28,7 +28,6 @@
 ## Shared DTOs (shared-dtos)
 - `PatternDTO`: {id, name, description?, thumbnailUrl?, fileUrl?, status: draft|geplant|genaeht|getestet|archiviert, isFavorite, tags[], ownerId, createdAt, updatedAt, proposedTags?}.
 - `TagDTO`: {id, name, categoryId, categoryName, colorHex?, category?}; `TagCategoryDTO` includes tags list.
-- `PatternTagProposalDTO`: proposal metadata with status pending/approved/rejected.
 - `AuthTokenDTO` holds access/refresh info; `ApiResponse<T>` shape {success, data, message?, errors?}; pagination type: {page, pageSize, totalPages, totalItems}.
 
 ## New Expo App (apps/schnittmuster)

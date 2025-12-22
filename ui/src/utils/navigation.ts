@@ -20,6 +20,7 @@ export type NavItem = {
 
 export const BOTTOM_NAV_ITEMS: NavItem[] = [
   { path: '/dashboard', label: 'Schnittmuster', icon: '📂' },
+  { path: '/tags', label: 'Tags', icon: '🏷️' },
   { path: '/patterns/search', label: 'Suche', icon: '🔍' },
   { path: '/patterns/new', label: 'Neu', icon: '➕' },
   { path: '/settings', label: 'Einstellungen', icon: '⚙️' },

@@ -15,9 +15,3 @@ export interface PatternListParams {
 export interface PatternRequestOptions {
   onUploadProgress?: (progress: number) => void;
 }
-
-export interface TagProposalPayload {
-  name: string;
-  tagCategoryId: string;
-  colorHex: string;
-}
