@@ -2,6 +2,8 @@ import { FindOptions, IncludeOptions, Op, WhereOptions } from "sequelize";
 import { Pattern, PatternCreationAttributes } from "@infrastructure/database/models/Pattern";
 import { Tag } from "@infrastructure/database/models/Tag";
 import { PatternNote } from "@infrastructure/database/models/PatternNote";
+import { PatternMeasurement } from "@infrastructure/database/models/PatternMeasurement";
+import { MeasurementType } from "@infrastructure/database/models/MeasurementType";
 import { NotFoundError } from "@shared/errors";
 import { buildPaginationMeta } from "@shared/utils/helpers";
 import { PaginatedResult } from "@shared/types";
@@ -153,7 +155,12 @@ export class PatternRepository {
   async getWithTags(id: string): Promise<Pattern | null> {
     return this.findById(id, {
       include: [
-        { model: Tag, as: "tags" }
+        { model: Tag, as: "tags" },
+        {
+          model: PatternMeasurement,
+          as: "measurements",
+          include: [{ model: MeasurementType, as: "measurementType" }],
+        },
       ],
     });
   }
@@ -163,6 +170,11 @@ export class PatternRepository {
       include: [
         { model: Tag, as: "tags" },
         { model: PatternNote, as: "notes" },
+        {
+          model: PatternMeasurement,
+          as: "measurements",
+          include: [{ model: MeasurementType, as: "measurementType" }],
+        },
       ],
     });
   }

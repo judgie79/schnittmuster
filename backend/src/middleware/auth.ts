@@ -7,6 +7,7 @@ import { AUTH_COOKIE_NAME } from "@features/auth/constants";
 
 export type AuthenticatedUser = {
   id: string;
+  username: string;
   email: string;
   provider: string;
   adminRole?: AdminRoleType | null;
@@ -45,7 +46,8 @@ export const authenticate: RequestHandler = (req: Request, _res: Response, next:
     }
     request.user = {
       id: String(payload.userId),
-      email: String(payload.sub),
+      username: String(payload.sub),
+      email: String(payload.username ?? payload.sub),
       provider: String(payload.provider ?? "local"),
       adminRole: (payload.adminRole as AdminRoleType | undefined) ?? undefined,
     };

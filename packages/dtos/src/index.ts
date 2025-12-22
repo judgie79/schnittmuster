@@ -6,6 +6,7 @@ export * from './TagDTO.js'
 export * from './RoleDTO.js'
 export * from './ResourceDTO.js'
 export * from './AuthDTO.js'
+export * from './MeasurementDTO.js'
 
 // Admin
 export * from './admin/AdminUserDTO.js'

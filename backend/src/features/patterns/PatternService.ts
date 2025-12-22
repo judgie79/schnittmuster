@@ -57,13 +57,16 @@ export class PatternService {
     file?: UploadedFile,
     thumbnail?: UploadedFile
   ): Promise<PatternDTO> {
-    const { tagIds, status, isFavorite, name, description } = payload as PatternCreateDTO & { isFavorite?: boolean };
+    const { tagIds, status, isFavorite, name, description, fabricRequirements } = payload as PatternCreateDTO & { isFavorite?: boolean };
     const data: PatternCreationAttributes = {
       userId,
       name,
       description: description ?? null,
       status: (status as PatternStatus) ?? "draft",
       isFavorite: isFavorite ?? false,
+      fabricWidth: fabricRequirements?.fabricWidth ?? null,
+      fabricLength: fabricRequirements?.fabricLength ?? null,
+      fabricType: fabricRequirements?.fabricType ?? null,
     };
 
     if (file) {
@@ -97,7 +100,7 @@ export class PatternService {
     }
     await this.assertPatternPermissions(pattern, userId, ["write"]);
 
-    const { tagIds, status, isFavorite, name, description } = payload;
+    const { tagIds, status, isFavorite, name, description, fabricRequirements } = payload;
     const data: Partial<Pattern> = {};
     if (typeof name !== "undefined") {
       data.name = name;
@@ -110,6 +113,11 @@ export class PatternService {
     }
     if (typeof isFavorite !== "undefined") {
       data.isFavorite = isFavorite;
+    }
+    if (typeof fabricRequirements !== "undefined") {
+      data.fabricWidth = fabricRequirements?.fabricWidth ?? null;
+      data.fabricLength = fabricRequirements?.fabricLength ?? null;
+      data.fabricType = fabricRequirements?.fabricType ?? null;
     }
     if (file) {
       const existingFileId = this.getStoredFileIdentifier(pattern);

@@ -1,5 +1,6 @@
 import type { ISODateString, UUID } from './types.js'
 import type { TagDTO } from './TagDTO.js'
+import type { PatternMeasurementDTO, FabricRequirementsDTO } from './MeasurementDTO.js'
 
 //export type PatternStatus = 'draft' | 'geplant' | 'genaeht' | 'getestet' | 'archiviert'
 
@@ -21,6 +22,8 @@ export interface PatternDTO {
   status: PatternStatus
   isFavorite: boolean
   tags: TagDTO[]
+  measurements?: PatternMeasurementDTO[]
+  fabricRequirements?: FabricRequirementsDTO
   ownerId: UUID
   createdAt: ISODateString
   updatedAt: ISODateString
@@ -33,6 +36,7 @@ export interface PatternCreateDTO {
   fileUrl?: string
   status?: PatternStatus
   isFavorite?: boolean
+  fabricRequirements?: FabricRequirementsDTO
 }
 
 export interface PatternUpdateDTO {
@@ -42,4 +46,5 @@ export interface PatternUpdateDTO {
   fileUrl?: string
   status?: PatternStatus
   isFavorite?: boolean
+  fabricRequirements?: FabricRequirementsDTO
 }

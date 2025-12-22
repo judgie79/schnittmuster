@@ -12,11 +12,14 @@ export interface PatternAttributes {
   fileStorageId: string | null;
   status: PatternStatus;
   isFavorite: boolean;
+  fabricWidth: number | null;
+  fabricLength: number | null;
+  fabricType: string | null;
   createdAt?: Date;
   updatedAt?: Date;
 }
 
-export type PatternCreationAttributes = Optional<PatternAttributes, "id" | "description" | "filePath" | "thumbnailPath" | "fileStorageId" | "status" | "isFavorite">;
+export type PatternCreationAttributes = Optional<PatternAttributes, "id" | "description" | "filePath" | "thumbnailPath" | "fileStorageId" | "status" | "isFavorite" | "fabricWidth" | "fabricLength" | "fabricType">;
 
 export class Pattern
   extends Model<PatternAttributes, PatternCreationAttributes>
@@ -31,6 +34,9 @@ export class Pattern
   public fileStorageId!: string | null;
   public status!: PatternStatus;
   public isFavorite!: boolean;
+  public fabricWidth!: number | null;
+  public fabricLength!: number | null;
+  public fabricType!: string | null;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 }
@@ -80,6 +86,21 @@ Pattern.init(
       allowNull: false,
       defaultValue: false,
       field: "is_favorite",
+    },
+    fabricWidth: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: true,
+      field: "fabric_width",
+    },
+    fabricLength: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: true,
+      field: "fabric_length",
+    },
+    fabricType: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+      field: "fabric_type",
     },
   },
   {

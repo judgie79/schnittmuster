@@ -5,6 +5,7 @@ import patternsRoutes from "./patterns.routes";
 import tagsRoutes from "./tags.routes";
 import adminRoutes from "./admin.routes";
 import filesRoutes from "./files.routes";
+import measurementRoutes from "@features/measurements/measurement.routes";
 
 export function setupRoutes(app: Express): void {
   const apiPrefix = environment.apiPrefix;
@@ -14,6 +15,7 @@ export function setupRoutes(app: Express): void {
   app.use(`${apiPrefix}/tags`, tagsRoutes);
   app.use(`${apiPrefix}/admin`, adminRoutes);
   app.use(`${apiPrefix}/files`, filesRoutes);
+  app.use(apiPrefix, measurementRoutes);
 
   // Health check
   app.get(`${apiPrefix}/health`, (req, res) => {

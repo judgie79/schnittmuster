@@ -15,6 +15,8 @@ import { SystemSetting } from "./SystemSetting";
 import { AdminActionLog } from "./AdminActionLog";
 import { AdminNotification } from "./AdminNotification";
 import { FlaggedContent } from "./FlaggedContent";
+import { MeasurementType } from "./MeasurementType";
+import { PatternMeasurement } from "./PatternMeasurement";
 
 export const models = {
   User,
@@ -34,6 +36,8 @@ export const models = {
   AdminActionLog,
   AdminNotification,
   FlaggedContent,
+  MeasurementType,
+  PatternMeasurement,
 };
 
 export function applyAssociations(): void {
@@ -64,6 +68,15 @@ export function applyAssociations(): void {
 
   Pattern.belongsTo(FileStorage, { foreignKey: "fileStorageId", as: "fileStorage" });
   FileStorage.hasOne(Pattern, { foreignKey: "fileStorageId", as: "pattern" });
+
+  MeasurementType.belongsTo(User, { foreignKey: "userId", as: "user" });
+  User.hasMany(MeasurementType, { foreignKey: "userId", as: "measurementTypes" });
+
+  Pattern.hasMany(PatternMeasurement, { foreignKey: "patternId", as: "measurements" });
+  PatternMeasurement.belongsTo(Pattern, { foreignKey: "patternId", as: "pattern" });
+
+  MeasurementType.hasMany(PatternMeasurement, { foreignKey: "measurementTypeId", as: "patternMeasurements" });
+  PatternMeasurement.belongsTo(MeasurementType, { foreignKey: "measurementTypeId", as: "measurementType" });
 
   User.belongsToMany(Role, { through: UserRole, as: "roles", foreignKey: "userId", otherKey: "roleId" });
   Role.belongsToMany(User, { through: UserRole, as: "users", foreignKey: "roleId", otherKey: "userId" });
