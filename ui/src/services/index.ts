@@ -1,5 +1,11 @@
 // Re-export core services
-export { apiClient, authService, patternService, tagService } from '@schnittmuster/core'
+export { 
+  apiClient, 
+  authService, 
+  patternService, 
+  tagService, 
+  measurementService 
+} from '@schnittmuster/core'
 export type { PatternRequestOptions } from '@schnittmuster/core'
 
 // UI-specific services

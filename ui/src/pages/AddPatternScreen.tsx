@@ -4,8 +4,10 @@ import { PatternForm } from '@/components/features/PatternForm/PatternForm'
 import { Loader } from '@/components/common/Loader'
 import { useGlobalContext } from '@/context'
 import { usePatterns, useTags } from '@/hooks'
+import { measurementService } from '@/services'
 import type { PatternFormValues } from '@schnittmuster/core'
 import { buildPatternFormData } from '@schnittmuster/core'
+import type { MeasurementSelection } from '@/components/features/MeasurementSelector'
 import { createToast } from '@/utils'
 import styles from './Page.module.css'
 
@@ -19,7 +21,7 @@ export const AddPatternScreen = () => {
   const [formKey, setFormKey] = useState(0)
   const [uploadProgress, setUploadProgress] = useState<number | null>(null)
 
-  const handleSubmit = async (values: PatternFormValues) => {
+  const handleSubmit = async (values: PatternFormValues, measurements: MeasurementSelection[]) => {
     setSubmitError(null)
     setUploadProgress(0)
     const formData = buildPatternFormData(values)
@@ -28,6 +30,21 @@ export const AddPatternScreen = () => {
       const createdPattern = await mutate.create(formData, {
         onUploadProgress: (progress) => setUploadProgress(progress),
       })
+      
+      // Add measurements to the pattern if any were selected
+      if (createdPattern?.id && measurements.length > 0) {
+        await Promise.all(
+          measurements.map((measurement) =>
+            measurementService.addPatternMeasurement(createdPattern.id, {
+              measurementTypeId: measurement.measurementType.id,
+              value: measurement.value,
+              notes: measurement.notes,
+              isRequired: measurement.isRequired,
+            })
+          )
+        )
+      }
+      
       dispatch({ type: 'ADD_TOAST', payload: createToast('Schnittmuster gespeichert', 'success') })
       setFormKey((key) => key + 1)
       setUploadProgress(null)

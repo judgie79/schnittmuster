@@ -10,6 +10,7 @@ import { SearchScreen } from '@/pages/SearchScreen'
 import { SettingsScreen } from '@/pages/SettingsScreen'
 import { ProfileScreen } from '@/pages/ProfileScreen'
 import { TagsScreen } from '@/pages/TagsScreen'
+import { MeasurementsScreen } from '@/pages/MeasurementsScreen'
 import { NotFoundScreen } from '@/pages/NotFoundScreen'
 import { PrivateRoute } from './PrivateRoute'
 import { AdminRoute } from './AdminRoute'
@@ -36,6 +37,7 @@ export const routes: RouteObject[] = [
           { path: '/settings', element: <SettingsScreen /> },
           { path: '/profile', element: <ProfileScreen /> },
           { path: '/tags', element: <TagsScreen /> },
+          { path: '/measurements', element: <MeasurementsScreen /> },
           {
             element: <AdminRoute />,
             children: [

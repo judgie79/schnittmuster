@@ -1,0 +1,45 @@
+.container {
+  margin-top: 24px;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.description {
+  color: var(--text-secondary);
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label span {
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.input {
+  padding: 10px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.2s;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}

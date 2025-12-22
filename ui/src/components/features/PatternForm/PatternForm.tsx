@@ -2,22 +2,24 @@ import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { Button } from '@/components/common/Button'
 import { FileUpload } from '@/components/features/FileUpload/FileUpload'
 import { TagSelector } from '@/components/features/TagSelector/TagSelector'
-import { useProtectedFile } from '@/hooks'
-import { resolveAssetUrl } from '@/utils/url'
+import { MeasurementSelector, type MeasurementSelection } from '@/components/features/MeasurementSelector'
+import { useProtectedFile, useMeasurementTypes } from '@/hooks'
+import { FabricRequirements } from '@/components/features/FabricRequirements'
 import type { PatternFormValues } from '@schnittmuster/core'
-import { fileService, STATUS_LABELS } from '@schnittmuster/core'
-import type { TagCategoryDTO, TagDTO } from '@schnittmuster/dtos'
+import { fileService, STATUS_LABELS, resolveAssetUrl } from '@schnittmuster/core'
+import type { TagCategoryDTO, TagDTO, FabricRequirementsDTO } from '@schnittmuster/dtos'
 import { PatternStatus } from '@schnittmuster/dtos'
 import styles from './PatternForm.module.css'
 
 export interface PatternFormProps {
   initialValues?: Partial<PatternFormValues>
   initialTags?: TagDTO[]
+  initialMeasurements?: MeasurementSelection[]
   tagCategories: TagCategoryDTO[]
   areTagsLoading?: boolean
   existingThumbnailUrl?: string
   existingFileUrl?: string
-  onSubmit: (values: PatternFormValues) => void | Promise<void>
+  onSubmit: (values: PatternFormValues, measurements: MeasurementSelection[]) => void | Promise<void>
   submitLabel?: string
   isSubmitting?: boolean
   errorMessage?: string | null
@@ -35,6 +37,7 @@ const DEFAULT_VALUES: PatternFormValues = {
   thumbnail: null,
   tagIds: [],
   notes: '',
+  fabricRequirements: undefined,
 }
 
 const getFileNameFromPath = (path?: string): string | null => {
@@ -49,6 +52,7 @@ const getFileNameFromPath = (path?: string): string | null => {
 export const PatternForm = ({
   initialValues,
   initialTags = [],
+  initialMeasurements = [],
   tagCategories,
   areTagsLoading = false,
   existingThumbnailUrl,
@@ -63,6 +67,7 @@ export const PatternForm = ({
 }: PatternFormProps) => {
   const mergedInitial = useMemo(() => ({ ...DEFAULT_VALUES, ...initialValues }), [initialValues])
   const maxFileSizeMB = Math.round(maxFileSizeBytes / (1024 * 1024))
+  const { measurementTypes, isLoading: areMeasurementsLoading } = useMeasurementTypes()
 
   const [name, setName] = useState(mergedInitial.name)
   const [description, setDescription] = useState(mergedInitial.description ?? '')
@@ -72,6 +77,8 @@ export const PatternForm = ({
   const [patternFile, setPatternFile] = useState<File | null>(mergedInitial.file ?? null)
   const [thumbnail, setThumbnail] = useState<File | null>(mergedInitial.thumbnail ?? null)
   const [selectedTags, setSelectedTags] = useState<TagDTO[]>(initialTags)
+  const [selectedMeasurements, setSelectedMeasurements] = useState<MeasurementSelection[]>(initialMeasurements)
+  const [fabricRequirements, setFabricRequirements] = useState<FabricRequirementsDTO | undefined | undefined>(mergedInitial.fabricRequirements)
   const [localError, setLocalError] = useState<string | null>(null)
   const [fileSeed, setFileSeed] = useState(0)
   const [isOpeningExistingFile, setIsOpeningExistingFile] = useState(false)
@@ -120,6 +127,7 @@ export const PatternForm = ({
     if (!existingFileUrl || isOpeningExistingFile) {
       return
     }
+
     const resolvedUrl = resolveAssetUrl(existingFileUrl)
     if (!resolvedUrl) {
       setExistingFileError('Datei nicht verfügbar.')
@@ -169,7 +177,8 @@ export const PatternForm = ({
       file: patternFile,
       thumbnail,
       tagIds: selectedTags.map((tag) => tag.id),
-    })
+      fabricRequirements,
+    }, selectedMeasurements)
   }
 
   return (
@@ -246,6 +255,18 @@ export const PatternForm = ({
         <span className={styles.sectionTitle}>Kategorien & Tags</span>
         <TagSelector categories={tagCategories} selected={selectedTags} onToggle={toggleTag} isLoading={areTagsLoading} />
       </div>
+
+      <MeasurementSelector
+        measurementTypes={measurementTypes}
+        selectedMeasurements={selectedMeasurements}
+        onChange={setSelectedMeasurements}
+        isLoading={areMeasurementsLoading}
+      />
+
+      <FabricRequirements
+        fabricRequirements={fabricRequirements}
+        onChange={setFabricRequirements}
+      />
 
       {localError ? <p className={styles.error}>{localError}</p> : null}
       {errorMessage ? <p className={styles.error}>{errorMessage}</p> : null}

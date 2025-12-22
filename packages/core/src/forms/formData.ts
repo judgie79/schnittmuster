@@ -27,5 +27,18 @@ export const buildPatternFormData = (values: PatternFormValues) => {
     formData.append('tagIds', JSON.stringify(values.tagIds))
   }
 
+  if (values.fabricRequirements) {
+    const fabricReqs = values.fabricRequirements
+    if (fabricReqs.fabricWidth !== undefined) {
+      formData.append('fabricWidth', String(fabricReqs.fabricWidth))
+    }
+    if (fabricReqs.fabricLength !== undefined) {
+      formData.append('fabricLength', String(fabricReqs.fabricLength))
+    }
+    if (fabricReqs.fabricType) {
+      formData.append('fabricType', fabricReqs.fabricType)
+    }
+  }
+
   return formData
 }

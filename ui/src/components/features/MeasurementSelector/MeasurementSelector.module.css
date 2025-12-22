@@ -1,0 +1,218 @@
+.container {
+  margin-top: 24px;
+}
+
+.header h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.description {
+  color: var(--text-secondary);
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.helper {
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+/* Selected Measurements Section */
+.selectedSection {
+  margin-top: 20px;
+  padding: 16px;
+  border: 2px solid var(--primary-color);
+  border-radius: 8px;
+  background-color: var(--background-secondary);
+}
+
+.selectedSection h4 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.selectedList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.selectedItem {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background-color: var(--background-primary);
+}
+
+.measurementInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.measurementHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.unit {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.measurementInputs {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.inputGroup span {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.input {
+  padding: 8px 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.checkbox input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.removeButton {
+  align-self: flex-start;
+}
+
+/* Available Measurements Section */
+.availableSection {
+  margin-top: 24px;
+}
+
+.availableSection h4 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.categorySection {
+  margin-bottom: 16px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.categoryHeader {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: var(--background-secondary);
+  border: none;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.categoryHeader:hover {
+  background-color: var(--background-tertiary);
+}
+
+.categoryName {
+  font-weight: 600;
+}
+
+.categoryCount {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.measurementGrid {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+
+.measurementCard {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background-color: var(--background-primary);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.measurementCard:hover {
+  border-color: var(--primary-color);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.measurementCardSelected {
+  border-color: var(--primary-color);
+  background-color: var(--background-secondary);
+}
+
+.measurementCardContent {
+  flex: 1;
+}
+
+.measurementCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.unitBadge {
+  padding: 2px 8px;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 4px;
+  background-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+.measurementDescription {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.addButton {
+  width: 100%;
+}

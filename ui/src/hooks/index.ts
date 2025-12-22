@@ -1,5 +1,15 @@
 // Re-export core hooks (including usePatterns)
-export { useAuth, usePattern, usePatterns, useTags, useAllTags } from '@schnittmuster/core'
+export { 
+  useAuth, 
+  usePattern, 
+  usePatterns, 
+  useTags, 
+  useAllTags,
+  useMeasurementTypes,
+  useSystemDefaultMeasurements,
+  useUserCustomMeasurements,
+  usePatternMeasurements
+} from '@schnittmuster/core'
 
 // UI-specific hooks
 export * from './useSearch'

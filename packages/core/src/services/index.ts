@@ -3,3 +3,4 @@ export * from './auth';
 export * from './patterns';
 export * from './tags';
 export * from './files';
+export * from './measurements';

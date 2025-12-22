@@ -5,7 +5,7 @@ import { useAuthStore, getContrastColor, fileService } from '@schnittmuster/core
 import { Button } from '@/components/common/Button'
 import { Loader } from '@/components/common/Loader'
 import { Badge } from '@/components/common/Badge'
-import { usePattern, useProtectedFile } from '@/hooks'
+import { usePattern, useProtectedFile, usePatternMeasurements } from '@/hooks'
 import { useGlobalContext } from '@/context'
 import { patternPrinter, type PatternPrintRenderer } from '@/services'
 import { createToast } from '@/utils'
@@ -28,6 +28,7 @@ export const PatternDetailScreen = () => {
   const navigate = useNavigate()
   const { dispatch } = useGlobalContext()
   const { user } = useAuthStore()
+  const { measurements: patternMeasurements } = usePatternMeasurements(patternId)
   const { data, isLoading, error } = usePattern(patternId)
   const { url: thumbnailBlobUrl } = useProtectedFile(data?.thumbnailUrl)
   const [fileMimeType, setFileMimeType] = useState<string | null>(null)
@@ -201,6 +202,83 @@ export const PatternDetailScreen = () => {
           )}
         </div>
       </div>
+
+      {/* Measurements Section */}
+      {patternMeasurements.length > 0 && (
+        <div className={styles.tagSection}>
+          <h3>Maßangaben</h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {patternMeasurements.map((measurement) => (
+              <div
+                key={measurement.id}
+                style={{
+                  padding: '12px',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: '8px',
+                  backgroundColor: 'var(--background-secondary)',
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
+                  <div>
+                    <strong>{measurement.measurementType.name}</strong>
+                    {measurement.value && (
+                      <span style={{ marginLeft: '8px', color: 'var(--text-secondary)' }}>
+                        {measurement.value} {measurement.measurementType.unit}
+                      </span>
+                    )}
+                    {measurement.isRequired && (
+                      <span style={{ marginLeft: '8px', fontSize: '11px', padding: '2px 8px', backgroundColor: 'var(--border-color)', borderRadius: '4px' }}>
+                        Erforderlich
+                      </span>
+                    )}
+                  </div>
+                </div>
+                {measurement.notes && (
+                  <p style={{ marginTop: '8px', fontSize: '14px', color: 'var(--text-secondary)' }}>
+                    {measurement.notes}
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Fabric Requirements Section */}
+      {data.fabricRequirements && (
+        <div className={styles.tagSection}>
+          <h3>Stoffbedarf</h3>
+          <div
+            style={{
+              padding: '16px',
+              border: '1px solid var(--border-color)',
+              borderRadius: '8px',
+              backgroundColor: 'var(--background-secondary)',
+            }}
+          >
+            <div style={{ display: 'grid', gap: '12px', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>
+              {data.fabricRequirements.fabricWidth && (
+                <div>
+                  <strong style={{ display: 'block', marginBottom: '4px' }}>Stoffbreite</strong>
+                  <span>{data.fabricRequirements.fabricWidth} cm</span>
+                </div>
+              )}
+              {data.fabricRequirements.fabricLength && (
+                <div>
+                  <strong style={{ display: 'block', marginBottom: '4px' }}>Stofflänge</strong>
+                  <span>{data.fabricRequirements.fabricLength} cm</span>
+                </div>
+              )}
+              {data.fabricRequirements.fabricType && (
+                <div>
+                  <strong style={{ display: 'block', marginBottom: '4px' }}>Stoffart</strong>
+                  <span>{data.fabricRequirements.fabricType}</span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className={styles.printControls}>
         <label htmlFor={scaleInputId}>

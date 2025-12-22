@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Directory, File, Paths } from 'expo-file-system'
-import { resolveAssetUrl, STORAGE_KEYS, getStorage, parseFileName } from '@schnittmuster/core'
+import { resolveAssetUrl, fileService  } from '@schnittmuster/core'
 
 export interface PatternFileHandle {
   uri: string
@@ -42,10 +42,10 @@ const ensureDirectory = () => {
 
 const downloadPatternFile = async (fileUrl: string): Promise<PatternFileHandle> => {
   const resolvedUrl = resolveAssetUrl(fileUrl) ?? fileUrl
-  const headers = await buildAuthHeaders()
+  const headers = await fileService.buildAuthHeaders()
   const directory = ensureDirectory()
-  const metadata = await fetchRemoteMetadata(resolvedUrl, headers)
-  const fallbackName = sanitizeFileName(metadata.fileName ?? guessFileNameFromUrl(resolvedUrl))
+  const metadata = await fileService.getMetadata(resolvedUrl, headers)
+  const fallbackName = fileService.sanitizeFileName(metadata.fileName ?? fileService.guessFileNameFromUrl(resolvedUrl))
   const uniquePart = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`
   const storageName = `${uniquePart}-${fallbackName}`
   const destination = new File(directory, storageName)
@@ -58,7 +58,7 @@ const downloadPatternFile = async (fileUrl: string): Promise<PatternFileHandle> 
   return {
     uri: downloadedFile.uri,
     contentUri: downloadedFile.contentUri ?? null,
-    fileName: metadata.fileName ? sanitizeFileName(metadata.fileName) : fallbackName,
+    fileName: metadata.fileName ? fileService.sanitizeFileName(metadata.fileName) : fallbackName,
     mimeType: metadata.mimeType ?? downloadedFile.type ?? null,
   }
 }

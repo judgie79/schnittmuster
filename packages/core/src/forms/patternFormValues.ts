@@ -1,4 +1,5 @@
 import { PatternStatus } from "@schnittmuster/dtos";
+import type { FabricRequirementsDTO } from "@schnittmuster/dtos";
 
 export interface PatternFormValues {
   name: string
@@ -9,4 +10,5 @@ export interface PatternFormValues {
   thumbnail?: File | null
   tagIds: string[]
   notes?: string
+  fabricRequirements?: FabricRequirementsDTO
 }

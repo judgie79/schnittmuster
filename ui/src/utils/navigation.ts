@@ -5,6 +5,8 @@ export const ROUTE_TITLES: Record<string, string> = {
   '/patterns/search': 'Suche & Filter',
   '/settings': 'Einstellungen',
   '/profile': 'Profil',
+  '/tags': 'Tags',
+  '/measurements': 'Maßangaben',
   '/admin': 'Admin Dashboard',
   '/admin/users': 'Admin Nutzerverwaltung',
   '/admin/settings': 'Systemeinstellungen',
@@ -21,6 +23,7 @@ export type NavItem = {
 export const BOTTOM_NAV_ITEMS: NavItem[] = [
   { path: '/dashboard', label: 'Schnittmuster', icon: '📂' },
   { path: '/tags', label: 'Tags', icon: '🏷️' },
+  { path: '/measurements', label: 'Maße', icon: '📏' },
   { path: '/patterns/search', label: 'Suche', icon: '🔍' },
   { path: '/patterns/new', label: 'Neu', icon: '➕' },
   { path: '/settings', label: 'Einstellungen', icon: '⚙️' },

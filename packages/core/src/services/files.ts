@@ -53,23 +53,6 @@ export const fileService = {
     return headers
   },
 
-  async fetchRemoteMetadata(url: string, headers: Record<string, string>) {
-    try {
-      const response = await fetch(url, {
-        method: 'HEAD',
-        headers,
-      })
-      if (!response.ok) {
-        return { mimeType: null, fileName: null }
-      }
-      const mimeType = response.headers.get('content-type')
-      const fileName = this.parseFileName(response.headers.get('content-disposition'))
-      return { mimeType: mimeType ?? null, fileName }
-    } catch {
-      return { mimeType: null, fileName: null }
-    }
-  },
-
   getExtension(input?: string | null) {
     if (!input) {
       return undefined
