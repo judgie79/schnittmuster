@@ -17,7 +17,9 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "db:migrate": "sequelize-cli db:migrate",
-    "db:seed": "sequelize-cli db:seed:all"
+    "db:seed": "sequelize-cli db:seed:all",
+    "schema:generate": "ts-node -r tsconfig-paths/register src/scripts/generate-sqlite-schema.ts > docs/mobile-schema.sql",
+    "schema:export": "ts-node -r tsconfig-paths/register src/scripts/export-schema-json.ts"
   },
   "dependencies": {
     "aws-sdk": "^2.1539.0",

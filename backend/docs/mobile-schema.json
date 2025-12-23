@@ -1,0 +1,434 @@
+{
+  "version": "1.0.0",
+  "generatedAt": "2025-12-22T23:57:46.332Z",
+  "tables": {
+    "Pattern": {
+      "tableName": "patterns",
+      "modelName": "Pattern",
+      "fields": [
+        {
+          "name": "id",
+          "dbColumnName": "id",
+          "type": "UUID",
+          "nullable": true,
+          "primaryKey": true,
+          "defaultValue": {}
+        },
+        {
+          "name": "userId",
+          "dbColumnName": "user_id",
+          "type": "UUID",
+          "nullable": false,
+          "primaryKey": false
+        },
+        {
+          "name": "name",
+          "dbColumnName": "name",
+          "type": "STRING",
+          "nullable": false,
+          "primaryKey": false
+        },
+        {
+          "name": "description",
+          "dbColumnName": "description",
+          "type": "TEXT",
+          "nullable": true,
+          "primaryKey": false
+        },
+        {
+          "name": "filePath",
+          "dbColumnName": "file_path",
+          "type": "STRING",
+          "nullable": true,
+          "primaryKey": false
+        },
+        {
+          "name": "thumbnailPath",
+          "dbColumnName": "thumbnail_path",
+          "type": "STRING",
+          "nullable": true,
+          "primaryKey": false
+        },
+        {
+          "name": "fileStorageId",
+          "dbColumnName": "file_storage_id",
+          "type": "UUID",
+          "nullable": true,
+          "primaryKey": false
+        },
+        {
+          "name": "status",
+          "dbColumnName": "status",
+          "type": "ENUM",
+          "nullable": false,
+          "primaryKey": false,
+          "defaultValue": "draft",
+          "enumValues": [
+            "draft",
+            "geplant",
+            "genaeht",
+            "getestet",
+            "archiviert"
+          ]
+        },
+        {
+          "name": "isFavorite",
+          "dbColumnName": "is_favorite",
+          "type": "BOOLEAN",
+          "nullable": false,
+          "primaryKey": false,
+          "defaultValue": false
+        },
+        {
+          "name": "fabricWidth",
+          "dbColumnName": "fabric_width",
+          "type": "DECIMAL",
+          "nullable": true,
+          "primaryKey": false
+        },
+        {
+          "name": "fabricLength",
+          "dbColumnName": "fabric_length",
+          "type": "DECIMAL",
+          "nullable": true,
+          "primaryKey": false
+        },
+        {
+          "name": "fabricType",
+          "dbColumnName": "fabric_type",
+          "type": "STRING",
+          "nullable": true,
+          "primaryKey": false
+        },
+        {
+          "name": "createdAt",
+          "dbColumnName": "created_at",
+          "type": "DATE",
+          "nullable": false,
+          "primaryKey": false
+        },
+        {
+          "name": "updatedAt",
+          "dbColumnName": "updated_at",
+          "type": "DATE",
+          "nullable": false,
+          "primaryKey": false
+        }
+      ],
+      "timestamps": true
+    },
+    "Tag": {
+      "tableName": "tags",
+      "modelName": "Tag",
+      "fields": [
+        {
+          "name": "id",
+          "dbColumnName": "id",
+          "type": "UUID",
+          "nullable": true,
+          "primaryKey": true,
+          "defaultValue": {}
+        },
+        {
+          "name": "name",
+          "dbColumnName": "name",
+          "type": "STRING",
+          "nullable": false,
+          "primaryKey": false
+        },
+        {
+          "name": "colorHex",
+          "dbColumnName": "color_hex",
+          "type": "STRING",
+          "nullable": false,
+          "primaryKey": false,
+          "validation": {
+            "is": {}
+          }
+        },
+        {
+          "name": "tagCategoryId",
+          "dbColumnName": "tag_category_id",
+          "type": "UUID",
+          "nullable": false,
+          "primaryKey": false
+        },
+        {
+          "name": "createdAt",
+          "dbColumnName": "created_at",
+          "type": "DATE",
+          "nullable": false,
+          "primaryKey": false
+        },
+        {
+          "name": "updatedAt",
+          "dbColumnName": "updated_at",
+          "type": "DATE",
+          "nullable": false,
+          "primaryKey": false
+        }
+      ],
+      "timestamps": true
+    },
+    "TagCategory": {
+      "tableName": "tag_categories",
+      "modelName": "TagCategory",
+      "fields": [
+        {
+          "name": "id",
+          "dbColumnName": "id",
+          "type": "UUID",
+          "nullable": true,
+          "primaryKey": true,
+          "defaultValue": {}
+        },
+        {
+          "name": "name",
+          "dbColumnName": "name",
+          "type": "STRING",
+          "nullable": false,
+          "primaryKey": false
+        },
+        {
+          "name": "displayOrder",
+          "dbColumnName": "display_order",
+          "type": "INTEGER",
+          "nullable": false,
+          "primaryKey": false,
+          "defaultValue": 0
+        },
+        {
+          "name": "userId",
+          "dbColumnName": "user_id",
+          "type": "UUID",
+          "nullable": false,
+          "primaryKey": false
+        },
+        {
+          "name": "createdAt",
+          "dbColumnName": "created_at",
+          "type": "DATE",
+          "nullable": false,
+          "primaryKey": false
+        },
+        {
+          "name": "updatedAt",
+          "dbColumnName": "updated_at",
+          "type": "DATE",
+          "nullable": false,
+          "primaryKey": false
+        }
+      ],
+      "timestamps": true
+    },
+    "MeasurementType": {
+      "tableName": "measurement_types",
+      "modelName": "MeasurementType",
+      "fields": [
+        {
+          "name": "id",
+          "dbColumnName": "id",
+          "type": "UUID",
+          "nullable": true,
+          "primaryKey": true,
+          "defaultValue": {}
+        },
+        {
+          "name": "userId",
+          "dbColumnName": "user_id",
+          "type": "UUID",
+          "nullable": true,
+          "primaryKey": false
+        },
+        {
+          "name": "name",
+          "dbColumnName": "name",
+          "type": "STRING",
+          "nullable": false,
+          "primaryKey": false
+        },
+        {
+          "name": "description",
+          "dbColumnName": "description",
+          "type": "TEXT",
+          "nullable": true,
+          "primaryKey": false
+        },
+        {
+          "name": "unit",
+          "dbColumnName": "unit",
+          "type": "ENUM",
+          "nullable": false,
+          "primaryKey": false,
+          "defaultValue": "cm",
+          "enumValues": [
+            "cm",
+            "inch",
+            "mm"
+          ]
+        },
+        {
+          "name": "category",
+          "dbColumnName": "category",
+          "type": "ENUM",
+          "nullable": false,
+          "primaryKey": false,
+          "defaultValue": "custom",
+          "enumValues": [
+            "body",
+            "garment",
+            "custom"
+          ]
+        },
+        {
+          "name": "isSystemDefault",
+          "dbColumnName": "is_system_default",
+          "type": "BOOLEAN",
+          "nullable": false,
+          "primaryKey": false,
+          "defaultValue": false
+        },
+        {
+          "name": "displayOrder",
+          "dbColumnName": "display_order",
+          "type": "INTEGER",
+          "nullable": false,
+          "primaryKey": false,
+          "defaultValue": 0
+        },
+        {
+          "name": "createdAt",
+          "dbColumnName": "created_at",
+          "type": "DATE",
+          "nullable": false,
+          "primaryKey": false
+        },
+        {
+          "name": "updatedAt",
+          "dbColumnName": "updated_at",
+          "type": "DATE",
+          "nullable": false,
+          "primaryKey": false
+        }
+      ],
+      "timestamps": true
+    },
+    "PatternMeasurement": {
+      "tableName": "pattern_measurements",
+      "modelName": "PatternMeasurement",
+      "fields": [
+        {
+          "name": "id",
+          "dbColumnName": "id",
+          "type": "UUID",
+          "nullable": true,
+          "primaryKey": true,
+          "defaultValue": {}
+        },
+        {
+          "name": "patternId",
+          "dbColumnName": "pattern_id",
+          "type": "UUID",
+          "nullable": false,
+          "primaryKey": false
+        },
+        {
+          "name": "measurementTypeId",
+          "dbColumnName": "measurement_type_id",
+          "type": "UUID",
+          "nullable": false,
+          "primaryKey": false
+        },
+        {
+          "name": "value",
+          "dbColumnName": "value",
+          "type": "DECIMAL",
+          "nullable": true,
+          "primaryKey": false
+        },
+        {
+          "name": "notes",
+          "dbColumnName": "notes",
+          "type": "TEXT",
+          "nullable": true,
+          "primaryKey": false
+        },
+        {
+          "name": "isRequired",
+          "dbColumnName": "is_required",
+          "type": "BOOLEAN",
+          "nullable": false,
+          "primaryKey": false,
+          "defaultValue": false
+        },
+        {
+          "name": "createdAt",
+          "dbColumnName": "created_at",
+          "type": "DATE",
+          "nullable": false,
+          "primaryKey": false
+        },
+        {
+          "name": "updatedAt",
+          "dbColumnName": "updated_at",
+          "type": "DATE",
+          "nullable": false,
+          "primaryKey": false
+        }
+      ],
+      "timestamps": true
+    },
+    "PatternNote": {
+      "tableName": "pattern_notes",
+      "modelName": "PatternNote",
+      "fields": [
+        {
+          "name": "id",
+          "dbColumnName": "id",
+          "type": "UUID",
+          "nullable": true,
+          "primaryKey": true,
+          "defaultValue": {}
+        },
+        {
+          "name": "patternId",
+          "dbColumnName": "pattern_id",
+          "type": "UUID",
+          "nullable": false,
+          "primaryKey": false
+        },
+        {
+          "name": "noteText",
+          "dbColumnName": "note_text",
+          "type": "TEXT",
+          "nullable": false,
+          "primaryKey": false
+        },
+        {
+          "name": "createdAt",
+          "dbColumnName": "created_at",
+          "type": "DATE",
+          "nullable": false,
+          "primaryKey": false
+        },
+        {
+          "name": "updatedAt",
+          "dbColumnName": "updated_at",
+          "type": "DATE",
+          "nullable": false,
+          "primaryKey": false
+        }
+      ],
+      "timestamps": true
+    }
+  },
+  "junctionTables": [
+    {
+      "tableName": "pattern_tags",
+      "fields": [
+        "pattern_id",
+        "tag_id"
+      ]
+    }
+  ]
+}
